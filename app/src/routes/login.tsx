@@ -1,5 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { supabase } from '../lib/supabase'
+import { SocialButtons } from '../components/SocialButtons'
 
 export const Route = createFileRoute('/login')({
   component: Login,
@@ -31,6 +32,7 @@ function Login() {
         <input name="email" type="email" placeholder="Email" className="demo-input mb-4" required />
         <input name="password" type="password" placeholder="Contraseña" className="demo-input mb-4" required />
         <button type="submit" className="demo-button w-full">Entrar</button>
+        <SocialButtons />
       </form>
     </div>
   )

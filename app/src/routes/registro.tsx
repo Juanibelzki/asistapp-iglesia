@@ -1,5 +1,6 @@
 import { createFileRoute, redirect } from '@tanstack/react-router'
 import { supabase } from '../lib/supabase'
+import { SocialButtons } from '../components/SocialButtons'
 
 export const Route = createFileRoute('/registro')({
   component: Registro,
@@ -24,7 +25,9 @@ function Registro() {
     })
     if (authError) return alert(authError.message)
     if (!authData.user) return
-
+    
+    // ... (rest of the logic remains the same)
+    
     // 2. Crear Organización
     const { data: org, error: orgError } = await supabase
       .from('organizations')
@@ -57,7 +60,9 @@ function Registro() {
         <input name="password" type="password" placeholder="Contraseña" className="demo-input mb-4" required />
         <input name="org_name" placeholder="Nombre de tu iglesia" className="demo-input mb-4" required />
         <button type="submit" className="demo-button w-full">Crear cuenta</button>
+        <SocialButtons />
       </form>
     </div>
   )
 }
+
