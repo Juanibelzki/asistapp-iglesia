@@ -1,5 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router'
+import ThemeToggle from '../components/ThemeToggle'
 import { QrCode, ShieldCheck, WifiOff, BarChart3, ArrowRight, Check } from 'lucide-react'
+import logo from '../assets/logo.png'
 
 export const Route = createFileRoute('/')({
   component: LandingPage,
@@ -9,6 +11,19 @@ function LandingPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-emerald-500 selection:text-zinc-950 pb-16">
       
+      {/* 0. HEADER */}
+      <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-zinc-950/70 backdrop-blur-md">
+        <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
+          <div className="flex items-center gap-2">
+            <img src={logo} alt="AsistApp Logo" className="w-8 h-8 rounded-lg" />
+            <span className="font-mono font-bold tracking-wider text-lg">AsistApp</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <ThemeToggle />
+          </div>
+        </div>
+      </header>
+
       {/* 1. HERO SECTION */}
       <section className="max-w-4xl mx-auto px-6 pt-16 pb-12 text-center space-y-8">
         <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
