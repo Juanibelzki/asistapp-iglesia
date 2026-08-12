@@ -1,4 +1,4 @@
-import { createFileRoute, redirect } from '@tanstack/react-router'
+import { createFileRoute, redirect, Link } from '@tanstack/react-router'
 import { supabase } from '../lib/supabase'
 import { SocialButtons } from '../components/SocialButtons'
 
@@ -26,8 +26,6 @@ function Registro() {
     if (authError) return alert(authError.message)
     if (!authData.user) return
     
-    // ... (rest of the logic remains the same)
-    
     // 2. Crear Organización
     const { data: org, error: orgError } = await supabase
       .from('organizations')
@@ -52,15 +50,18 @@ function Registro() {
   }
 
   return (
-    <div className="demo-center">
-      <form onSubmit={registrar} className="demo-panel w-full max-w-sm">
-        <h1 className="demo-title mb-6">Registro</h1>
-        <input name="full_name" placeholder="Nombre completo" className="demo-input mb-4" required />
-        <input name="email" type="email" placeholder="Email" className="demo-input mb-4" required />
-        <input name="password" type="password" placeholder="Contraseña" className="demo-input mb-4" required />
-        <input name="org_name" placeholder="Nombre de tu iglesia" className="demo-input mb-4" required />
-        <button type="submit" className="demo-button w-full">Crear cuenta</button>
+    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-6">
+      <form onSubmit={registrar} className="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl w-full max-w-md shadow-2xl">
+        <h1 className="text-2xl font-bold text-white mb-6 tracking-tight">Registro</h1>
+        <input name="full_name" placeholder="Nombre completo" className="w-full px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-white mb-4 focus:outline-none focus:border-emerald-500" required />
+        <input name="email" type="email" placeholder="Email" className="w-full px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-white mb-4 focus:outline-none focus:border-emerald-500" required />
+        <input name="password" type="password" placeholder="Contraseña" className="w-full px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-white mb-4 focus:outline-none focus:border-emerald-500" required />
+        <input name="org_name" placeholder="Nombre de tu iglesia" className="w-full px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-white mb-6 focus:outline-none focus:border-emerald-500" required />
+        <button type="submit" className="w-full bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold py-3 rounded-xl transition-all active:scale-95">Crear cuenta</button>
         <SocialButtons />
+        <div className="text-center mt-6 text-sm text-zinc-400">
+          ¿Ya tienes cuenta? <Link to="/login" className="text-emerald-400 hover:underline">Inicia Sesión</Link>
+        </div>
       </form>
     </div>
   )
