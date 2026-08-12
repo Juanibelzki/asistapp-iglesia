@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EscanearRouteImport } from './routes/escanear'
@@ -21,6 +22,11 @@ import { Route as ConfiguracionSuscripcionRouteImport } from './routes/configura
 import { Route as EventosEventIdAsistenciaRouteImport } from './routes/eventos.$eventId.asistencia'
 import { Route as EventosEventIdQrRouteImport } from './routes/eventos.$eventId.qr'
 
+const IndexRoute = IndexRouteImport.update({
+  id: '/',
+  path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -80,6 +86,7 @@ const EventosEventIdQrRoute = EventosEventIdQrRouteImport.update({
 } as any)
 
 export interface FileRoutesByFullPath {
+  '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/dashboard': typeof DashboardRoute
   '/escanear': typeof EscanearRoute
@@ -93,6 +100,7 @@ export interface FileRoutesByFullPath {
   '/eventos/$eventId/qr': typeof EventosEventIdQrRoute
 }
 export interface FileRoutesByTo {
+  '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/dashboard': typeof DashboardRoute
   '/escanear': typeof EscanearRoute
@@ -107,6 +115,7 @@ export interface FileRoutesByTo {
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
+  '/': typeof IndexRoute
   '/about': typeof AboutRoute
   '/dashboard': typeof DashboardRoute
   '/escanear': typeof EscanearRoute
@@ -122,6 +131,7 @@ export interface FileRoutesById {
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
+    | '/'
     | '/about'
     | '/dashboard'
     | '/escanear'
@@ -135,6 +145,7 @@ export interface FileRouteTypes {
     | '/eventos/$eventId/qr'
   fileRoutesByTo: FileRoutesByTo
   to:
+    | '/'
     | '/about'
     | '/dashboard'
     | '/escanear'
@@ -148,6 +159,7 @@ export interface FileRouteTypes {
     | '/eventos/$eventId/qr'
   id:
     | '__root__'
+    | '/'
     | '/about'
     | '/dashboard'
     | '/escanear'
@@ -162,6 +174,7 @@ export interface FileRouteTypes {
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
+  IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
   DashboardRoute: typeof DashboardRoute
   EscanearRoute: typeof EscanearRoute
@@ -175,6 +188,13 @@ export interface RootRouteChildren {
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/': {
+      id: '/'
+      path: '/'
+      fullPath: '/'
+      preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -269,6 +289,7 @@ const EventosRouteWithChildren =
   EventosRoute._addFileChildren(EventosRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
+  IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
   DashboardRoute: DashboardRoute,
   EscanearRoute: EscanearRoute,
