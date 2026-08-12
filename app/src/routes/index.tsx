@@ -15,8 +15,7 @@ function LandingPage() {
       <header className="sticky top-0 z-50 w-full border-b border-white/10 bg-zinc-950/70 backdrop-blur-md">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
           <div className="flex items-center gap-2">
-            <img src={logo} alt="AsistApp Logo" className="w-8 h-8 rounded-lg" />
-            <span className="font-mono font-bold tracking-wider text-lg">AsistApp</span>
+            <img src={logo} alt="AsistApp Logo" className="w-10 h-10 rounded-full" />
           </div>
           <div className="flex items-center gap-4">
             <ThemeToggle />
