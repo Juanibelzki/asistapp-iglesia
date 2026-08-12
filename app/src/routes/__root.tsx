@@ -17,7 +17,17 @@ export const Route = createRootRoute({
       { charSet: 'utf-8' },
       { name: 'viewport', content: 'width=device-width, initial-scale=1, viewport-fit=cover' },
       { name: 'theme-color', content: '#FFFFFF' },
-      { title: 'AsistApp Iglesia' },
+      { title: 'AsistApp — Control de Asistencia y Gestión Infantil para Iglesias' },
+      { name: 'description', content: 'Plataforma SaaS para el registro rápido de asistencia con código QR, gestión de niños y seguridad en iglesias.' },
+      // OpenGraph
+      { property: 'og:title', content: 'AsistApp — Control de Asistencia y Gestión Infantil para Iglesias' },
+      { property: 'og:description', content: 'Plataforma SaaS para el registro rápido de asistencia con código QR, gestión de niños y seguridad en iglesias.' },
+      { property: 'og:type', content: 'website' },
+      { property: 'og:site_name', content: 'AsistApp' },
+      // Twitter
+      { name: 'twitter:card', content: 'summary_large_image' },
+      { name: 'twitter:title', content: 'AsistApp — Control de Asistencia y Gestión Infantil para Iglesias' },
+      { name: 'twitter:description', content: 'Plataforma SaaS para el registro rápido de asistencia con código QR, gestión de niños y seguridad en iglesias.' },
     ],
     links: [
       { rel: 'stylesheet', href: appCss },
