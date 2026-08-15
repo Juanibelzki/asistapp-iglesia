@@ -180,7 +180,7 @@ function RegistroPage() {
   };
 
   const inputClass =
-    'w-full bg-zinc-900/90 border border-zinc-800 text-zinc-100 rounded-xl px-4 py-3 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all placeholder:text-zinc-600';
+    'w-full bg-zinc-900/90 border border-zinc-800 text-zinc-100 rounded-xl px-4 py-3 text-base focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all placeholder:text-zinc-600';
 
   if (loading) {
     return (
@@ -193,7 +193,7 @@ function RegistroPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans">
-      <main className="flex-1 w-full max-w-md mx-auto p-4 md:p-6 space-y-6 pb-10">
+      <main className="flex-1 w-full max-w-md mx-auto px-4 sm:px-6 space-y-6 pb-10">
         {/* CABECERA DE IGLESIA */}
         <div className="flex flex-col items-center text-center gap-3 pt-6">
           {selectedChurch?.logo_url ? (

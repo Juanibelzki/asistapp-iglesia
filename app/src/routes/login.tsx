@@ -115,13 +115,13 @@ function Login() {
   }
 
   const inputClass =
-    'w-full px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-white focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-zinc-600'
+    'w-full px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-white text-base focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-zinc-600'
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center p-6">
+    <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-4 sm:px-6">
       <form
         onSubmit={login}
-        className="bg-zinc-900 border border-zinc-800 p-8 rounded-3xl w-full max-w-md shadow-2xl shadow-black/40"
+        className="bg-zinc-900 border border-zinc-800 p-6 sm:p-8 rounded-3xl w-full max-w-md shadow-2xl shadow-black/40"
       >
         <div className="flex flex-col items-center text-center mb-6">
           <div className="w-14 h-14 rounded-2xl bg-emerald-500 flex items-center justify-center text-zinc-950 font-black text-xl mb-4 shadow-lg shadow-emerald-500/20">

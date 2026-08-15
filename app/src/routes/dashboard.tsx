@@ -520,7 +520,7 @@ function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
-      <header className="sticky top-0 z-40 backdrop-blur-md bg-zinc-950/80 border-b border-zinc-800/80 px-6 py-4">
+      <header className="sticky top-0 z-40 backdrop-blur-md bg-zinc-950/80 border-b border-zinc-800/80 px-4 py-3 sm:px-6 sm:py-4">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-zinc-950 font-black text-lg shadow-lg shadow-emerald-500/20 shrink-0">
@@ -574,7 +574,7 @@ function DashboardPage() {
         </div>
       </header>
 
-      <main className="max-w-7xl mx-auto p-6 space-y-8">
+      <main className="max-w-7xl mx-auto px-4 py-6 sm:p-6 space-y-8">
       {/* Invitación al equipo */}
       <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl">
         <div className="flex flex-wrap items-center justify-between gap-4">
@@ -607,7 +607,7 @@ function DashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
         <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl hover:border-zinc-700/60 transition-all shadow-sm">
           <p className="text-zinc-400 text-xs uppercase flex items-center gap-2">
             <Users className="w-3.5 h-3.5" /> Congregados
