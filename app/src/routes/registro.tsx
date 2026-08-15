@@ -8,9 +8,10 @@ export const Route = createFileRoute('/registro')({
 
 type StudentStage = 'niño' | 'adolescente' | 'adulto';
 
-interface OrgInfo {
+interface ChurchInfo {
   id: string;
   name: string;
+  address?: string | null;
   logo_url?: string | null;
   motto?: string | null;
 }
@@ -39,7 +40,11 @@ function RegistroPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [submitting, setSubmitting] = useState(false);
-  const [org, setOrg] = useState<OrgInfo | null>(null);
+  const [churches, setChurches] = useState<ChurchInfo[]>([]);
+  const [selectedChurch, setSelectedChurch] = useState<ChurchInfo | null>(null);
+  const [selectedChurchId, setSelectedChurchId] = useState('');
+  const [churchQuery, setChurchQuery] = useState('');
+  const [churchOpen, setChurchOpen] = useState(false);
   const [form, setForm] = useState<RegisterForm>(EMPTY_FORM);
   const [formError, setFormError] = useState('');
   const [success, setSuccess] = useState(false);
@@ -47,48 +52,70 @@ function RegistroPage() {
   useEffect(() => {
     let isMounted = true;
 
-    async function loadOrg() {
+    async function loadChurches() {
       try {
         const params = new URLSearchParams(window.location.search);
         const orgParam = params.get('org');
 
-        let orgQuery = supabase.from('organizations').select('id, name, logo_url, motto');
+        const { data, error } = await supabase
+          .from('organizations')
+          .select('id, name, address, logo_url, motto')
+          .order('name', { ascending: true });
+
+        if (error) throw error;
+        if (!isMounted) return;
+
+        const list = (data ?? []) as ChurchInfo[];
+        setChurches(list);
 
         if (orgParam) {
-          orgQuery = orgQuery.eq('id', orgParam);
-        } else {
-          orgQuery = orgQuery.limit(1);
-        }
-
-        const { data, error } = await orgQuery.maybeSingle();
-
-        if (data && isMounted) {
-          setOrg(data as OrgInfo);
-        } else if (error && error.code === 'PGRST204') {
-          const { data: fallback, error: fallbackError } = await supabase
-            .from('organizations')
-            .select('id, name, motto')
-            .limit(1)
-            .maybeSingle();
-          if (fallback && isMounted) setOrg(fallback as OrgInfo);
-          if (fallbackError && isMounted) setFormError('No se pudo cargar la organización.');
-        } else if (error && isMounted) {
-          setFormError('No se pudo cargar la organización.');
+          const match = list.find((c) => c.id === orgParam);
+          if (match) {
+            setSelectedChurch(match);
+            setSelectedChurchId(match.id);
+            setChurchQuery(match.name + (match.address ? ` · ${match.address}` : ''));
+          }
         }
       } catch (err) {
-        console.error('Error al cargar organización:', err);
-        if (isMounted) setFormError('Error de conexión. Intenta nuevamente.');
+        console.error('Error al cargar iglesias:', err);
+        if (isMounted) setFormError('No se pudo cargar la lista de iglesias. Intenta nuevamente.');
       } finally {
         if (isMounted) setLoading(false);
       }
     }
 
-    loadOrg();
+    loadChurches();
 
     return () => {
       isMounted = false;
     };
   }, []);
+
+  const churchDisplay = (c: ChurchInfo) => c.name + (c.address ? ` · ${c.address}` : '');
+
+  const selectChurch = (c: ChurchInfo) => {
+    setSelectedChurch(c);
+    setSelectedChurchId(c.id);
+    setChurchQuery(churchDisplay(c));
+    setChurchOpen(false);
+  };
+
+  const handleQueryChange = (v: string) => {
+    setChurchQuery(v);
+    if (selectedChurch && v.trim() !== churchDisplay(selectedChurch)) {
+      setSelectedChurch(null);
+      setSelectedChurchId('');
+    }
+    setChurchOpen(true);
+  };
+
+  const q = churchQuery.trim().toLowerCase();
+  const isSelectedText = !!selectedChurch && q === churchDisplay(selectedChurch).toLowerCase();
+  const filteredChurches = !q || isSelectedText
+    ? churches.slice(0, 8)
+    : churches
+        .filter((c) => c.name.toLowerCase().includes(q) || (c.address || '').toLowerCase().includes(q))
+        .slice(0, 8);
 
   const setField = <K extends keyof RegisterForm>(key: K, value: RegisterForm[K]) => {
     setForm((f) => ({ ...f, [key]: value }));
@@ -98,8 +125,8 @@ function RegistroPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!org) {
-      setFormError('No se pudo identificar la organización. Intenta recargar la página.');
+    if (!selectedChurchId || !selectedChurch) {
+      setFormError('Seleccioná tu iglesia / congregación para continuar.');
       return;
     }
     if (!form.first_name.trim() || !form.last_name.trim()) {
@@ -121,7 +148,7 @@ function RegistroPage() {
       const generatedQr = crypto.randomUUID();
 
       const { error } = await supabase.from('congregados').insert({
-        organization_id: org.id,
+        organization_id: selectedChurchId,
         first_name: form.first_name.trim(),
         last_name: form.last_name.trim(),
         phone: form.phone.trim(),
@@ -165,20 +192,22 @@ function RegistroPage() {
       <main className="flex-1 w-full max-w-md mx-auto p-4 md:p-6 space-y-6 pb-10">
         {/* CABECERA DE IGLESIA */}
         <div className="flex flex-col items-center text-center gap-3 pt-6">
-          {org?.logo_url ? (
+          {selectedChurch?.logo_url ? (
             <img
-              src={org.logo_url}
+              src={selectedChurch.logo_url}
               alt="Logo de la iglesia"
               className="w-16 h-16 rounded-2xl object-cover border border-zinc-700 bg-zinc-900"
             />
           ) : (
             <div className="w-16 h-16 rounded-2xl bg-emerald-500 flex items-center justify-center text-zinc-950 font-black text-2xl shadow-lg shadow-emerald-500/20">
-              {(org?.name || 'A').charAt(0).toUpperCase()}
+              {(selectedChurch?.name || 'A').charAt(0).toUpperCase()}
             </div>
           )}
           <div>
-            <h1 className="text-xl font-extrabold text-white tracking-tight">{org?.name || 'Mi Iglesia'}</h1>
-            {org?.motto && <p className="text-sm text-zinc-400 mt-1">{org.motto}</p>}
+            <h1 className="text-xl font-extrabold text-white tracking-tight">
+              {selectedChurch?.name || 'Seleccioná tu Iglesia'}
+            </h1>
+            {selectedChurch?.motto && <p className="text-sm text-zinc-400 mt-1">{selectedChurch.motto}</p>}
           </div>
         </div>
 
@@ -206,6 +235,64 @@ function RegistroPage() {
             <form onSubmit={handleSubmit} className="space-y-5">
               <h2 className="font-bold text-white text-center">Auto-Inscripción</h2>
 
+              {/* SELECTOR DE IGLESIA */}
+              <div className="relative">
+                <label className="block text-xs font-semibold text-zinc-400 mb-1.5">
+                  Seleccioná tu Iglesia / Congregación *
+                </label>
+                <input
+                  type="text"
+                  value={churchQuery}
+                  onChange={(e) => handleQueryChange(e.target.value)}
+                  onFocus={() => setChurchOpen(true)}
+                  onBlur={() => setTimeout(() => setChurchOpen(false), 150)}
+                  placeholder="Escribí el nombre de tu iglesia o dirección..."
+                  className={inputClass}
+                  autoFocus
+                  required
+                />
+                {selectedChurch && (
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setSelectedChurch(null);
+                      setSelectedChurchId('');
+                      setChurchQuery('');
+                      setChurchOpen(true);
+                    }}
+                    className="absolute right-3 top-9 text-zinc-500 hover:text-zinc-300 transition"
+                    aria-label="Quitar iglesia seleccionada"
+                  >
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+
+                {churchOpen && (
+                  <div className="absolute z-20 mt-2 w-full bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl shadow-black/50 max-h-64 overflow-y-auto">
+                    {filteredChurches.length === 0 ? (
+                      <p className="px-4 py-3 text-xs text-zinc-500">
+                        Sin resultados para "{churchQuery}".
+                      </p>
+                    ) : (
+                      filteredChurches.map((c) => (
+                        <button
+                          key={c.id}
+                          type="button"
+                          onMouseDown={(e) => e.preventDefault()}
+                          onClick={() => selectChurch(c)}
+                          className="w-full text-left px-4 py-3 hover:bg-zinc-800 transition border-b border-zinc-800/60 last:border-0"
+                        >
+                          <p className="text-sm font-semibold text-white">{c.name}</p>
+                          {c.address && <p className="text-[11px] text-zinc-500 mt-0.5">{c.address}</p>}
+                        </button>
+                      ))
+                    )}
+                  </div>
+                )}
+              </div>
+
               <div>
                 <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Nombre *</label>
                 <input
@@ -214,7 +301,6 @@ function RegistroPage() {
                   onChange={(e) => setField('first_name', e.target.value)}
                   placeholder="Ej: María"
                   className={inputClass}
-                  autoFocus
                   required
                 />
               </div>
