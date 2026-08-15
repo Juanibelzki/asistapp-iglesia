@@ -38,6 +38,7 @@ function AsistenciaPage() {
   const [toast, setToast] = useState<ToastState | null>(null);
 
   const [scannerRunning, setScannerRunning] = useState(false);
+  const [scannerStarting, setScannerStarting] = useState(false);
   const [scannerError, setScannerError] = useState('');
   const [processing, setProcessing] = useState(false);
 
@@ -177,10 +178,13 @@ function AsistenciaPage() {
       setScannerError('Seleccioná un evento antes de iniciar el escáner.');
       return;
     }
-    if (scannerRunning) return;
+    if (scannerRunning || scannerStarting) return;
 
     setScannerError('');
     setProcessing(false);
+    setScannerStarting(true);
+
+    await new Promise<void>((resolve) => requestAnimationFrame(() => resolve()));
 
     const scanner = new Html5Qrcode(QR_READER_ID);
     scannerRef.current = scanner;
@@ -267,6 +271,8 @@ function AsistenciaPage() {
         'No se pudo iniciar la cámara. Verificá los permisos del navegador o usá un dispositivo con cámara.'
       );
       scannerRef.current = null;
+    } finally {
+      setScannerStarting(false);
     }
   };
 
@@ -339,6 +345,13 @@ function AsistenciaPage() {
             )}
           </div>
 
+          <div
+            id={QR_READER_ID}
+            className={`w-full max-w-sm mx-auto rounded-2xl overflow-hidden border-2 border-emerald-500/50 bg-zinc-950 ${
+              scannerRunning || scannerStarting ? '' : 'hidden'
+            }`}
+          />
+
           {!scannerRunning ? (
             <div className="flex flex-col items-center gap-3 py-6">
               <div className="w-14 h-14 rounded-2xl bg-zinc-950 border border-zinc-800 flex items-center justify-center text-zinc-500">
@@ -361,21 +374,15 @@ function AsistenciaPage() {
               </button>
             </div>
           ) : (
-            <div className="flex flex-col gap-4">
-              <div
-                id={QR_READER_ID}
-                className="w-full max-w-sm mx-auto rounded-2xl overflow-hidden border-2 border-emerald-500/50 bg-zinc-950"
-              />
-              <button
-                onClick={stopScanner}
-                className="mx-auto px-5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-sm transition flex items-center gap-2"
-              >
-                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                </svg>
-                Apagar Cámara
-              </button>
-            </div>
+            <button
+              onClick={stopScanner}
+              className="mx-auto px-5 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-sm transition flex items-center gap-2"
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+              </svg>
+              Apagar Cámara
+            </button>
           )}
 
           {scannerError && (
