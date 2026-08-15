@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { readLocalSession, clearLocalSessions } from '../lib/session';
+import { exportAttendanceReport } from '../lib/export';
 import { CalendarDays, Users, GraduationCap, Plus, CheckCircle2, Pencil, Trash2, Eraser, ChevronDown, CalendarCheck, LayoutGrid, Link2 } from 'lucide-react';
 
 export const Route = createFileRoute('/dashboard')({
@@ -61,6 +62,7 @@ function DashboardPage() {
   const [successMsg, setSuccessMsg] = useState('');
   const [expandedPrograms, setExpandedPrograms] = useState<Record<string, boolean>>({});
   const [copiedStaffLink, setCopiedStaffLink] = useState(false);
+  const [exportingAttendance, setExportingAttendance] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -228,6 +230,14 @@ function DashboardPage() {
     clearLocalSessions();
     await supabase.auth.signOut();
     navigate({ to: '/login' });
+  };
+
+  const handleExportAttendance = async () => {
+    if (!profile?.orgId || exportingAttendance) return;
+    setExportingAttendance(true);
+    const now = new Date();
+    await exportAttendanceReport(profile.orgId, now.getMonth(), now.getFullYear());
+    setExportingAttendance(false);
   };
 
   const staffLink = profile ? `${window.location.origin}/registerstaff?org=${profile.orgId}` : '';
@@ -688,7 +698,14 @@ function DashboardPage() {
       <div className="bg-zinc-900 rounded-2xl border border-zinc-800 overflow-hidden">
         <div className="p-6 border-b border-zinc-800 flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-bold">Próximos Eventos</h2>
-          <div className="flex items-center gap-2">
+          <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
+            <button
+              onClick={handleExportAttendance}
+              disabled={exportingAttendance}
+              className="w-full sm:w-auto text-xs bg-zinc-800 text-zinc-200 px-3 py-1.5 rounded-lg flex items-center justify-center gap-1 font-semibold transition hover:bg-zinc-700 disabled:opacity-60 disabled:cursor-not-allowed"
+            >
+              📊 {exportingAttendance ? 'Exportando…' : 'Exportar Asistencias'}
+            </button>
             {events.length > 0 && (
               <button
                 onClick={handleCleanupPast}

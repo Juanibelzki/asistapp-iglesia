@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { readLocalSession } from '../lib/session';
+import { exportAttendanceReport } from '../lib/export';
 import { QRCodeSVG } from 'qrcode.react';
 
 export const Route = createFileRoute('/congregados')({
@@ -68,6 +69,7 @@ function CongregadosPage() {
 
   const [qrMember, setQrMember] = useState<Congregado | null>(null);
   const [toast, setToast] = useState<ToastState | null>(null);
+  const [exportingAttendance, setExportingAttendance] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -152,6 +154,19 @@ function CongregadosPage() {
   const showToast = (message: string, type: ToastState['type'] = 'success') => {
     setToast({ message, type });
     setTimeout(() => setToast(null), 3500);
+  };
+
+  const handleExportAttendance = async () => {
+    if (!orgId || exportingAttendance) return;
+    setExportingAttendance(true);
+    const now = new Date();
+    const res = await exportAttendanceReport(orgId, now.getMonth(), now.getFullYear());
+    setExportingAttendance(false);
+    if (res.ok) {
+      showToast(res.count > 0 ? `${res.count} registros exportados.` : 'No hay asistencias registradas este mes.');
+    } else {
+      showToast(res.error || 'No se pudo exportar.', 'error');
+    }
   };
 
   const openModal = () => {
@@ -359,6 +374,17 @@ function CongregadosPage() {
             <p className="text-sm text-zinc-400 mt-1">Gestión integral de miembros y alumnos formativos de <span className="text-zinc-200 font-semibold">{churchName}</span></p>
           </div>
 
+          <div className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full sm:w-auto">
+          <button
+            onClick={handleExportAttendance}
+            disabled={exportingAttendance}
+            className="px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold text-sm transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+          >
+            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+            </svg>
+            <span>{exportingAttendance ? 'Exportando…' : 'Exportar Lista'}</span>
+          </button>
           <button
             onClick={openModal}
             className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-sm transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
@@ -368,6 +394,7 @@ function CongregadosPage() {
             </svg>
             <span>+ Registrar Congregado</span>
           </button>
+        </div>
         </div>
 
         {/* PESTAÑA PRINCIPAL: TODOS VS ALUMNOS */}
