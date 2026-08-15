@@ -22,14 +22,18 @@ function Registro() {
     const form = e.target as HTMLFormElement
     const { email, password, full_name, org_name } = Object.fromEntries(new FormData(form))
 
-    if (!email || !password || !full_name || !org_name) {
+    const emailStr = email as string
+    const fullName = full_name as string
+    const churchName = org_name as string
+
+    if (!emailStr || !password || !fullName || !churchName) {
       setErrorMsg('Por favor completa todos los campos.')
       return
     }
     
     // 1. Registro Auth
     const { data: authData, error: authError } = await supabase.auth.signUp({
-      email: email as string,
+      email: emailStr,
       password: password as string,
     })
     if (authError) {
@@ -41,14 +45,13 @@ function Registro() {
     // 2. RPC para registrar iglesia y perfil de manera atómica
     const { error: rpcError } = await supabase.rpc('register_church_admin', {
       p_auth_user_id: authData.user.id,
-      p_full_name: full_name as string,
-      p_email: email as string,
-      p_church_name: org_name as string
+      p_full_name: fullName,
+      p_email: emailStr,
+      p_church_name: churchName,
     })
 
     if (rpcError) {
       setErrorMsg(rpcError.message)
-      // Opcional: intentar eliminar el usuario si la RPC falla
       return
     }
 
