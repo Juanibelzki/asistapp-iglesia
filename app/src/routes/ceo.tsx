@@ -7,7 +7,7 @@ export const Route = createFileRoute('/ceo')({
 });
 
 const CEO_AUTH_KEY = 'asistapp_ceo_auth';
-const CEO_PIN = (import.meta.env.VITE_CEO_PIN as string | undefined) || '2026';
+const CEO_PIN = (import.meta.env.VITE_CEO_PIN as string | undefined) || '20446247205';
 const PIN_LENGTH = CEO_PIN.length;
 
 interface OrgRow {
