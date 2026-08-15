@@ -15,7 +15,7 @@ const config = defineConfig({
       rollupConfig: { external: [/^@sentry\//] },
       vercel: {
         functions: {
-          runtime: 'nodejs20.x',
+          runtime: 'nodejs22.x',
         },
       },
     }),
