@@ -1,5 +1,6 @@
+import { useEffect, useState } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
-import { motion } from 'framer-motion'
+import { AnimatePresence, motion } from 'framer-motion'
 import ThemeToggle from '../components/ThemeToggle'
 import { Reveal } from '../components/Reveal'
 import {
@@ -10,9 +11,7 @@ import {
   ArrowRight,
   Check,
   Church,
-  ScanLine,
   Play,
-  Sparkles,
   BadgeCheck,
   CircleCheck,
   AlertTriangle,
@@ -273,6 +272,122 @@ function ShowcaseBlock({ index, tag, icon: Icon, title, what, why, mockup }: Sho
   )
 }
 
+/* ---------- Phone Demo (ciclo escaneo -> check-in -> métricas) ---------- */
+
+type PhoneState = 'scan' | 'success' | 'metrics'
+
+function PhoneDemo() {
+  const [state, setState] = useState<PhoneState>('scan')
+
+  useEffect(() => {
+    const next: Record<PhoneState, PhoneState> = {
+      scan: 'success',
+      success: 'metrics',
+      metrics: 'scan',
+    }
+    const delay = state === 'scan' ? 2500 : state === 'success' ? 2000 : 1500
+    const t = setTimeout(() => setState(next[state]), delay)
+    return () => clearTimeout(t)
+  }, [state])
+
+  return (
+    <div className="relative mx-auto w-[300px] sm:w-[320px]">
+      {/* Glow detrás del teléfono */}
+      <div className="absolute -inset-10 bg-gradient-to-br from-emerald-500/20 to-indigo-500/20 blur-3xl rounded-full pointer-events-none" />
+
+      <div className="relative animate-float rounded-[40px] border border-white/15 bg-zinc-900/90 p-3 shadow-2xl shadow-black/60 backdrop-blur-xl">
+        {/* Dynamic Island */}
+        <div className="flex items-center justify-center pb-3">
+          <div className="w-28 h-6 rounded-full bg-black/90 border border-white/10 flex items-center justify-end pr-5">
+            <span className="w-2 h-2 rounded-full bg-zinc-800" />
+          </div>
+        </div>
+
+        {/* Pantalla */}
+        <div className="rounded-[28px] overflow-hidden bg-zinc-950 border border-white/5 aspect-[9/19] relative">
+          <AnimatePresence mode="wait">
+            {state === 'scan' && (
+              <motion.div
+                key="scan"
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.25 }}
+                className="absolute inset-0 flex flex-col items-center justify-center p-6"
+              >
+                <p className="text-[10px] font-mono uppercase tracking-widest text-zinc-500 mb-5">
+                  Escáner QR
+                </p>
+                <div className="relative w-40 h-40 overflow-hidden flex items-center justify-center">
+                  <div className="absolute inset-0 rounded-2xl border border-dashed border-emerald-400/40" />
+                  <FakeQr className="w-24 h-24" />
+                  <div className="absolute left-3 right-3 h-0.5 rounded-full bg-emerald-400/90 shadow-[0_0_12px_rgba(52,211,153,0.8)] animate-scanline" />
+                  <div className="absolute top-1.5 left-1.5 w-5 h-5 border-t-2 border-l-2 border-emerald-400/70 rounded-tl-lg" />
+                  <div className="absolute top-1.5 right-1.5 w-5 h-5 border-t-2 border-r-2 border-emerald-400/70 rounded-tr-lg" />
+                  <div className="absolute bottom-1.5 left-1.5 w-5 h-5 border-b-2 border-l-2 border-emerald-400/70 rounded-bl-lg" />
+                  <div className="absolute bottom-1.5 right-1.5 w-5 h-5 border-b-2 border-r-2 border-emerald-400/70 rounded-br-lg" />
+                </div>
+                <p className="mt-7 text-xs font-mono text-zinc-400 flex items-center gap-2">
+                  <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                  Escaneando…
+                </p>
+              </motion.div>
+            )}
+
+            {state === 'success' && (
+              <motion.div
+                key="success"
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                exit={{ opacity: 0, scale: 0.95 }}
+                transition={{ type: 'spring', stiffness: 220, damping: 18 }}
+                className="absolute inset-0 flex flex-col items-center justify-center p-6 text-center bg-emerald-500/5"
+              >
+                <motion.div
+                  initial={{ scale: 0 }}
+                  animate={{ scale: 1 }}
+                  transition={{ type: 'spring', stiffness: 260, damping: 16, delay: 0.15 }}
+                  className="w-16 h-16 rounded-full bg-emerald-500 flex items-center justify-center shadow-lg shadow-emerald-500/30"
+                >
+                  <Check className="w-8 h-8 text-zinc-950" strokeWidth={3} />
+                </motion.div>
+                <p className="mt-5 font-bold text-white text-sm">¡Asistencia Registrada!</p>
+                <p className="mt-1 text-xs text-zinc-400">Mateo Benítez · Salón Infantes</p>
+                <span className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-semibold">
+                  <ShieldCheck className="w-3.5 h-3.5" />
+                  Tutor: Carlos Benítez (DNI ***890)
+                </span>
+              </motion.div>
+            )}
+
+            {state === 'metrics' && (
+              <motion.div
+                key="metrics"
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0 }}
+                transition={{ duration: 0.3 }}
+                className="absolute inset-0 flex flex-col items-center justify-center p-6"
+              >
+                <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-4">
+                  <BarChart3 className="w-5 h-5" />
+                </div>
+                <p className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">
+                  Asistencia hoy
+                </p>
+                <p className="mt-1 text-2xl font-bold text-white">142 niños</p>
+                <span className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold font-mono">
+                  +1
+                </span>
+              </motion.div>
+            )}
+          </AnimatePresence>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 function LandingPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-emerald-500 selection:text-zinc-950 pb-16 overflow-x-hidden">
@@ -295,87 +410,62 @@ function LandingPage() {
       </header>
 
       {/* 1. HERO */}
-      <section className="max-w-4xl mx-auto px-6 pt-24 md:pt-32 pb-20 text-center space-y-10">
-        <Reveal variant="up">
-          <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
-            <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-            SaaS para Escuelas Dominicales y Ministerios
+      <section className="relative max-w-6xl mx-auto px-6 pt-24 md:pt-28 pb-24">
+        {/* Aurora Glow */}
+        <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
+          <div className="absolute -top-44 left-[6%] w-[620px] h-[620px] rounded-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-900/20 via-slate-900/10 to-transparent blur-3xl" />
+          <div className="absolute -top-24 right-[2%] w-[560px] h-[560px] rounded-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-900/10 to-transparent blur-3xl" />
+        </div>
+
+        <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-12 items-center">
+          {/* Columna texto */}
+          <div className="text-center lg:text-left space-y-8">
+            <Reveal variant="up">
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+                SaaS para Escuelas Dominicales y Ministerios
+              </div>
+            </Reveal>
+
+            <Reveal variant="up" delay={120}>
+              <h1 className="text-4xl md:text-5xl xl:text-6xl font-bold tracking-tight text-white leading-tight">
+                Gestión de asistencia y seguridad infantil para tu iglesia,{' '}
+                <span className="text-gradient">sin complicaciones.</span>
+              </h1>
+            </Reveal>
+
+            <Reveal variant="up" delay={240}>
+              <p className="text-lg text-zinc-400 max-w-xl mx-auto lg:mx-0 leading-relaxed">
+                Toma asistencia en segundos con código QR, protege el retiro de los niños con
+                validación de tutores y mantén informada a tu iglesia en tiempo real.
+              </p>
+            </Reveal>
+
+            <Reveal variant="up" delay={360}>
+              <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
+                <Link
+                  to="/registro"
+                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-emerald-400 text-zinc-950 font-mono font-bold text-xs uppercase tracking-widest hover:bg-emerald-300 transition-all duration-200 active:scale-95 shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2"
+                >
+                  Comenzar Prueba Gratis
+                  <ArrowRight className="w-4 h-4" />
+                </Link>
+                <Link
+                  to="/registro"
+                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-zinc-900/60 border border-white/10 text-zinc-300 font-mono font-bold text-xs uppercase tracking-widest hover:bg-zinc-800 hover:text-white hover:border-white/20 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 backdrop-blur-md"
+                >
+                  <Play className="w-4 h-4" />
+                  Ver Demostración
+                </Link>
+              </div>
+            </Reveal>
           </div>
-        </Reveal>
 
-        <Reveal variant="up" delay={120}>
-          <h1 className="text-4xl md:text-6xl font-bold tracking-tight text-white leading-tight">
-            Gestión de asistencia y seguridad infantil para tu iglesia,{' '}
-            <span className="text-gradient">sin complicaciones.</span>
-          </h1>
-        </Reveal>
-
-        <Reveal variant="up" delay={240}>
-          <p className="text-lg text-zinc-400 max-w-2xl mx-auto leading-relaxed">
-            Toma asistencia en segundos con código QR, protege el retiro de los niños con
-            validación de tutores y mantén informada a tu iglesia en tiempo real.
-          </p>
-        </Reveal>
-
-        <Reveal variant="up" delay={360}>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
-            <Link
-              to="/registro"
-              className="w-full sm:w-auto px-8 py-4 rounded-full bg-emerald-400 text-zinc-950 font-mono font-bold text-xs uppercase tracking-widest hover:bg-emerald-300 transition-all duration-200 active:scale-95 shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2"
-            >
-              Comenzar Prueba Gratis
-              <ArrowRight className="w-4 h-4" />
-            </Link>
-            <Link
-              to="/registro"
-              className="w-full sm:w-auto px-8 py-4 rounded-full bg-zinc-900/60 border border-white/10 text-zinc-300 font-mono font-bold text-xs uppercase tracking-widest hover:bg-zinc-800 hover:text-white hover:border-white/20 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 backdrop-blur-md"
-            >
-              <Play className="w-4 h-4" />
-              Ver Demostración
-            </Link>
-          </div>
-        </Reveal>
-
-        {/* Mockup / Preview */}
-        <Reveal variant="fade" delay={480}>
-          <div className="relative max-w-2xl mx-auto mt-8">
-            <div className="absolute -inset-6 bg-gradient-to-r from-emerald-500/20 to-indigo-500/20 blur-3xl rounded-3xl pointer-events-none" />
-            <div className="relative animate-float bg-zinc-900/90 border border-white/10 rounded-3xl p-6 backdrop-blur-xl shadow-2xl shadow-black/40 flex items-center gap-5 text-left">
-              <div className="bg-white rounded-2xl p-4 shrink-0 shadow-inner">
-                <QrCode className="w-20 h-20 text-zinc-900" />
-              </div>
-              <div className="min-w-0">
-                <p className="text-[11px] uppercase tracking-widest text-zinc-500 font-semibold">
-                  Iglesia Vida Nueva
-                </p>
-                <h3 className="text-xl font-bold text-white mt-1 truncate">María Gómez</h3>
-                <div className="mt-2 inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-semibold">
-                  <Sparkles className="w-3 h-3" /> Niño · Sala 3
-                </div>
-                <p className="text-xs text-zinc-400 mt-2 flex items-center gap-1.5">
-                  <ScanLine className="w-3.5 h-3.5 text-emerald-400" />
-                  Ingreso 10:02 · Tutor verificado
-                </p>
-              </div>
-            </div>
-
-            {/* Mini card flotante del escáner */}
-            <div className="absolute -right-4 -top-6 hidden sm:flex items-center gap-2 bg-zinc-900/90 border border-white/10 rounded-xl px-3 py-2 backdrop-blur-md shadow-xl animate-float-slow">
-              <div className="w-8 h-8 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
-                <ScanLine className="w-4 h-4" />
-              </div>
-              <span className="text-[11px] font-mono text-zinc-300">Escaneo en vivo</span>
-            </div>
-
-            {/* Mini card del dashboard */}
-            <div className="absolute -left-6 -bottom-6 hidden sm:flex items-center gap-2 bg-zinc-900/90 border border-white/10 rounded-xl px-3 py-2 backdrop-blur-md shadow-xl animate-float">
-              <div className="w-8 h-8 rounded-lg bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400">
-                <BarChart3 className="w-4 h-4" />
-              </div>
-              <span className="text-[11px] font-mono text-zinc-300">128 presentes hoy</span>
-            </div>
-          </div>
-        </Reveal>
+          {/* Columna mockup celular */}
+          <Reveal variant="right" delay={200}>
+            <PhoneDemo />
+          </Reveal>
+        </div>
       </section>
 
       {/* 2. FEATURE SHOWCASES (Zig-Zag) */}
