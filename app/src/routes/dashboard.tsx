@@ -24,9 +24,14 @@ interface EventItem {
 function DashboardPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState<{ fullName: string; churchName: string; orgId: string } | null>(null);
+  const [profile, setProfile] = useState<{ fullName: string; churchName: string; orgId: string; profileId: string } | null>(null);
   const [stats, setStats] = useState<DashboardStats>({ memberCount: 0, studentCount: 0, eventCount: 0 });
   const [events, setEvents] = useState<EventItem[]>([]);
+
+  const [isOpenModal, setIsOpenModal] = useState(false);
+  const [eventForm, setEventForm] = useState({ title: '', event_type: 'clase_sabado', event_date: '', start_time: '' });
+  const [savingEvent, setSavingEvent] = useState(false);
+  const [eventError, setEventError] = useState('');
 
   useEffect(() => {
     let isMounted = true;
@@ -44,7 +49,7 @@ function DashboardPage() {
 
         const { data: profileData } = await supabase
           .from('profiles')
-          .select('full_name, organization_id, organizations(name)')
+          .select('id, full_name, organization_id, organizations(name)')
           .eq('auth_user_id', session.user.id)
           .single();
 
@@ -56,6 +61,7 @@ function DashboardPage() {
             fullName: profileData.full_name || 'Admin',
             churchName: (profileData.organizations as any)?.name || 'Mi Iglesia',
             orgId,
+            profileId: profileData.id,
           });
         }
 
@@ -116,6 +122,69 @@ function DashboardPage() {
     navigate({ to: '/login' });
   };
 
+  const openEventModal = () => {
+    setEventForm({ title: '', event_type: 'clase_sabado', event_date: '', start_time: '' });
+    setEventError('');
+    setIsOpenModal(true);
+  };
+
+  const closeEventModal = () => {
+    setIsOpenModal(false);
+    setEventError('');
+  };
+
+  const handleCreateEvent = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!profile) {
+      setEventError('No se pudo determinar tu organización. Intenta recargar la página.');
+      return;
+    }
+    if (!eventForm.title.trim() || !eventForm.event_date) {
+      setEventError('Título y Fecha son obligatorios.');
+      return;
+    }
+
+    setSavingEvent(true);
+    setEventError('');
+    try {
+      const { error } = await supabase.from('events').insert({
+        organization_id: profile.orgId,
+        title: eventForm.title.trim(),
+        event_type: eventForm.event_type,
+        event_date: eventForm.event_date,
+        start_time: eventForm.start_time || null,
+        created_by: profile.profileId || null,
+      });
+      if (error) throw error;
+
+      const { data: eventData } = await supabase
+        .from('events')
+        .select('*')
+        .eq('organization_id', profile.orgId)
+        .order('event_date', { ascending: true })
+        .limit(5);
+
+      if (eventData) {
+        setEvents(
+          eventData.map((e) => ({
+            id: e.id,
+            title: e.title,
+            event_date: e.event_date,
+            start_time: e.start_time ?? null,
+            event_type: e.event_type,
+          })),
+        );
+        setStats((s) => ({ ...s, eventCount: eventData.length }));
+      }
+      closeEventModal();
+    } catch (err) {
+      console.error('Error al crear evento:', err);
+      setEventError(err instanceof Error ? err.message : 'Error al crear el evento.');
+    } finally {
+      setSavingEvent(false);
+    }
+  };
+
   const formatDate = (d: string) => {
     try {
       return new Date(d.length === 10 ? `${d}T00:00:00` : d).toLocaleDateString('es-ES', {
@@ -170,7 +239,7 @@ function DashboardPage() {
       <div className="bg-zinc-900 rounded-2xl border border-zinc-800 overflow-hidden">
         <div className="p-6 border-b border-zinc-800 flex justify-between items-center">
           <h2 className="font-bold">Próximos Eventos</h2>
-          <button className="text-xs bg-emerald-500 text-black px-3 py-1.5 rounded-lg flex items-center gap-1 font-bold">
+          <button onClick={openEventModal} className="text-xs bg-emerald-500 text-black px-3 py-1.5 rounded-lg flex items-center gap-1 font-bold">
             <Plus className="w-3 h-3" /> Nuevo Evento
           </button>
         </div>
@@ -181,7 +250,7 @@ function DashboardPage() {
             </div>
             <h3 className="font-bold text-white mb-1">Aún no hay eventos programados</h3>
             <p className="text-sm text-zinc-500 mb-6">Crea tu primer evento para comenzar a registrar asistencia con QR.</p>
-            <button className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-sm flex items-center gap-2 transition">
+            <button onClick={openEventModal} className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-sm flex items-center gap-2 transition">
               <Plus className="w-4 h-4" /> Nuevo Evento
             </button>
           </div>
@@ -208,6 +277,118 @@ function DashboardPage() {
           </table>
         )}
       </div>
+
+      {/* MODAL NUEVO EVENTO */}
+      {isOpenModal && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+          onClick={closeEventModal}
+        >
+          <div
+            className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl shadow-black/50"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
+              <h2 className="text-lg font-bold text-white">Nuevo Evento</h2>
+              <button
+                onClick={closeEventModal}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition"
+                aria-label="Cerrar"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateEvent} className="p-6 space-y-5">
+              <div>
+                <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Título *</label>
+                <input
+                  type="text"
+                  value={eventForm.title}
+                  onChange={(e) => setEventForm((f) => ({ ...f, title: e.target.value }))}
+                  placeholder="Ej: Clase de Escuela Sabática"
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/40 transition"
+                  required
+                />
+              </div>
+
+              <div>
+                <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Tipo</label>
+                <div className="grid grid-cols-2 gap-2">
+                  {(['clase_sabado', 'actividad_semana'] as const).map((type) => (
+                    <button
+                      key={type}
+                      type="button"
+                      onClick={() => setEventForm((f) => ({ ...f, event_type: type }))}
+                      className={`px-3 py-2 rounded-lg text-xs font-bold capitalize transition border ${
+                        eventForm.event_type === type
+                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                          : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-zinc-200 hover:border-zinc-700'
+                      }`}
+                    >
+                      {type.replace('_', ' ')}
+                    </button>
+                  ))}
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Fecha *</label>
+                  <input
+                    type="date"
+                    value={eventForm.event_date}
+                    onChange={(e) => setEventForm((f) => ({ ...f, event_date: e.target.value }))}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/40 transition [color-scheme:dark]"
+                    required
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Hora (opcional)</label>
+                  <input
+                    type="time"
+                    value={eventForm.start_time}
+                    onChange={(e) => setEventForm((f) => ({ ...f, start_time: e.target.value }))}
+                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/40 transition [color-scheme:dark]"
+                  />
+                </div>
+              </div>
+
+              {eventError && (
+                <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-medium rounded-lg px-3 py-2.5">
+                  {eventError}
+                </div>
+              )}
+
+              <div className="flex items-center justify-end gap-3 pt-2 border-t border-zinc-800">
+                <button
+                  type="button"
+                  onClick={closeEventModal}
+                  className="px-4 py-2.5 rounded-xl text-sm font-bold text-zinc-300 hover:text-white hover:bg-zinc-800 transition"
+                >
+                  Cancelar
+                </button>
+                <button
+                  type="submit"
+                  disabled={savingEvent}
+                  className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 disabled:cursor-not-allowed text-zinc-950 font-bold text-sm transition shadow-lg shadow-emerald-500/20 flex items-center gap-2"
+                >
+                  {savingEvent ? (
+                    <>
+                      <span className="w-4 h-4 border-2 border-zinc-950/40 border-t-zinc-950 rounded-full animate-spin" />
+                      Guardando...
+                    </>
+                  ) : (
+                    'Crear Evento'
+                  )}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
