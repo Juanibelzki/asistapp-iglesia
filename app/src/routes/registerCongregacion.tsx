@@ -74,7 +74,7 @@ function RegisterCongregacionPage() {
         .select('id, name')
         .single();
 
-      if (result.error?.code === '42703') {
+      if (result.error && (result.error.code === '42703' || result.error.code === 'PGRST204')) {
         result = await supabase.from('organizations').insert(base).select('id, name').single();
       }
 

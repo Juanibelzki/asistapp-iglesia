@@ -44,6 +44,7 @@ const OFFLINE_QUEUE_KEY = 'asistapp_offline_queue';
 const MEMBERS_CACHE_KEY = 'asistapp_members_cache';
 const STAFF_SESSION_KEY = 'asistapp_staff_session';
 const WELCOME_MSG_KEY = 'asistapp_welcome_msg';
+const CLOUD_PENDING_KEY = 'asistapp_staff_cloud_pending';
 
 interface StaffSession {
   organization_id: string;
@@ -117,6 +118,7 @@ function AsistenciaPage() {
   const [attendees, setAttendees] = useState<Attendee[]>([]);
   const [attendeesLoading, setAttendeesLoading] = useState(false);
   const [toast, setToast] = useState<ToastState | null>(null);
+  const [staffCloudPending, setStaffCloudPending] = useState(false);
 
   const [scannerRunning, setScannerRunning] = useState(false);
   const [scannerStarting, setScannerStarting] = useState(false);
@@ -146,6 +148,7 @@ function AsistenciaPage() {
           const staff = readStaffSession();
           if (staff?.organization_id) {
             orgForLoad = staff.organization_id;
+            if (isMounted) setStaffCloudPending(localStorage.getItem(CLOUD_PENDING_KEY) === '1');
             const welcomeMsg = localStorage.getItem(WELCOME_MSG_KEY);
             if (welcomeMsg) {
               localStorage.removeItem(WELCOME_MSG_KEY);
@@ -665,6 +668,21 @@ function AsistenciaPage() {
             Ajustes
           </Link>
         </div>
+
+        {/* REGISTRO EN NUBE PENDIENTE */}
+        {staffCloudPending && (
+          <div className="flex flex-wrap items-center gap-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl px-4 py-3">
+            <CloudOff className="w-4 h-4 text-amber-400 shrink-0" />
+            <div className="text-xs flex-1 min-w-[180px]">
+              <p className="font-semibold text-amber-300">
+                Acceso local activo, pero tu registro aún no se guardó en la nube
+              </p>
+              <p className="text-zinc-400 mt-0.5">
+                Pedile al administrador que ejecute la migración en Supabase para que el equipo quede en el panel.
+              </p>
+            </div>
+          </div>
+        )}
 
         {/* ESTADO DE CONEXIÓN / SINCRONIZACIÓN */}
         {(!isOnline || pendingCount > 0) && (

@@ -2,7 +2,7 @@
 -- Ejecutar en el SQL Editor de Supabase.
 
 -- 1) Columnas para PIN y teléfono (no existen en el esquema real de profiles).
---    El código intenta insertar con pin/phone y, si falla (42703), reintenta sin ellas.
+--    El código intenta insertar con pin/phone y, si falla (PGRST204/42703), reintenta sin ellas.
 alter table public.profiles
   add column if not exists pin text,
   add column if not exists phone text;

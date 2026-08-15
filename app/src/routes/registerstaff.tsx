@@ -167,8 +167,6 @@ function RegisterStaffPage() {
         if (/row-level security/i.test(error.message)) break;
       }
 
-      if (!saved) throw lastError;
-
       localStorage.setItem(
         'asistapp_staff_session',
         JSON.stringify({
@@ -181,19 +179,18 @@ function RegisterStaffPage() {
       );
       localStorage.setItem('asistapp_welcome_msg', `¡Bienvenido al equipo de ${selectedChurch.name}!`);
 
+      if (saved) {
+        localStorage.removeItem('asistapp_staff_cloud_pending');
+      } else {
+        console.warn('Registro en nube pendiente:', lastError?.message);
+        localStorage.setItem('asistapp_staff_cloud_pending', '1');
+      }
+
       navigate({ to: '/asistencia' });
     } catch (err) {
       console.error('Error al registrar staff:', err);
       const msg = err instanceof Error ? err.message : 'Error al registrarte en el equipo.';
-      if (/row-level security/i.test(msg)) {
-        setFormError(
-          'Aún no se habilitaron los permisos para el registro de staff. Contactá al administrador de AsistApp.',
-        );
-      } else if (/not-null|violates not-null|23502/i.test(msg)) {
-        setFormError('Falta un dato obligatorio en la cuenta del equipo. Contactá al administrador.');
-      } else {
-        setFormError(msg);
-      }
+      setFormError(msg);
     } finally {
       setSubmitting(false);
     }
