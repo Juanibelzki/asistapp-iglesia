@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AjustesRouteImport } from './routes/ajustes'
 import { Route as AsistenciaRouteImport } from './routes/asistencia'
+import { Route as CeoRouteImport } from './routes/ceo'
 import { Route as CongregadosRouteImport } from './routes/congregados'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EscanearRouteImport } from './routes/escanear'
@@ -46,6 +47,11 @@ const AjustesRoute = AjustesRouteImport.update({
 const AsistenciaRoute = AsistenciaRouteImport.update({
   id: '/asistencia',
   path: '/asistencia',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const CeoRoute = CeoRouteImport.update({
+  id: '/ceo',
+  path: '/ceo',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CongregadosRoute = CongregadosRouteImport.update({
@@ -126,6 +132,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/ajustes': typeof AjustesRoute
   '/asistencia': typeof AsistenciaRoute
+  '/ceo': typeof CeoRoute
   '/congregados': typeof CongregadosRoute
   '/dashboard': typeof DashboardRoute
   '/escanear': typeof EscanearRoute
@@ -146,6 +153,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/ajustes': typeof AjustesRoute
   '/asistencia': typeof AsistenciaRoute
+  '/ceo': typeof CeoRoute
   '/congregados': typeof CongregadosRoute
   '/dashboard': typeof DashboardRoute
   '/escanear': typeof EscanearRoute
@@ -167,6 +175,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/ajustes': typeof AjustesRoute
   '/asistencia': typeof AsistenciaRoute
+  '/ceo': typeof CeoRoute
   '/congregados': typeof CongregadosRoute
   '/dashboard': typeof DashboardRoute
   '/escanear': typeof EscanearRoute
@@ -189,6 +198,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/ajustes'
     | '/asistencia'
+    | '/ceo'
     | '/congregados'
     | '/dashboard'
     | '/escanear'
@@ -209,6 +219,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/ajustes'
     | '/asistencia'
+    | '/ceo'
     | '/congregados'
     | '/dashboard'
     | '/escanear'
@@ -229,6 +240,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/ajustes'
     | '/asistencia'
+    | '/ceo'
     | '/congregados'
     | '/dashboard'
     | '/escanear'
@@ -250,6 +262,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   AjustesRoute: typeof AjustesRoute
   AsistenciaRoute: typeof AsistenciaRoute
+  CeoRoute: typeof CeoRoute
   CongregadosRoute: typeof CongregadosRoute
   DashboardRoute: typeof DashboardRoute
   EscanearRoute: typeof EscanearRoute
@@ -292,6 +305,13 @@ declare module '@tanstack/react-router' {
       path: '/asistencia'
       fullPath: '/asistencia'
       preLoaderRoute: typeof AsistenciaRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ceo': {
+      id: '/ceo'
+      path: '/ceo'
+      fullPath: '/ceo'
+      preLoaderRoute: typeof CeoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/congregados': {
@@ -413,6 +433,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   AjustesRoute: AjustesRoute,
   AsistenciaRoute: AsistenciaRoute,
+  CeoRoute: CeoRoute,
   CongregadosRoute: CongregadosRoute,
   DashboardRoute: DashboardRoute,
   EscanearRoute: EscanearRoute,
