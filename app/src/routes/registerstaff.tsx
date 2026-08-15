@@ -138,6 +138,9 @@ function RegisterStaffPage() {
       return;
     }
 
+    const cleanPhone = form.phone.replace(/\D/g, '').trim();
+    const cleanPin = form.pin.trim();
+
     setSubmitting(true);
     setFormError('');
     try {
@@ -148,8 +151,8 @@ function RegisterStaffPage() {
       };
 
       const attempts: Record<string, string | null>[] = [
-        { ...base, phone: form.phone.trim(), pin: form.pin, auth_user_id: crypto.randomUUID() },
-        { ...base, phone: form.phone.trim(), pin: form.pin },
+        { ...base, phone: cleanPhone, pin: cleanPin, auth_user_id: crypto.randomUUID() },
+        { ...base, phone: cleanPhone, pin: cleanPin },
         { ...base, auth_user_id: crypto.randomUUID() },
         { ...base },
       ];
@@ -173,7 +176,7 @@ function RegisterStaffPage() {
           organization_id: selectedChurchId,
           full_name: form.fullName.trim(),
           role: selectedRole,
-          pin: form.pin,
+          pin: cleanPin,
           church_name: selectedChurch.name,
         }),
       );

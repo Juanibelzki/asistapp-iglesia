@@ -38,10 +38,12 @@ function Login() {
 
     setSubmitting(true)
     try {
-      const { data, error } = await supabase
+      const cleanDigits = cleanPhone.replace(/\D/g, '')
+
+      let { data, error } = await supabase
         .from('profiles')
         .select('id, organization_id, role, full_name, phone, organizations(name)')
-        .eq('phone', cleanPhone)
+        .eq('phone', cleanDigits)
         .eq('pin', cleanPin)
         .limit(1)
         .maybeSingle()
@@ -52,7 +54,36 @@ function Login() {
         return
       }
 
+      if (!data && cleanDigits.length >= 8) {
+        const { data: candidates, error: flexError } = await supabase
+          .from('profiles')
+          .select('id, organization_id, role, full_name, phone, organizations(name)')
+          .eq('pin', cleanPin)
+          .not('phone', 'is', null)
+          .limit(20)
+
+        if (flexError) {
+          console.error('Error al buscar coincidencia flexible en login:', flexError)
+          setErrorMsg('Error al conectar con el servidor. Revisá los permisos de la base de datos.')
+          return
+        }
+
+        const normalized = (s?: string | null) => (s || '').replace(/\D/g, '')
+        const match = (candidates || []).find((c) => {
+          const stored = normalized(c.phone)
+          if (!stored) return false
+          return (
+            stored === cleanDigits ||
+            stored.endsWith(cleanDigits) ||
+            cleanDigits.endsWith(stored) ||
+            stored.slice(-8) === cleanDigits.slice(-8)
+          )
+        })
+        if (match) data = match
+      }
+
       if (!data) {
+        console.warn(`Login sin coincidencia: phone="${cleanDigits}" pin="${cleanPin}"`)
         setErrorMsg('Teléfono o PIN incorrectos. Si no tenés cuenta, registrate con tu iglesia.')
         return
       }
@@ -77,7 +108,7 @@ function Login() {
             organization_id: data.organization_id,
             full_name: data.full_name,
             role,
-            pin,
+            pin: cleanPin,
             church_name: (data.organizations as any)?.name || '',
           }),
         )
