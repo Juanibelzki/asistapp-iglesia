@@ -8,6 +8,7 @@ export const Route = createFileRoute('/ceo')({
 
 const CEO_AUTH_KEY = 'asistapp_ceo_auth';
 const CEO_PIN = (import.meta.env.VITE_CEO_PIN as string | undefined) || '2026';
+const PIN_LENGTH = CEO_PIN.length;
 
 interface OrgRow {
   id: string;
@@ -80,15 +81,15 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
           type="password"
           inputMode="numeric"
           value={pin}
-          onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, 4))}
-          placeholder="••••"
+          onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, PIN_LENGTH))}
+          placeholder={'•'.repeat(PIN_LENGTH)}
           autoFocus
           className="w-full bg-zinc-900/90 border border-zinc-800 text-zinc-100 rounded-xl px-4 py-4 text-center text-2xl tracking-[0.6em] font-mono focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all placeholder:text-zinc-700"
         />
         {error && <p className="text-xs text-red-400 text-center">{error}</p>}
         <button
           type="submit"
-          disabled={pin.length < 4}
+          disabled={pin.length < PIN_LENGTH}
           className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-bold text-sm transition-all shadow-lg shadow-emerald-500/10"
         >
           Desbloquear
