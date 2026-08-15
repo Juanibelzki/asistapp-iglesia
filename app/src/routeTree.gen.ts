@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AsistenciaRouteImport } from './routes/asistencia'
 import { Route as CongregadosRouteImport } from './routes/congregados'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EscanearRouteImport } from './routes/escanear'
@@ -32,6 +33,11 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AsistenciaRoute = AsistenciaRouteImport.update({
+  id: '/asistencia',
+  path: '/asistencia',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CongregadosRoute = CongregadosRouteImport.update({
@@ -100,6 +106,7 @@ const EventosEventIdQrRoute = EventosEventIdQrRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/asistencia': typeof AsistenciaRoute
   '/congregados': typeof CongregadosRoute
   '/dashboard': typeof DashboardRoute
   '/escanear': typeof EscanearRoute
@@ -116,6 +123,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/asistencia': typeof AsistenciaRoute
   '/congregados': typeof CongregadosRoute
   '/dashboard': typeof DashboardRoute
   '/escanear': typeof EscanearRoute
@@ -133,6 +141,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/asistencia': typeof AsistenciaRoute
   '/congregados': typeof CongregadosRoute
   '/dashboard': typeof DashboardRoute
   '/escanear': typeof EscanearRoute
@@ -151,6 +160,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/asistencia'
     | '/congregados'
     | '/dashboard'
     | '/escanear'
@@ -167,6 +177,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/asistencia'
     | '/congregados'
     | '/dashboard'
     | '/escanear'
@@ -183,6 +194,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/asistencia'
     | '/congregados'
     | '/dashboard'
     | '/escanear'
@@ -200,6 +212,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AsistenciaRoute: typeof AsistenciaRoute
   CongregadosRoute: typeof CongregadosRoute
   DashboardRoute: typeof DashboardRoute
   EscanearRoute: typeof EscanearRoute
@@ -226,6 +239,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/asistencia': {
+      id: '/asistencia'
+      path: '/asistencia'
+      fullPath: '/asistencia'
+      preLoaderRoute: typeof AsistenciaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/congregados': {
@@ -331,6 +351,7 @@ const EventosRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AsistenciaRoute: AsistenciaRoute,
   CongregadosRoute: CongregadosRoute,
   DashboardRoute: DashboardRoute,
   EscanearRoute: EscanearRoute,
