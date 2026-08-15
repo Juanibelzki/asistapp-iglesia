@@ -16,6 +16,7 @@ import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EscanearRouteImport } from './routes/escanear'
 import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as MaterialesRouteImport } from './routes/materiales'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as RegistroRouteImport } from './routes/registro'
@@ -56,6 +57,11 @@ const EventosRoute = EventosRouteImport.update({
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const MaterialesRoute = MaterialesRouteImport.update({
+  id: '/materiales',
+  path: '/materiales',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortalRoute = PortalRouteImport.update({
@@ -99,6 +105,7 @@ export interface FileRoutesByFullPath {
   '/escanear': typeof EscanearRoute
   '/eventos': typeof EventosRouteWithChildren
   '/login': typeof LoginRoute
+  '/materiales': typeof MaterialesRoute
   '/portal': typeof PortalRoute
   '/privacidad': typeof PrivacidadRoute
   '/registro': typeof RegistroRoute
@@ -114,6 +121,7 @@ export interface FileRoutesByTo {
   '/escanear': typeof EscanearRoute
   '/eventos': typeof EventosRouteWithChildren
   '/login': typeof LoginRoute
+  '/materiales': typeof MaterialesRoute
   '/portal': typeof PortalRoute
   '/privacidad': typeof PrivacidadRoute
   '/registro': typeof RegistroRoute
@@ -130,6 +138,7 @@ export interface FileRoutesById {
   '/escanear': typeof EscanearRoute
   '/eventos': typeof EventosRouteWithChildren
   '/login': typeof LoginRoute
+  '/materiales': typeof MaterialesRoute
   '/portal': typeof PortalRoute
   '/privacidad': typeof PrivacidadRoute
   '/registro': typeof RegistroRoute
@@ -147,6 +156,7 @@ export interface FileRouteTypes {
     | '/escanear'
     | '/eventos'
     | '/login'
+    | '/materiales'
     | '/portal'
     | '/privacidad'
     | '/registro'
@@ -162,6 +172,7 @@ export interface FileRouteTypes {
     | '/escanear'
     | '/eventos'
     | '/login'
+    | '/materiales'
     | '/portal'
     | '/privacidad'
     | '/registro'
@@ -177,6 +188,7 @@ export interface FileRouteTypes {
     | '/escanear'
     | '/eventos'
     | '/login'
+    | '/materiales'
     | '/portal'
     | '/privacidad'
     | '/registro'
@@ -193,6 +205,7 @@ export interface RootRouteChildren {
   EscanearRoute: typeof EscanearRoute
   EventosRoute: typeof EventosRouteWithChildren
   LoginRoute: typeof LoginRoute
+  MaterialesRoute: typeof MaterialesRoute
   PortalRoute: typeof PortalRoute
   PrivacidadRoute: typeof PrivacidadRoute
   RegistroRoute: typeof RegistroRoute
@@ -248,6 +261,13 @@ declare module '@tanstack/react-router' {
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/materiales': {
+      id: '/materiales'
+      path: '/materiales'
+      fullPath: '/materiales'
+      preLoaderRoute: typeof MaterialesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portal': {
@@ -316,6 +336,7 @@ const rootRouteChildren: RootRouteChildren = {
   EscanearRoute: EscanearRoute,
   EventosRoute: EventosRouteWithChildren,
   LoginRoute: LoginRoute,
+  MaterialesRoute: MaterialesRoute,
   PortalRoute: PortalRoute,
   PrivacidadRoute: PrivacidadRoute,
   RegistroRoute: RegistroRoute,

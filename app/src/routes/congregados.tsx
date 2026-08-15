@@ -325,6 +325,9 @@ function CongregadosPage() {
               <span className="px-3 py-1.5 rounded-lg bg-zinc-900 text-emerald-400 border border-zinc-800">
                 Congregados
               </span>
+              <Link className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 transition" to="/materiales">
+                Materiales
+              </Link>
             </nav>
           </div>
 

@@ -335,6 +335,7 @@ function DashboardPage() {
         <nav className="flex items-center gap-4">
           <Link to="/dashboard" className="text-sm font-bold text-white">Dashboard</Link>
           <Link to="/congregados" className="text-sm text-zinc-400 hover:text-white">Congregados</Link>
+          <Link to="/materiales" className="text-sm text-zinc-400 hover:text-white">Materiales</Link>
         </nav>
         <button onClick={handleSignOut} className="text-sm text-zinc-400 hover:text-white">Salir</button>
       </header>
