@@ -268,7 +268,7 @@ function AjustesPage() {
               <button
                 type="submit"
                 disabled={saving}
-                className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 disabled:cursor-not-allowed text-zinc-950 font-medium text-sm transition shadow-lg shadow-emerald-500/20 flex items-center gap-2"
+                className="px-6 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 disabled:cursor-not-allowed text-zinc-950 font-medium text-sm transition shadow-lg shadow-emerald-500/20 flex items-center gap-2"
               >
                 {saving ? (
                   <>
