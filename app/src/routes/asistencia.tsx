@@ -8,31 +8,6 @@ export const Route = createFileRoute('/asistencia')({
   component: AsistenciaPage,
 });
 
-interface PortalEvent {
-  id: string;
-  title: string;
-  event_date: string;
-}
-
-interface Attendee {
-  id: string;
-  first_name: string;
-  last_name: string;
-  created_at: string;
-}
-
-interface ExportRow {
-  event_date: string;
-  event_title: string;
-  first_name: string;
-  last_name: string;
-  phone: string;
-  student_stage: string;
-  guardian_name: string;
-  guardian_phone: string;
-  check_in_time: string;
-}
-
 interface ToastState {
   message: string;
   type: 'success' | 'error' | 'info';
@@ -44,7 +19,6 @@ const OFFLINE_QUEUE_KEY = 'asistapp_offline_queue';
 const MEMBERS_CACHE_KEY = 'asistapp_members_cache';
 const STAFF_SESSION_KEY = 'asistapp_staff_session';
 const WELCOME_MSG_KEY = 'asistapp_welcome_msg';
-const CLOUD_PENDING_KEY = 'asistapp_staff_cloud_pending';
 
 interface StaffSession {
   organization_id: string;
@@ -73,7 +47,6 @@ interface MemberEntry {
 }
 
 interface PendingCheckIn {
-  event_id: string;
   congregado_id: string;
   organization_id: string;
   check_in_time: string;
@@ -113,12 +86,7 @@ function AsistenciaPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [orgId, setOrgId] = useState<string | null>(null);
-  const [events, setEvents] = useState<PortalEvent[]>([]);
-  const [selectedEventId, setSelectedEventId] = useState('');
-  const [attendees, setAttendees] = useState<Attendee[]>([]);
-  const [attendeesLoading, setAttendeesLoading] = useState(false);
   const [toast, setToast] = useState<ToastState | null>(null);
-  const [staffCloudPending, setStaffCloudPending] = useState(false);
 
   const [scannerRunning, setScannerRunning] = useState(false);
   const [scannerStarting, setScannerStarting] = useState(false);
@@ -133,7 +101,12 @@ function AsistenciaPage() {
 
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const processingRef = useRef(false);
-  const attendeesLoadedFor = useRef<string | null>(null);
+  const orgIdRef = useRef<string | null>(null);
+
+  const showToast = (message: string, type: ToastState['type'] = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3500);
+  };
 
   useEffect(() => {
     let isMounted = true;
@@ -148,7 +121,6 @@ function AsistenciaPage() {
           const staff = readStaffSession();
           if (staff?.organization_id) {
             orgForLoad = staff.organization_id;
-            if (isMounted) setStaffCloudPending(localStorage.getItem(CLOUD_PENDING_KEY) === '1');
             const welcomeMsg = localStorage.getItem(WELCOME_MSG_KEY);
             if (welcomeMsg) {
               localStorage.removeItem(WELCOME_MSG_KEY);
@@ -172,33 +144,11 @@ function AsistenciaPage() {
           return;
         }
 
+        orgIdRef.current = orgForLoad;
         if (isMounted) setOrgId(orgForLoad);
         hydrateMembersCache(orgForLoad);
-
-        const { data, error } = await supabase
-          .from('events')
-          .select('*')
-          .eq('organization_id', orgForLoad)
-          .order('event_date', { ascending: true });
-
-        if (!error && data && isMounted) {
-          const today = new Date().toISOString().slice(0, 10);
-          const upcoming = (data as PortalEvent[])
-            .filter((evt) => evt.event_date >= today)
-            .sort((a, b) => a.event_date.localeCompare(b.event_date));
-          const recent = (data as PortalEvent[])
-            .filter((evt) => evt.event_date < today)
-            .sort((a, b) => b.event_date.localeCompare(a.event_date))
-            .slice(0, 5);
-          setEvents([...upcoming, ...recent]);
-          if (upcoming.length > 0) {
-            setSelectedEventId(upcoming[0].id);
-          } else if (recent.length > 0) {
-            setSelectedEventId(recent[0].id);
-          }
-        }
       } catch (err) {
-        console.error('Error al cargar eventos:', err);
+        console.error('Error al cargar la toma de asistencia:', err);
       } finally {
         if (isMounted) setLoading(false);
       }
@@ -263,7 +213,6 @@ function AsistenciaPage() {
 
     for (const item of queue) {
       const { error } = await supabase.from('attendance').insert({
-        event_id: item.event_id,
         congregado_id: item.congregado_id,
         organization_id: item.organization_id,
         check_in_time: item.check_in_time,
@@ -277,10 +226,6 @@ function AsistenciaPage() {
           synced += 1;
           continue;
         }
-        if (isNetworkError(error) || isOffline()) {
-          remaining.push(item);
-          continue;
-        }
         remaining.push(item);
         continue;
       }
@@ -291,8 +236,6 @@ function AsistenciaPage() {
     setPendingCount(remaining.length);
 
     if (synced > 0) {
-      if (attendeesLoadedFor.current) attendeesLoadedFor.current = null;
-      await loadAttendees(selectedEventId);
       showToast(`Sincronización completa: ${synced} registro(s) enviado(s)`);
     }
     return synced;
@@ -315,146 +258,7 @@ function AsistenciaPage() {
       window.removeEventListener('online', goOnline);
       window.removeEventListener('offline', goOffline);
     };
-  }, [orgId, selectedEventId]);
-
-  useEffect(() => {
-    return () => {
-      stopScanner();
-    };
-  }, []);
-
-  const showToast = (message: string, type: ToastState['type'] = 'success') => {
-    setToast({ message, type });
-    setTimeout(() => setToast(null), 3500);
-  };
-
-  const loadAttendees = async (eventId: string) => {
-    if (!orgId || attendeesLoadedFor.current === eventId) return;
-    attendeesLoadedFor.current = eventId;
-    setAttendeesLoading(true);
-    try {
-      const { data, error } = await supabase
-        .from('attendance')
-        .select('id, congregado_id, check_in_time, congregados(first_name, last_name)')
-        .eq('event_id', eventId)
-        .eq('organization_id', orgId)
-        .order('check_in_time', { ascending: true });
-
-      if (error) throw error;
-
-      const mapped = (data || [])
-        .map((row: any) => {
-          const member = row.congregados;
-          return {
-            id: row.id,
-            first_name: member?.first_name || 'Desconocido',
-            last_name: member?.last_name || '',
-            created_at: row.check_in_time || row.created_at,
-          };
-        })
-        .filter((item: Attendee) => item.first_name !== 'Desconocido' || item.last_name !== '');
-      setAttendees(mapped);
-    } catch (err) {
-      console.error('Error al cargar asistentes:', err);
-      setAttendees([]);
-    } finally {
-      setAttendeesLoading(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!selectedEventId) return;
-    attendeesLoadedFor.current = null;
-    setAttendees([]);
-    loadAttendees(selectedEventId);
-  }, [selectedEventId, orgId]);
-
-  const selectedEvent = events.find((evt) => evt.id === selectedEventId) || null;
-
-  const csvEscape = (value: string | number | null | undefined): string => {
-    const str = value == null ? '' : String(value);
-    return `"${str.replace(/"/g, '""')}"`;
-  };
-
-  const handleExport = async () => {
-    if (!orgId || !selectedEvent) return;
-
-    const { data, error } = await supabase
-      .from('attendance')
-      .select('congregado_id, check_in_time, congregados(first_name, last_name, phone, student_stage, guardian_name, guardian_phone)')
-      .eq('event_id', selectedEvent.id)
-      .eq('organization_id', orgId)
-      .order('check_in_time', { ascending: true });
-
-    if (error) {
-      showToast('No se pudo generar el reporte.', 'error');
-      return;
-    }
-
-    const rows: ExportRow[] = (data || [])
-      .map((row: any) => {
-        const member = row.congregados;
-        if (!member) return null;
-        return {
-          event_date: selectedEvent.event_date,
-          event_title: selectedEvent.title,
-          first_name: member.first_name || '',
-          last_name: member.last_name || '',
-          phone: member.phone || '',
-          student_stage: member.student_stage || '',
-          guardian_name: member.guardian_name || '',
-          guardian_phone: member.guardian_phone || '',
-          check_in_time: formatTime(row.check_in_time || row.created_at),
-        };
-      })
-      .filter((row: ExportRow | null): row is ExportRow => row !== null);
-
-    const headers = [
-      'Fecha del Evento',
-      'Evento / Clase',
-      'Nombre',
-      'Apellido',
-      'Teléfono',
-      'Etapa Formativa',
-      'Nombre del Tutor',
-      'Teléfono del Tutor',
-      'Hora de Check-in',
-    ];
-
-    const csvLines = [
-      headers.map(csvEscape).join(';'),
-      ...rows.map((row) =>
-        [
-          csvEscape(row.event_date),
-          csvEscape(row.event_title),
-          csvEscape(row.first_name),
-          csvEscape(row.last_name),
-          csvEscape(row.phone),
-          csvEscape(row.student_stage),
-          csvEscape(row.guardian_name),
-          csvEscape(row.guardian_phone),
-          csvEscape(row.check_in_time),
-        ].join(';'),
-      ),
-    ];
-
-    const csvContent = '\uFEFF' + csvLines.join('\r\n');
-    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
-    const url = URL.createObjectURL(blob);
-
-    const safeTitle = selectedEvent.title.toLowerCase().replace(/\s+/g, '_');
-    const filename = `asistencia_${safeTitle}_${selectedEvent.event_date}.csv`;
-
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = filename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-
-    showToast('Reporte descargado exitosamente');
-  };
+  }, [orgId]);
 
   const stopScanner = async () => {
     const scanner = scannerRef.current;
@@ -471,9 +275,15 @@ function AsistenciaPage() {
     setScannerRunning(false);
   };
 
+  useEffect(() => {
+    return () => {
+      stopScanner();
+    };
+  }, []);
+
   const startScanner = async () => {
-    if (!orgId || !selectedEventId) {
-      setScannerError('Seleccioná un evento antes de iniciar el escáner.');
+    if (!orgIdRef.current) {
+      setScannerError('Esperando la conexión a tu iglesia...');
       return;
     }
     if (scannerRunning || scannerStarting) return;
@@ -496,9 +306,8 @@ function AsistenciaPage() {
 
       const queueOffline = (member: MemberEntry) => {
         const item: PendingCheckIn = {
-          event_id: selectedEventId,
           congregado_id: member.id,
-          organization_id: orgId as string,
+          organization_id: orgIdRef.current as string,
           check_in_time: new Date().toISOString(),
           qr_code: member.qr_code,
           first_name: member.first_name,
@@ -545,9 +354,8 @@ function AsistenciaPage() {
 
         if (member) {
           const checkIn = {
-            event_id: selectedEventId,
             congregado_id: member.id,
-            organization_id: orgId,
+            organization_id: orgIdRef.current as string,
             check_in_time: new Date().toISOString(),
           };
 
@@ -571,9 +379,7 @@ function AsistenciaPage() {
                   showToast(insertError.message, 'error');
                 }
               } else {
-                showToast(`Asistencia registrada: ${member.first_name} ${member.last_name}`);
-                attendeesLoadedFor.current = null;
-                await loadAttendees(selectedEventId);
+                showToast(`¡Presente! ${member.first_name} ${member.last_name}`);
               }
             } catch {
               queueOffline(member);
@@ -587,7 +393,7 @@ function AsistenciaPage() {
           }
           processingRef.current = false;
           setProcessing(false);
-        }, 2000);
+        }, 1500);
       } catch (err) {
         console.error('Error procesando escaneo:', err);
         processingRef.current = false;
@@ -618,7 +424,7 @@ function AsistenciaPage() {
     } catch (err) {
       console.error('Error al iniciar cámara:', err);
       setScannerError(
-        'No se pudo iniciar la cámara. Verificá los permisos del navegador o usá un dispositivo con cámara.'
+        'No se pudo iniciar la cámara automáticamente. Tocate el botón para activarla (los navegadores requieren tu permiso).'
       );
       scannerRef.current = null;
     } finally {
@@ -626,16 +432,12 @@ function AsistenciaPage() {
     }
   };
 
-  const formatTime = (iso: string) => {
-    try {
-      return new Date(iso).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' });
-    } catch {
-      return iso;
-    }
-  };
-
-  const inputClass =
-    'w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/40 transition [color-scheme:dark]';
+  useEffect(() => {
+    if (!orgId || scannerRunning || scannerStarting) return;
+    const t = setTimeout(() => startScanner(), 500);
+    return () => clearTimeout(t);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [orgId]);
 
   if (loading) {
     return (
@@ -668,21 +470,6 @@ function AsistenciaPage() {
             Ajustes
           </Link>
         </div>
-
-        {/* REGISTRO EN NUBE PENDIENTE */}
-        {staffCloudPending && (
-          <div className="flex flex-wrap items-center gap-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl px-4 py-3">
-            <CloudOff className="w-4 h-4 text-amber-400 shrink-0" />
-            <div className="text-xs flex-1 min-w-[180px]">
-              <p className="font-semibold text-amber-300">
-                Acceso local activo, pero tu registro aún no se guardó en la nube
-              </p>
-              <p className="text-zinc-400 mt-0.5">
-                Pedile al administrador que ejecute la migración en Supabase para que el equipo quede en el panel.
-              </p>
-            </div>
-          </div>
-        )}
 
         {/* ESTADO DE CONEXIÓN / SINCRONIZACIÓN */}
         {(!isOnline || pendingCount > 0) && (
@@ -717,42 +504,6 @@ function AsistenciaPage() {
           </div>
         )}
 
-        {/* SELECTOR DE EVENTO */}
-        <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-2xl p-5 space-y-3">
-          <div className="flex flex-wrap items-center justify-between gap-3">
-            <label className="block text-xs font-semibold text-zinc-400">Evento / Clase</label>
-            <button
-              onClick={handleExport}
-              disabled={!selectedEvent || attendees.length === 0}
-              className={`px-4 py-2 rounded-lg text-sm inline-flex items-center gap-2 transition-colors ${
-                selectedEvent && attendees.length > 0
-                  ? 'border border-zinc-700 bg-zinc-900/80 hover:bg-zinc-800 text-zinc-200'
-                  : 'border border-zinc-800 bg-zinc-900/40 text-zinc-600 opacity-50 cursor-not-allowed'
-              }`}
-            >
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
-              </svg>
-              Exportar Lista (CSV)
-            </button>
-          </div>
-          {events.length === 0 ? (
-            <p className="text-sm text-zinc-500">No hay eventos disponibles. Creá uno desde el Dashboard.</p>
-          ) : (
-            <select
-              value={selectedEventId}
-              onChange={(e) => setSelectedEventId(e.target.value)}
-              className={inputClass}
-            >
-              {events.map((evt) => (
-                <option key={evt.id} value={evt.id}>
-                  {evt.title} — {evt.event_date}
-                </option>
-              ))}
-            </select>
-          )}
-        </div>
-
         {/* VISOR DE CÁMARA */}
         <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-2xl p-5 space-y-4">
           <div className="flex items-center justify-between gap-3">
@@ -780,11 +531,10 @@ function AsistenciaPage() {
                 </svg>
               </div>
               <p className="text-xs text-zinc-500 text-center max-w-sm">
-                La cámara usa el modo trasero (environment). Asegurate de tener permiso de cámara activado.
+                La cámara usa el modo trasero (environment). Tocate el botón para activarla si no se inició sola.
               </p>
               <button
                 onClick={startScanner}
-                disabled={!selectedEventId || events.length === 0}
                 className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 disabled:cursor-not-allowed text-zinc-950 font-bold text-sm transition shadow-lg shadow-emerald-500/20 flex items-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -809,42 +559,6 @@ function AsistenciaPage() {
             <p className="text-xs text-red-400 font-medium bg-red-500/10 border border-red-500/30 rounded-lg px-3 py-2.5">
               {scannerError}
             </p>
-          )}
-        </div>
-
-        {/* LISTA DE ASISTENTES */}
-        <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-2xl overflow-hidden">
-          <div className="p-5 border-b border-zinc-800 flex items-center justify-between gap-3">
-            <h2 className="font-bold text-white">Asistentes del Evento</h2>
-            <span className="text-xs px-2.5 py-1 rounded-full bg-zinc-800 text-zinc-300 font-semibold">
-              {attendees.length} {attendees.length === 1 ? 'registro' : 'registros'}
-            </span>
-          </div>
-          {attendeesLoading ? (
-            <div className="p-8 flex items-center justify-center gap-3 text-sm text-zinc-400">
-              <span className="w-4 h-4 border-2 border-zinc-600 border-t-zinc-200 rounded-full animate-spin" />
-              Cargando asistentes...
-            </div>
-          ) : attendees.length === 0 ? (
-            <div className="p-8 text-center">
-              <p className="text-sm text-zinc-500">Aún no hay asistencias registradas para este evento.</p>
-            </div>
-          ) : (
-            <ul className="divide-y divide-zinc-800/60 max-h-80 overflow-y-auto">
-              {attendees.map((item) => (
-                <li key={item.id} className="px-5 py-3 flex items-center justify-between gap-3">
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span className="w-8 h-8 shrink-0 rounded-full bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 text-xs font-black">
-                      {item.first_name.charAt(0)}
-                    </span>
-                    <p className="font-bold text-white truncate">
-                      {item.first_name} {item.last_name}
-                    </p>
-                  </div>
-                  <span className="shrink-0 text-xs text-zinc-400">{formatTime(item.created_at)}</span>
-                </li>
-              ))}
-            </ul>
           )}
         </div>
       </main>
