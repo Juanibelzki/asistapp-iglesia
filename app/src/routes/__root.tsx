@@ -1,10 +1,10 @@
-import { createRootRoute, Outlet, Link, useNavigate } from '@tanstack/react-router';
-import { supabase } from '../lib/supabase';
-// Asegurar la importación del CSS principal que contiene Tailwind
-import '../styles.css'; 
+import { createRootRoute, HeadContent, Scripts, Link } from '@tanstack/react-router';
+// CSS principal con Tailwind v4 (@import "tailwindcss") — imprescindible para que
+// los estilos lleguen al <head> del documento renderizado en SSR.
+import '../styles.css';
 
 export const Route = createRootRoute({
-  component: RootComponent,
+  shellComponent: RootDocument,
   notFoundComponent: () => (
     <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-zinc-100 p-6">
       <h1 className="text-4xl font-black text-emerald-400 mb-2">404</h1>
@@ -16,10 +16,16 @@ export const Route = createRootRoute({
   ),
 });
 
-function RootComponent() {
+function RootDocument({ children }: { children: React.ReactNode }) {
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col selection:bg-emerald-500 selection:text-zinc-950">
-      <Outlet/>
-    </div>
+    <html lang="es" className="dark" suppressHydrationWarning>
+      <head>
+        <HeadContent />
+      </head>
+      <body className="min-h-screen bg-zinc-950 text-zinc-100 font-sans antialiased flex flex-col">
+        {children}
+        <Scripts />
+      </body>
+    </html>
   );
 }
