@@ -471,29 +471,69 @@ function DashboardPage() {
   if (loading) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-zinc-400">Cargando...</div>;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 space-y-8">
-      <header className="flex justify-between items-center border-b border-zinc-800 pb-6">
-        <div>
-          <h1 className="text-2xl font-bold">{profile?.churchName}</h1>
-          <p className="text-sm text-zinc-400 mt-0.5">Hola, {profile?.fullName}</p>
+    <div className="min-h-screen bg-zinc-950 text-zinc-100">
+      <header className="sticky top-0 z-40 backdrop-blur-md bg-zinc-950/80 border-b border-zinc-800/80 px-6 py-4">
+        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+          <div className="flex items-center gap-3 min-w-0">
+            <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-zinc-950 font-black text-lg shadow-lg shadow-emerald-500/20 shrink-0">
+              {(profile?.churchName || 'A').charAt(0).toUpperCase()}
+            </div>
+            <div className="min-w-0">
+              <h1 className="text-lg font-bold text-white truncate leading-tight">{profile?.churchName}</h1>
+              <p className="text-xs text-zinc-400 truncate">Hola, {profile?.fullName}</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3 flex-wrap">
+            <nav className="flex items-center gap-1">
+              <Link
+                to="/dashboard"
+                className="text-sm text-white font-medium bg-zinc-900/60 px-3 py-1.5 rounded-lg border border-zinc-800/60"
+              >
+                Dashboard
+              </Link>
+              <Link
+                to="/congregados"
+                className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors px-3 py-1.5 rounded-lg"
+              >
+                Congregados
+              </Link>
+              <Link
+                to="/materiales"
+                className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors px-3 py-1.5 rounded-lg"
+              >
+                Materiales
+              </Link>
+              <Link
+                to="/asistencia"
+                className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors px-3 py-1.5 rounded-lg"
+              >
+                Asistencia
+              </Link>
+              <Link
+                to="/ajustes"
+                className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors px-3 py-1.5 rounded-lg"
+              >
+                Ajustes
+              </Link>
+            </nav>
+            <button
+              onClick={handleSignOut}
+              className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors px-3 py-1.5 rounded-lg hover:bg-zinc-900/60"
+            >
+              Salir
+            </button>
+          </div>
         </div>
-        <nav className="flex items-center gap-4">
-          <Link to="/dashboard" className="text-sm font-bold text-white">Dashboard</Link>
-          <Link to="/congregados" className="text-sm text-zinc-400 hover:text-white">Congregados</Link>
-          <Link to="/materiales" className="text-sm text-zinc-400 hover:text-white">Materiales</Link>
-          <Link to="/asistencia" className="text-sm text-zinc-400 hover:text-white">Asistencia</Link>
-          <Link to="/ajustes" className="text-sm text-zinc-400 hover:text-white">Ajustes</Link>
-        </nav>
-        <button onClick={handleSignOut} className="text-sm text-zinc-400 hover:text-white">Salir</button>
       </header>
 
+      <main className="max-w-7xl mx-auto p-6 space-y-8">
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-        <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+        <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl hover:border-zinc-700/60 transition-all shadow-sm">
           <p className="text-zinc-400 text-xs uppercase flex items-center gap-2">
             <Users className="w-3.5 h-3.5" /> Congregados
           </p>
-          <p className="text-3xl font-bold mt-2">{stats.memberCount}</p>
+          <p className="text-3xl font-bold tracking-tight text-white mt-2">{stats.memberCount}</p>
           <p className="text-xs text-zinc-500 mt-2 flex items-center gap-1.5">
             <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[11px] font-semibold">
               +{stats.newMembers30d}
@@ -501,11 +541,11 @@ function DashboardPage() {
             altas en los últimos 30 días
           </p>
         </div>
-        <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+        <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl hover:border-zinc-700/60 transition-all shadow-sm">
           <p className="text-zinc-400 text-xs uppercase flex items-center gap-2">
             <GraduationCap className="w-3.5 h-3.5" /> Alumnos en Formación
           </p>
-          <p className="text-3xl font-bold mt-2">{stats.studentCount}</p>
+          <p className="text-3xl font-bold tracking-tight text-white mt-2">{stats.studentCount}</p>
           <div className="flex items-center gap-1.5 mt-2 flex-wrap">
             <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[11px] font-semibold">
               {stats.stageCounts['niño']} niños
@@ -518,22 +558,22 @@ function DashboardPage() {
             </span>
           </div>
         </div>
-        <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+        <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl hover:border-zinc-700/60 transition-all shadow-sm">
           <p className="text-zinc-400 text-xs uppercase flex items-center gap-2">
             <CalendarCheck className="w-3.5 h-3.5" /> Asistencia del Último Evento
           </p>
-          <p className="text-3xl font-bold mt-2">{stats.lastEventAttendance}</p>
+          <p className="text-3xl font-bold tracking-tight text-white mt-2">{stats.lastEventAttendance}</p>
           <p className="text-xs text-zinc-400 mt-2 truncate">
             {stats.lastEventTitle
               ? `${stats.lastEventAttendance} presentes · ${stats.lastEventTitle}`
               : 'Sin eventos con asistencia registrada'}
           </p>
         </div>
-        <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+        <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl hover:border-zinc-700/60 transition-all shadow-sm">
           <p className="text-zinc-400 text-xs uppercase flex items-center gap-2">
             <LayoutGrid className="w-3.5 h-3.5" /> Programas Activos
           </p>
-          <p className="text-3xl font-bold mt-2">{stats.activePrograms}</p>
+          <p className="text-3xl font-bold tracking-tight text-white mt-2">{stats.activePrograms}</p>
           <p className="text-xs text-zinc-500 mt-2">Cursos programados con fechas futuras</p>
         </div>
       </div>
@@ -578,7 +618,7 @@ function DashboardPage() {
               const isOpen = !!expandedPrograms[program.title];
               return (
                 <div key={program.title}>
-                  <div className="flex flex-wrap items-center gap-3 p-4 hover:bg-zinc-800/30 transition">
+                  <div className="flex flex-wrap items-center gap-3 p-4 hover:bg-zinc-800/40 transition-colors">
                     <button
                       onClick={() => toggleProgram(program.title)}
                       className="flex items-center gap-3 flex-1 min-w-[200px] text-left"
@@ -586,9 +626,9 @@ function DashboardPage() {
                       aria-label={`${isOpen ? 'Colapsar' : 'Expandir'} programa ${program.title}`}
                     >
                       <ChevronDown
-                        className={`w-4 h-4 shrink-0 text-zinc-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                        className={`w-4 h-4 shrink-0 text-zinc-500 transition-transform duration-200 ${isOpen ? 'rotate-180 text-emerald-400' : ''}`}
                       />
-                      <span className="font-medium text-white">{program.title}</span>
+                      <span className={`font-medium transition-colors ${isOpen ? 'text-emerald-400' : 'text-white'}`}>{program.title}</span>
                       <span className="bg-zinc-800 text-zinc-300 text-xs px-2.5 py-0.5 rounded-full shrink-0">
                         {program.sessions.length} {program.sessions.length === 1 ? 'clase' : 'clases'}
                       </span>
@@ -603,7 +643,7 @@ function DashboardPage() {
                   </div>
 
                   {isOpen && (
-                    <div className="pl-6 ml-4 border-l border-zinc-800 space-y-2 py-3 pr-4">
+                    <div className="ml-4 border-l-2 border-zinc-800 pl-4 space-y-2 py-3 pr-4">
                       {program.sessions.map((evt, index) => (
                         <div
                           key={evt.id}
@@ -639,6 +679,7 @@ function DashboardPage() {
           </div>
         )}
       </div>
+      </main>
 
       {/* MODAL NUEVO EVENTO */}
       {isOpenModal && (

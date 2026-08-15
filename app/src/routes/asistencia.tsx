@@ -468,7 +468,7 @@ function AsistenciaPage() {
 
           <div
             id={QR_READER_ID}
-            className={`w-full max-w-sm mx-auto rounded-2xl overflow-hidden border-2 border-emerald-500/50 bg-zinc-950 ${
+            className={`w-full max-w-sm mx-auto rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-950 ${
               scannerRunning || scannerStarting ? '' : 'hidden'
             }`}
           />
@@ -553,7 +553,7 @@ function AsistenciaPage() {
       {/* TOAST */}
       {toast && (
         <div
-          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-xl text-sm font-bold shadow-2xl border transition ${
+          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-xl text-sm font-bold shadow-2xl border transition-all duration-300 animate-[fadeInUp_0.3s_ease-out] ${
             toast.type === 'success'
               ? 'bg-emerald-500 text-zinc-950 border-emerald-400'
               : toast.type === 'error'
