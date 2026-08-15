@@ -179,6 +179,19 @@
   animation: float 6s ease-in-out infinite;
 }
 
+@keyframes scanline {
+  0%,
+  100% {
+    top: 10%;
+  }
+  50% {
+    top: 86%;
+  }
+}
+.animate-scanline {
+  animation: scanline 2.2s ease-in-out infinite;
+}
+
 @keyframes floatSlow {
   0%,
   100% {
