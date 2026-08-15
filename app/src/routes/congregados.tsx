@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { QRCodeSVG } from 'qrcode.react';
 
 export const Route = createFileRoute('/congregados')({
   component: CongregadosPage,
@@ -20,6 +21,12 @@ interface Congregado {
   guardian_name?: string;
   guardian_phone?: string;
   status: string;
+  qr_code?: string;
+}
+
+interface ToastState {
+  message: string;
+  type: 'success' | 'error';
 }
 
 interface CongregadoForm {
@@ -53,9 +60,13 @@ function CongregadosPage() {
   const [studentStage, setStudentStage] = useState<StudentStage>('todos');
 
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const [editingId, setEditingId] = useState<string | null>(null);
   const [form, setForm] = useState<CongregadoForm>(EMPTY_FORM);
   const [saving, setSaving] = useState(false);
   const [formError, setFormError] = useState('');
+
+  const [qrMember, setQrMember] = useState<Congregado | null>(null);
+  const [toast, setToast] = useState<ToastState | null>(null);
 
   useEffect(() => {
     let isMounted = true;
@@ -120,15 +131,86 @@ function CongregadosPage() {
     };
   }, [navigate]);
 
+  const reloadCongregados = async () => {
+    if (!orgId) return;
+    const { data: members, error: membersError } = await supabase
+      .from('congregados')
+      .select('*')
+      .eq('organization_id', orgId)
+      .order('created_at', { ascending: false });
+    if (!membersError && members) {
+      setCongregados(members);
+    }
+  };
+
+  const showToast = (message: string, type: ToastState['type'] = 'success') => {
+    setToast({ message, type });
+    setTimeout(() => setToast(null), 3500);
+  };
+
   const openModal = () => {
+    setEditingId(null);
     setForm(EMPTY_FORM);
+    setFormError('');
+    setIsOpenModal(true);
+  };
+
+  const openEditModal = (item: Congregado) => {
+    setEditingId(item.id);
+    setForm({
+      first_name: item.first_name,
+      last_name: item.last_name,
+      phone: item.phone || '',
+      is_student: item.is_student,
+      student_stage: item.student_stage || 'niño',
+      guardian_name: item.guardian_name || '',
+      guardian_phone: item.guardian_phone || '',
+    });
     setFormError('');
     setIsOpenModal(true);
   };
 
   const closeModal = () => {
     setIsOpenModal(false);
+    setEditingId(null);
     setFormError('');
+  };
+
+  const handleDelete = async (item: Congregado) => {
+    if (!orgId) return;
+    if (!window.confirm(`¿Eliminar a ${item.first_name} ${item.last_name}? Esta acción no se puede deshacer.`)) return;
+
+    const { error } = await supabase
+      .from('congregados')
+      .delete()
+      .eq('id', item.id)
+      .eq('organization_id', orgId);
+
+    if (error) {
+      console.error('Error al eliminar congregado:', error);
+      showToast(error.message, 'error');
+      return;
+    }
+
+    await reloadCongregados();
+    showToast(`${item.first_name} ${item.last_name} fue eliminado.`);
+  };
+
+  const openQrModal = (item: Congregado) => setQrMember(item);
+  const closeQrModal = () => setQrMember(null);
+
+  const downloadQr = (item: Congregado) => {
+    const svg = document.getElementById('congregado-qr-svg');
+    if (!svg) return;
+    const serializer = new XMLSerializer();
+    const source = serializer.serializeToString(svg);
+    const blob = new Blob(['<?xml version="1.0" encoding="UTF-8"?>\n' + source], { type: 'image/svg+xml;charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `qr-${item.first_name}-${item.last_name}.svg`;
+    a.click();
+    URL.revokeObjectURL(url);
   };
 
   const needsGuardian = form.is_student && (form.student_stage === 'niño' || form.student_stage === 'adolescente');
@@ -147,33 +229,48 @@ function CongregadosPage() {
     setSaving(true);
     setFormError('');
     try {
-      const { error } = await supabase.from('congregados').insert({
-        organization_id: orgId,
-        first_name: form.first_name.trim(),
-        last_name: form.last_name.trim(),
-        phone: form.phone.trim() || null,
-        is_student: form.is_student,
-        student_stage: form.is_student ? form.student_stage : null,
-        guardian_name: needsGuardian ? form.guardian_name.trim() || null : null,
-        guardian_phone: needsGuardian ? form.guardian_phone.trim() || null : null,
-        qr_code: crypto.randomUUID(),
-        status: 'activo',
-      });
-      if (error) throw error;
+      if (editingId) {
+        const { error } = await supabase
+          .from('congregados')
+          .update({
+            first_name: form.first_name.trim(),
+            last_name: form.last_name.trim(),
+            phone: form.phone.trim() || null,
+            is_student: form.is_student,
+            student_stage: form.is_student ? form.student_stage : null,
+            guardian_name: needsGuardian ? form.guardian_name.trim() || null : null,
+            guardian_phone: needsGuardian ? form.guardian_phone.trim() || null : null,
+          })
+          .eq('id', editingId)
+          .eq('organization_id', orgId);
 
-      const { data: members, error: membersError } = await supabase
-        .from('congregados')
-        .select('*')
-        .eq('organization_id', orgId)
-        .order('created_at', { ascending: false });
+        if (error) throw error;
 
-      if (!membersError && members) {
-        setCongregados(members);
+        await reloadCongregados();
+        closeModal();
+        showToast(`${form.first_name.trim()} ${form.last_name.trim()} fue actualizado.`);
+      } else {
+        const { error } = await supabase.from('congregados').insert({
+          organization_id: orgId,
+          first_name: form.first_name.trim(),
+          last_name: form.last_name.trim(),
+          phone: form.phone.trim() || null,
+          is_student: form.is_student,
+          student_stage: form.is_student ? form.student_stage : null,
+          guardian_name: needsGuardian ? form.guardian_name.trim() || null : null,
+          guardian_phone: needsGuardian ? form.guardian_phone.trim() || null : null,
+          qr_code: crypto.randomUUID(),
+          status: 'activo',
+        });
+        if (error) throw error;
+
+        await reloadCongregados();
+        closeModal();
+        showToast(`${form.first_name.trim()} ${form.last_name.trim()} fue registrado.`);
       }
-      closeModal();
     } catch (err) {
-      console.error('Error al registrar congregado:', err);
-      setFormError(err instanceof Error ? err.message : 'Error al registrar el congregado.');
+      console.error('Error al guardar congregado:', err);
+      setFormError(err instanceof Error ? err.message : 'Error al guardar el congregado.');
     } finally {
       setSaving(false);
     }
@@ -358,6 +455,7 @@ function CongregadosPage() {
                     <th className="py-3.5 px-6 font-semibold">Categoría / Etapa</th>
                     <th className="py-3.5 px-6 font-semibold">Tutor / Contacto</th>
                     <th className="py-3.5 px-6 font-semibold">Estado</th>
+                    <th className="py-3.5 px-6 font-semibold text-right">Acciones</th>
                   </tr>
                 </thead>
                 <tbody className="divide-y divide-zinc-800/60 font-medium">
@@ -392,6 +490,40 @@ function CongregadosPage() {
                           {item.status || 'Activo'}
                         </span>
                       </td>
+                      <td className="py-4 px-6">
+                        <div className="flex items-center justify-end gap-1">
+                          <button
+                            onClick={() => openQrModal(item)}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 transition hover:text-emerald-400 hover:bg-emerald-500/10"
+                            aria-label={`Ver QR de ${item.first_name} ${item.last_name}`}
+                            title="Ver QR"
+                          >
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M3 3h7v7H3V3zm11 0h7v7h-7V3zM3 14h7v7H3v-7zm11 4h1v2h-1v-2zm3 0h1v1h-1v-1zm0 3h2v1h-2v-1zm-3-6h3v1h-3v-1zm-4 2h1v3h-1v-3z" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => openEditModal(item)}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 transition hover:text-emerald-400 hover:bg-emerald-500/10"
+                            aria-label={`Editar ${item.first_name} ${item.last_name}`}
+                            title="Editar"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M16.862 4.487l1.687-1.688a1.875 1.875 0 112.652 2.652L6.832 19.82a4.5 4.5 0 01-1.897 1.13l-2.685.8.8-2.685a4.5 4.5 0 011.13-1.897L16.863 4.487z" />
+                            </svg>
+                          </button>
+                          <button
+                            onClick={() => handleDelete(item)}
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 transition hover:text-red-400 hover:bg-red-500/10"
+                            aria-label={`Eliminar ${item.first_name} ${item.last_name}`}
+                            title="Eliminar"
+                          >
+                            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M14.74 9l-.346 9m-4.788 0L9.26 9m9.968-3.21c.342.052.682.107 1.022.166m-1.022-.165L18.16 19.673a2.25 2.25 0 01-2.244 2.077H8.084a2.25 2.25 0 01-2.244-2.077L4.772 5.79m14.456 0a48.108 48.108 0 00-3.478-.397m-12 .562c.34-.059.68-.114 1.022-.165m0 0a48.11 48.11 0 013.478-.397m7.5 0v-.916c0-1.18-.91-2.164-2.09-2.201a51.964 51.964 0 00-3.32 0c-1.18.037-2.09 1.022-2.09 2.201v.916m7.5 0a48.667 48.667 0 00-7.5 0" />
+                            </svg>
+                          </button>
+                        </div>
+                      </td>
                     </tr>
                   ))}
                 </tbody>
@@ -412,7 +544,9 @@ function CongregadosPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
-              <h2 className="text-lg font-bold text-white">Registrar Congregado</h2>
+              <h2 className="text-lg font-bold text-white">
+                {editingId ? 'Editar Congregado' : 'Registrar Congregado'}
+              </h2>
               <button
                 onClick={closeModal}
                 className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition"
@@ -559,6 +693,8 @@ function CongregadosPage() {
                       <span className="w-4 h-4 border-2 border-zinc-950/40 border-t-zinc-950 rounded-full animate-spin" />
                       Guardando...
                     </>
+                  ) : editingId ? (
+                    'Guardar Cambios'
                   ) : (
                     'Registrar'
                   )}
@@ -566,6 +702,66 @@ function CongregadosPage() {
               </div>
             </form>
           </div>
+        </div>
+      )}
+
+      {/* MODAL DE QR */}
+      {qrMember && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm"
+          onClick={closeQrModal}
+        >
+          <div
+            className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-sm shadow-2xl shadow-black/50"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
+              <h2 className="text-lg font-bold text-white">QR de Asistencia</h2>
+              <button
+                onClick={closeQrModal}
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition"
+                aria-label="Cerrar"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            <div className="p-6 flex flex-col items-center gap-4">
+              <p className="text-sm text-zinc-300 font-semibold text-center">
+                {qrMember.first_name} {qrMember.last_name}
+              </p>
+              <div className="bg-white rounded-xl p-4">
+                <QRCodeSVG id="congregado-qr-svg" value={qrMember.qr_code || qrMember.id} size={180} />
+              </div>
+              <p className="text-[11px] text-zinc-500 text-center">
+                Comparte este código con {qrMember.is_student ? 'el alumno' : 'el miembro'} para registrar su asistencia.
+              </p>
+              <button
+                onClick={() => downloadQr(qrMember)}
+                className="w-full px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-sm transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
+              >
+                <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
+                </svg>
+                Descargar QR (SVG)
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* TOAST */}
+      {toast && (
+        <div
+          className={`fixed bottom-6 left-1/2 -translate-x-1/2 z-50 px-4 py-3 rounded-xl text-sm font-bold shadow-2xl border transition ${
+            toast.type === 'success'
+              ? 'bg-emerald-500 text-zinc-950 border-emerald-400'
+              : 'bg-red-500 text-zinc-950 border-red-400'
+          }`}
+        >
+          {toast.message}
         </div>
       )}
     </div>
