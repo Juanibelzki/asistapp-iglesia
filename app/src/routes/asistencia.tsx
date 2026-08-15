@@ -124,10 +124,10 @@ function AsistenciaPage() {
     try {
       const { data, error } = await supabase
         .from('attendance')
-        .select('id, child_id, created_at, congregados(first_name, last_name)')
+        .select('id, congregado_id, check_in_time, congregados(first_name, last_name)')
         .eq('event_id', eventId)
         .eq('organization_id', orgId)
-        .order('created_at', { ascending: true });
+        .order('check_in_time', { ascending: true });
 
       if (error) throw error;
 
@@ -138,7 +138,7 @@ function AsistenciaPage() {
             id: row.id,
             first_name: member?.first_name || 'Desconocido',
             last_name: member?.last_name || '',
-            created_at: row.created_at,
+            created_at: row.check_in_time || row.created_at,
           };
         })
         .filter((item: Attendee) => item.first_name !== 'Desconocido' || item.last_name !== '');
@@ -210,9 +210,9 @@ function AsistenciaPage() {
         } else {
           const { error: insertError } = await supabase.from('attendance').insert({
             event_id: selectedEventId,
-            child_id: member.id,
+            congregado_id: member.id,
             organization_id: orgId,
-            status: 'presente',
+            check_in_time: new Date().toISOString(),
           });
 
           if (insertError) {
