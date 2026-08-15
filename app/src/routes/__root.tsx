@@ -2,6 +2,7 @@ import { createRootRoute, HeadContent, Scripts, Link } from '@tanstack/react-rou
 // CSS principal con Tailwind v4 (@import "tailwindcss") — imprescindible para que
 // los estilos lleguen al <head> del documento renderizado en SSR.
 import '../styles.css';
+import { PwaRegister } from '../components/PwaRegister';
 
 export const Route = createRootRoute({
   shellComponent: RootDocument,
@@ -24,6 +25,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
       </head>
       <body className="min-h-screen bg-zinc-950 text-zinc-100 font-sans antialiased flex flex-col">
         {children}
+        <PwaRegister />
         <Scripts />
       </body>
     </html>

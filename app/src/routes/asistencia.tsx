@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
+import { RefreshCw, CloudOff } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 
 export const Route = createFileRoute('/asistencia')({
@@ -39,6 +40,53 @@ interface ToastState {
 
 const QR_READER_ID = 'qr-reader';
 
+const OFFLINE_QUEUE_KEY = 'asistapp_offline_queue';
+const MEMBERS_CACHE_KEY = 'asistapp_members_cache';
+
+interface MemberEntry {
+  id: string;
+  first_name: string;
+  last_name: string;
+  qr_code: string;
+}
+
+interface PendingCheckIn {
+  event_id: string;
+  congregado_id: string;
+  organization_id: string;
+  check_in_time: string;
+  qr_code: string;
+  first_name: string;
+  last_name: string;
+}
+
+const isOffline = () => typeof navigator !== 'undefined' && !navigator.onLine;
+
+const isNetworkError = (err: any): boolean => {
+  if (!err) return false;
+  const msg = String(err?.message || err).toLowerCase();
+  return !err?.code && /fetch|network|internet|offline|load failed|envelope|timeout/i.test(msg);
+};
+
+const readQueue = (): PendingCheckIn[] => {
+  try {
+    const raw = localStorage.getItem(OFFLINE_QUEUE_KEY);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    return [];
+  }
+};
+
+const writeQueue = (queue: PendingCheckIn[]) => {
+  try {
+    localStorage.setItem(OFFLINE_QUEUE_KEY, JSON.stringify(queue));
+  } catch {
+    /* storage lleno o no disponible */
+  }
+};
+
 function AsistenciaPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
@@ -53,6 +101,12 @@ function AsistenciaPage() {
   const [scannerStarting, setScannerStarting] = useState(false);
   const [scannerError, setScannerError] = useState('');
   const [processing, setProcessing] = useState(false);
+
+  const [isOnline, setIsOnline] = useState<boolean>(() =>
+    typeof navigator !== 'undefined' ? navigator.onLine : true,
+  );
+  const [pendingCount, setPendingCount] = useState(0);
+  const membersCacheRef = useRef<Map<string, MemberEntry>>(new Map());
 
   const scannerRef = useRef<Html5Qrcode | null>(null);
   const processingRef = useRef(false);
@@ -81,6 +135,7 @@ function AsistenciaPage() {
         }
 
         if (isMounted) setOrgId(profile.organization_id);
+        hydrateMembersCache(profile.organization_id);
 
         const { data, error } = await supabase
           .from('events')
@@ -117,6 +172,112 @@ function AsistenciaPage() {
       isMounted = false;
     };
   }, [navigate]);
+
+  const loadMembersCache = async (orgId: string) => {
+    try {
+      const { data, error } = await supabase
+        .from('congregados')
+        .select('id, first_name, last_name, qr_code')
+        .eq('organization_id', orgId);
+      if (error || !data) return;
+      const map = new Map<string, MemberEntry>();
+      (data as MemberEntry[]).forEach((m) => {
+        if (m.qr_code) map.set(m.qr_code, m);
+      });
+      membersCacheRef.current = map;
+      try {
+        localStorage.setItem(
+          MEMBERS_CACHE_KEY,
+          JSON.stringify({ orgId, members: Array.from(map.values()) }),
+        );
+      } catch {
+        /* no disponible */
+      }
+    } catch {
+      /* offline */
+    }
+  };
+
+  const hydrateMembersCache = (orgId: string) => {
+    try {
+      const raw = localStorage.getItem(MEMBERS_CACHE_KEY);
+      if (raw) {
+        const cached = JSON.parse(raw);
+        if (cached?.orgId === orgId && Array.isArray(cached.members)) {
+          membersCacheRef.current = new Map(
+            (cached.members as MemberEntry[]).map((m) => [m.qr_code, m]),
+          );
+        }
+      }
+    } catch {
+      /* no disponible */
+    }
+    loadMembersCache(orgId);
+  };
+
+  const flushQueue = async () => {
+    if (!orgId || isOffline()) return 0;
+    const queue = readQueue();
+    if (queue.length === 0) return 0;
+
+    let synced = 0;
+    const remaining: PendingCheckIn[] = [];
+
+    for (const item of queue) {
+      const { error } = await supabase.from('attendance').insert({
+        event_id: item.event_id,
+        congregado_id: item.congregado_id,
+        organization_id: item.organization_id,
+        check_in_time: item.check_in_time,
+      });
+
+      if (error) {
+        const isDuplicate =
+          (error as any)?.code === '23505' ||
+          /duplicate|already exists|ya registrado/i.test(error.message);
+        if (isDuplicate) {
+          synced += 1;
+          continue;
+        }
+        if (isNetworkError(error) || isOffline()) {
+          remaining.push(item);
+          continue;
+        }
+        remaining.push(item);
+        continue;
+      }
+      synced += 1;
+    }
+
+    writeQueue(remaining);
+    setPendingCount(remaining.length);
+
+    if (synced > 0) {
+      if (attendeesLoadedFor.current) attendeesLoadedFor.current = null;
+      await loadAttendees(selectedEventId);
+      showToast(`Sincronización completa: ${synced} registro(s) enviado(s)`);
+    }
+    return synced;
+  };
+
+  useEffect(() => {
+    const goOnline = () => {
+      setIsOnline(true);
+      flushQueue();
+    };
+    const goOffline = () => setIsOnline(false);
+
+    window.addEventListener('online', goOnline);
+    window.addEventListener('offline', goOffline);
+
+    const initial = readQueue();
+    setPendingCount(initial.length);
+
+    return () => {
+      window.removeEventListener('online', goOnline);
+      window.removeEventListener('offline', goOffline);
+    };
+  }, [orgId, selectedEventId]);
 
   useEffect(() => {
     return () => {
@@ -295,38 +456,90 @@ function AsistenciaPage() {
       processingRef.current = true;
       setProcessing(true);
 
+      const queueOffline = (member: MemberEntry) => {
+        const item: PendingCheckIn = {
+          event_id: selectedEventId,
+          congregado_id: member.id,
+          organization_id: orgId as string,
+          check_in_time: new Date().toISOString(),
+          qr_code: member.qr_code,
+          first_name: member.first_name,
+          last_name: member.last_name,
+        };
+        const queue = readQueue();
+        queue.push(item);
+        writeQueue(queue);
+        setPendingCount(queue.length);
+        showToast('Modo Offline: Registro guardado en dispositivo', 'info');
+      };
+
       try {
         await scanner.pause(true);
 
-        const { data: member, error: memberError } = await supabase
-          .from('congregados')
-          .select('id, first_name, last_name')
-          .eq('qr_code', decodedText)
-          .maybeSingle();
+        let member = membersCacheRef.current.get(decodedText);
 
-        if (memberError || !member) {
-          showToast('Código QR no reconocido', 'error');
-        } else {
-          const { error: insertError } = await supabase.from('attendance').insert({
+        if (!member) {
+          try {
+            const { data, error } = await supabase
+              .from('congregados')
+              .select('id, first_name, last_name, qr_code')
+              .eq('qr_code', decodedText)
+              .maybeSingle();
+
+            if (error || !data) {
+              if (isOffline() || isNetworkError(error)) {
+                showToast('Modo Offline: miembro no disponible sin conexión', 'error');
+              } else {
+                showToast('Código QR no reconocido', 'error');
+              }
+            } else {
+              member = data as MemberEntry;
+              membersCacheRef.current.set(member.qr_code, member);
+            }
+          } catch {
+            if (isOffline()) {
+              showToast('Modo Offline: miembro no disponible sin conexión', 'error');
+            } else {
+              showToast('Error de red. Intentalo nuevamente', 'error');
+            }
+          }
+        }
+
+        if (member) {
+          const checkIn = {
             event_id: selectedEventId,
             congregado_id: member.id,
             organization_id: orgId,
             check_in_time: new Date().toISOString(),
-          });
+          };
 
-          if (insertError) {
-            const isDuplicate =
-              (insertError as any)?.code === '23505' ||
-              /duplicate|already exists|ya registrado/i.test(insertError.message);
-            if (isDuplicate) {
-              showToast('Ya registrado previamente', 'info');
-            } else {
-              showToast(insertError.message, 'error');
-            }
+          if (isOffline()) {
+            queueOffline(member);
           } else {
-            showToast(`Asistencia registrada: ${member.first_name} ${member.last_name}`);
-            attendeesLoadedFor.current = null;
-            await loadAttendees(selectedEventId);
+            try {
+              const { error: insertError } = await supabase
+                .from('attendance')
+                .insert(checkIn);
+
+              if (insertError) {
+                const isDuplicate =
+                  (insertError as any)?.code === '23505' ||
+                  /duplicate|already exists|ya registrado/i.test(insertError.message);
+                if (isDuplicate) {
+                  showToast('Ya registrado previamente', 'info');
+                } else if (isNetworkError(insertError)) {
+                  queueOffline(member);
+                } else {
+                  showToast(insertError.message, 'error');
+                }
+              } else {
+                showToast(`Asistencia registrada: ${member.first_name} ${member.last_name}`);
+                attendeesLoadedFor.current = null;
+                await loadAttendees(selectedEventId);
+              }
+            } catch {
+              queueOffline(member);
+            }
           }
         }
 
@@ -417,6 +630,39 @@ function AsistenciaPage() {
             Ajustes
           </Link>
         </div>
+
+        {/* ESTADO DE CONEXIÓN / SINCRONIZACIÓN */}
+        {(!isOnline || pendingCount > 0) && (
+          <div className="flex flex-wrap items-center gap-3 bg-amber-500/10 border border-amber-500/30 rounded-2xl px-4 py-3">
+            <CloudOff className="w-4 h-4 text-amber-400 shrink-0" />
+            <div className="text-xs flex-1 min-w-[180px]">
+              {!isOnline && pendingCount === 0 && (
+                <p className="font-semibold text-amber-300">
+                  Modo Offline: los registros se guardan en el dispositivo
+                </p>
+              )}
+              {!isOnline && pendingCount > 0 && (
+                <p className="font-semibold text-amber-300">
+                  Modo Offline: Registro guardado en dispositivo ({pendingCount} en cola)
+                </p>
+              )}
+              {isOnline && pendingCount > 0 && (
+                <p className="font-semibold text-emerald-300 flex items-center gap-2">
+                  <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  Sincronizando {pendingCount} registro(s) pendientes...
+                </p>
+              )}
+            </div>
+            {isOnline && pendingCount > 0 && (
+              <button
+                onClick={() => flushQueue()}
+                className="text-xs font-bold text-zinc-950 bg-emerald-400 hover:bg-emerald-300 px-3 py-1.5 rounded-lg transition"
+              >
+                Sincronizar ahora
+              </button>
+            )}
+          </div>
+        )}
 
         {/* SELECTOR DE EVENTO */}
         <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-2xl p-5 space-y-3">
