@@ -10,7 +10,6 @@ import {
   ArrowRight,
   Check,
   Church,
-  Play,
   BadgeCheck,
   CircleCheck,
   AlertTriangle,
@@ -404,6 +403,12 @@ function LandingPage() {
             >
               Ingresar
             </Link>
+            <Link
+              to="/registerCongregacion"
+              className="px-4 py-2 rounded-full bg-emerald-400 text-zinc-950 font-mono font-bold text-xs uppercase tracking-widest hover:bg-emerald-300 transition-all duration-200 active:scale-95"
+            >
+              Registrar mi Iglesia
+            </Link>
             <ThemeToggle />
           </div>
         </div>
@@ -444,18 +449,18 @@ function LandingPage() {
             <Reveal variant="up" delay={360}>
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
                 <Link
-                  to="/registro"
+                  to="/registerCongregacion"
                   className="w-full sm:w-auto px-8 py-4 rounded-full bg-emerald-400 text-zinc-950 font-mono font-bold text-xs uppercase tracking-widest hover:bg-emerald-300 transition-all duration-200 active:scale-95 shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2"
                 >
-                  Comenzar Prueba Gratis
+                  Registrar mi Iglesia
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
-                  to="/registro"
+                  to="/portal"
                   className="w-full sm:w-auto px-8 py-4 rounded-full bg-zinc-900/60 border border-white/10 text-zinc-300 font-mono font-bold text-xs uppercase tracking-widest hover:bg-zinc-800 hover:text-white hover:border-white/20 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 backdrop-blur-md"
                 >
-                  <Play className="w-4 h-4" />
-                  Ver Demostración
+                  <BadgeCheck className="w-4 h-4" />
+                  Soy Miembro (Mi Credencial)
                 </Link>
               </div>
             </Reveal>

@@ -21,6 +21,7 @@ import { Route as LoginRouteImport } from './routes/login'
 import { Route as MaterialesRouteImport } from './routes/materiales'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
+import { Route as RegisterCongregacionRouteImport } from './routes/registerCongregacion'
 import { Route as RegistroRouteImport } from './routes/registro'
 import { Route as ConfiguracionSuscripcionRouteImport } from './routes/configuracion/suscripcion'
 import { Route as EventosEventIdAsistenciaRouteImport } from './routes/eventos.$eventId.asistencia'
@@ -86,6 +87,11 @@ const PrivacidadRoute = PrivacidadRouteImport.update({
   path: '/privacidad',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RegisterCongregacionRoute = RegisterCongregacionRouteImport.update({
+  id: '/registerCongregacion',
+  path: '/registerCongregacion',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegistroRoute = RegistroRouteImport.update({
   id: '/registro',
   path: '/registro',
@@ -122,6 +128,7 @@ export interface FileRoutesByFullPath {
   '/materiales': typeof MaterialesRoute
   '/portal': typeof PortalRoute
   '/privacidad': typeof PrivacidadRoute
+  '/registerCongregacion': typeof RegisterCongregacionRoute
   '/registro': typeof RegistroRoute
   '/configuracion/suscripcion': typeof ConfiguracionSuscripcionRoute
   '/eventos/$eventId/asistencia': typeof EventosEventIdAsistenciaRoute
@@ -140,6 +147,7 @@ export interface FileRoutesByTo {
   '/materiales': typeof MaterialesRoute
   '/portal': typeof PortalRoute
   '/privacidad': typeof PrivacidadRoute
+  '/registerCongregacion': typeof RegisterCongregacionRoute
   '/registro': typeof RegistroRoute
   '/configuracion/suscripcion': typeof ConfiguracionSuscripcionRoute
   '/eventos/$eventId/asistencia': typeof EventosEventIdAsistenciaRoute
@@ -159,6 +167,7 @@ export interface FileRoutesById {
   '/materiales': typeof MaterialesRoute
   '/portal': typeof PortalRoute
   '/privacidad': typeof PrivacidadRoute
+  '/registerCongregacion': typeof RegisterCongregacionRoute
   '/registro': typeof RegistroRoute
   '/configuracion/suscripcion': typeof ConfiguracionSuscripcionRoute
   '/eventos/$eventId/asistencia': typeof EventosEventIdAsistenciaRoute
@@ -179,6 +188,7 @@ export interface FileRouteTypes {
     | '/materiales'
     | '/portal'
     | '/privacidad'
+    | '/registerCongregacion'
     | '/registro'
     | '/configuracion/suscripcion'
     | '/eventos/$eventId/asistencia'
@@ -197,6 +207,7 @@ export interface FileRouteTypes {
     | '/materiales'
     | '/portal'
     | '/privacidad'
+    | '/registerCongregacion'
     | '/registro'
     | '/configuracion/suscripcion'
     | '/eventos/$eventId/asistencia'
@@ -215,6 +226,7 @@ export interface FileRouteTypes {
     | '/materiales'
     | '/portal'
     | '/privacidad'
+    | '/registerCongregacion'
     | '/registro'
     | '/configuracion/suscripcion'
     | '/eventos/$eventId/asistencia'
@@ -234,6 +246,7 @@ export interface RootRouteChildren {
   MaterialesRoute: typeof MaterialesRoute
   PortalRoute: typeof PortalRoute
   PrivacidadRoute: typeof PrivacidadRoute
+  RegisterCongregacionRoute: typeof RegisterCongregacionRoute
   RegistroRoute: typeof RegistroRoute
   ConfiguracionSuscripcionRoute: typeof ConfiguracionSuscripcionRoute
 }
@@ -324,6 +337,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PrivacidadRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/registerCongregacion': {
+      id: '/registerCongregacion'
+      path: '/registerCongregacion'
+      fullPath: '/registerCongregacion'
+      preLoaderRoute: typeof RegisterCongregacionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/registro': {
       id: '/registro'
       path: '/registro'
@@ -381,6 +401,7 @@ const rootRouteChildren: RootRouteChildren = {
   MaterialesRoute: MaterialesRoute,
   PortalRoute: PortalRoute,
   PrivacidadRoute: PrivacidadRoute,
+  RegisterCongregacionRoute: RegisterCongregacionRoute,
   RegistroRoute: RegistroRoute,
   ConfiguracionSuscripcionRoute: ConfiguracionSuscripcionRoute,
 }

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from '@tanstack/react-router';
+import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 
@@ -43,6 +43,7 @@ function RegistroPage() {
   const [churches, setChurches] = useState<ChurchInfo[]>([]);
   const [selectedChurch, setSelectedChurch] = useState<ChurchInfo | null>(null);
   const [selectedChurchId, setSelectedChurchId] = useState('');
+  const [lockedOrg, setLockedOrg] = useState<ChurchInfo | null>(null);
   const [churchQuery, setChurchQuery] = useState('');
   const [churchOpen, setChurchOpen] = useState(false);
   const [form, setForm] = useState<RegisterForm>(EMPTY_FORM);
@@ -71,9 +72,12 @@ function RegistroPage() {
         if (orgParam) {
           const match = list.find((c) => c.id === orgParam);
           if (match) {
+            setLockedOrg(match);
             setSelectedChurch(match);
             setSelectedChurchId(match.id);
             setChurchQuery(match.name + (match.address ? ` · ${match.address}` : ''));
+          } else {
+            setFormError('La iglesia indicada no fue encontrada. Seleccioná otra o registrala.');
           }
         }
       } catch (err) {
@@ -236,62 +240,79 @@ function RegistroPage() {
               <h2 className="font-bold text-white text-center">Auto-Inscripción</h2>
 
               {/* SELECTOR DE IGLESIA */}
-              <div className="relative">
-                <label className="block text-xs font-semibold text-zinc-400 mb-1.5">
-                  Seleccioná tu Iglesia / Congregación *
-                </label>
-                <input
-                  type="text"
-                  value={churchQuery}
-                  onChange={(e) => handleQueryChange(e.target.value)}
-                  onFocus={() => setChurchOpen(true)}
-                  onBlur={() => setTimeout(() => setChurchOpen(false), 150)}
-                  placeholder="Escribí el nombre de tu iglesia o dirección..."
-                  className={inputClass}
-                  autoFocus
-                  required
-                />
-                {selectedChurch && (
-                  <button
-                    type="button"
-                    onClick={() => {
-                      setSelectedChurch(null);
-                      setSelectedChurchId('');
-                      setChurchQuery('');
-                      setChurchOpen(true);
-                    }}
-                    className="absolute right-3 top-9 text-zinc-500 hover:text-zinc-300 transition"
-                    aria-label="Quitar iglesia seleccionada"
-                  >
-                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
-                    </svg>
-                  </button>
-                )}
-
-                {churchOpen && (
-                  <div className="absolute z-20 mt-2 w-full bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl shadow-black/50 max-h-64 overflow-y-auto">
-                    {filteredChurches.length === 0 ? (
-                      <p className="px-4 py-3 text-xs text-zinc-500">
-                        Sin resultados para "{churchQuery}".
-                      </p>
-                    ) : (
-                      filteredChurches.map((c) => (
-                        <button
-                          key={c.id}
-                          type="button"
-                          onMouseDown={(e) => e.preventDefault()}
-                          onClick={() => selectChurch(c)}
-                          className="w-full text-left px-4 py-3 hover:bg-zinc-800 transition border-b border-zinc-800/60 last:border-0"
-                        >
-                          <p className="text-sm font-semibold text-white">{c.name}</p>
-                          {c.address && <p className="text-[11px] text-zinc-500 mt-0.5">{c.address}</p>}
-                        </button>
-                      ))
+              {lockedOrg ? (
+                <div className="bg-zinc-950/60 border border-emerald-500/30 rounded-xl px-4 py-3 flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-emerald-500 flex items-center justify-center text-zinc-950 font-black text-sm shrink-0">
+                    {lockedOrg.name.charAt(0).toUpperCase()}
+                  </div>
+                  <div className="min-w-0">
+                    <p className="text-xs text-emerald-400 font-mono uppercase tracking-wider mb-0.5">
+                      Iglesia confirmada
+                    </p>
+                    <p className="text-sm font-semibold text-white truncate">{lockedOrg.name}</p>
+                    {lockedOrg.address && (
+                      <p className="text-[11px] text-zinc-500 truncate">{lockedOrg.address}</p>
                     )}
                   </div>
-                )}
-              </div>
+                </div>
+              ) : (
+                <div className="relative">
+                  <label className="block text-xs font-semibold text-zinc-400 mb-1.5">
+                    Seleccioná tu Iglesia / Congregación *
+                  </label>
+                  <input
+                    type="text"
+                    value={churchQuery}
+                    onChange={(e) => handleQueryChange(e.target.value)}
+                    onFocus={() => setChurchOpen(true)}
+                    onBlur={() => setTimeout(() => setChurchOpen(false), 150)}
+                    placeholder="Escribí el nombre de tu iglesia o dirección..."
+                    className={inputClass}
+                    autoFocus
+                    required
+                  />
+                  {selectedChurch && (
+                    <button
+                      type="button"
+                      onClick={() => {
+                        setSelectedChurch(null);
+                        setSelectedChurchId('');
+                        setChurchQuery('');
+                        setChurchOpen(true);
+                      }}
+                      className="absolute right-3 top-9 text-zinc-500 hover:text-zinc-300 transition"
+                      aria-label="Quitar iglesia seleccionada"
+                    >
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />
+                      </svg>
+                    </button>
+                  )}
+
+                  {churchOpen && (
+                    <div className="absolute z-20 mt-2 w-full bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl shadow-black/50 max-h-64 overflow-y-auto">
+                      {filteredChurches.length === 0 ? (
+                        <p className="px-4 py-3 text-xs text-zinc-500">
+                          Sin resultados para "{churchQuery}".
+                        </p>
+                      ) : (
+                        filteredChurches.map((c) => (
+                          <button
+                            key={c.id}
+                            type="button"
+                            onMouseDown={(e) => e.preventDefault()}
+                            onClick={() => selectChurch(c)}
+                            className="w-full text-left px-4 py-3 hover:bg-zinc-800 transition border-b border-zinc-800/60 last:border-0"
+                          >
+                            <p className="text-sm font-semibold text-white">{c.name}</p>
+                            {c.address && <p className="text-[11px] text-zinc-500 mt-0.5">{c.address}</p>}
+                          </button>
+                        ))
+                      )}
+                    </div>
+                  )}
+                </div>
+              )}
 
               <div>
                 <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Nombre *</label>
@@ -424,6 +445,18 @@ function RegistroPage() {
             </form>
           )}
         </div>
+
+        {!lockedOrg && (
+          <p className="text-center text-xs text-zinc-500">
+            ¿Sos pastor o líder y querés registrar tu iglesia?{' '}
+            <Link
+              to="/registerCongregacion"
+              className="text-emerald-400 hover:text-emerald-300 font-semibold"
+            >
+              Crear congregación aquí
+            </Link>
+          </p>
+        )}
       </main>
     </div>
   );
