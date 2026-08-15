@@ -30,7 +30,7 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <link rel="apple-touch-icon" href="/pwa-192x192.png" />
         <HeadContent />
       </head>
-      <body className="min-h-screen bg-zinc-950 text-zinc-100 font-sans antialiased flex flex-col">
+      <body className="min-h-screen bg-zinc-950 text-zinc-100 font-sans antialiased flex flex-col w-full max-w-full overflow-x-hidden box-border">
         {children}
         <PwaRegister />
         <Scripts />

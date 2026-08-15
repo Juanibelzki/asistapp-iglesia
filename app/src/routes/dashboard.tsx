@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { CalendarDays, Users, GraduationCap, Plus, CheckCircle2, Pencil, Trash2, Eraser, ChevronDown, CalendarCheck, LayoutGrid, Link2, Menu, X } from 'lucide-react';
+import { CalendarDays, Users, GraduationCap, Plus, CheckCircle2, Pencil, Trash2, Eraser, ChevronDown, CalendarCheck, LayoutGrid, Link2 } from 'lucide-react';
 
 export const Route = createFileRoute('/dashboard')({
   component: DashboardPage,
@@ -80,7 +80,6 @@ function DashboardPage() {
   const [successMsg, setSuccessMsg] = useState('');
   const [expandedPrograms, setExpandedPrograms] = useState<Record<string, boolean>>({});
   const [copiedStaffLink, setCopiedStaffLink] = useState(false);
-  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -520,7 +519,7 @@ function DashboardPage() {
   if (loading) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-zinc-400">Cargando...</div>;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100">
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 w-full max-w-full overflow-x-hidden box-border flex flex-col">
       <header className="sticky top-0 z-40 backdrop-blur-md bg-zinc-950/80 border-b border-zinc-800/80 px-4 py-3 sm:px-6 sm:py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
@@ -533,7 +532,7 @@ function DashboardPage() {
             </div>
           </div>
 
-          <div className="hidden md:flex items-center gap-3">
+          <div className="hidden md:flex items-center gap-2">
             <nav className="flex items-center gap-1">
               <Link
                 to="/dashboard"
@@ -566,74 +565,56 @@ function DashboardPage() {
                 Ajustes
               </Link>
             </nav>
-            <button
-              onClick={handleSignOut}
-              className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors px-3 py-1.5 rounded-lg hover:bg-zinc-900/60"
-            >
-              Salir
-            </button>
-          </div>
-
-          <button
-            onClick={() => setMenuOpen((o) => !o)}
-            className="md:hidden w-11 h-11 rounded-xl border border-zinc-800 bg-zinc-900/60 flex items-center justify-center text-zinc-200 active:scale-95 transition"
-            aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
-            aria-expanded={menuOpen}
+<button
+            onClick={handleSignOut}
+            className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors px-3 py-1.5 rounded-lg hover:bg-zinc-900/60"
           >
-            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            Salir
           </button>
+          </div>
         </div>
 
-        {menuOpen && (
-          <div className="md:hidden absolute top-full left-0 right-0 border-t border-zinc-800 bg-zinc-950/95 backdrop-blur-md shadow-2xl shadow-black/40 animate-[fadeInUp_0.2s_ease-out]">
-            <nav className="flex flex-col gap-1 px-4 py-3">
-              <Link
-                to="/dashboard"
-                onClick={() => setMenuOpen(false)}
-                className="px-4 py-3 rounded-xl text-base font-medium text-white bg-zinc-900/60 border border-zinc-800/60"
-              >
-                Dashboard
-              </Link>
-              <Link
-                to="/congregados"
-                onClick={() => setMenuOpen(false)}
-                className="px-4 py-3 rounded-xl text-base font-medium text-zinc-300 hover:bg-zinc-900/60 transition"
-              >
-                Congregados
-              </Link>
-              <Link
-                to="/materiales"
-                onClick={() => setMenuOpen(false)}
-                className="px-4 py-3 rounded-xl text-base font-medium text-zinc-300 hover:bg-zinc-900/60 transition"
-              >
-                Materiales
-              </Link>
-              <Link
-                to="/asistencia"
-                onClick={() => setMenuOpen(false)}
-                className="px-4 py-3 rounded-xl text-base font-medium text-zinc-300 hover:bg-zinc-900/60 transition"
-              >
-                Asistencia
-              </Link>
-              <Link
-                to="/ajustes"
-                onClick={() => setMenuOpen(false)}
-                className="px-4 py-3 rounded-xl text-base font-medium text-zinc-300 hover:bg-zinc-900/60 transition"
-              >
-                Ajustes
-              </Link>
-              <button
-                onClick={handleSignOut}
-                className="px-4 py-3 rounded-xl text-base font-medium text-red-400 hover:bg-red-500/10 text-left transition"
-              >
-                Salir
-              </button>
-            </nav>
-          </div>
-        )}
+        <nav className="flex md:hidden overflow-x-auto no-scrollbar gap-2 py-2 w-full whitespace-nowrap border-b border-white/10 max-w-7xl mx-auto px-4">
+          <Link
+            to="/dashboard"
+            className="px-3 py-1.5 text-xs rounded-full bg-white/10 text-white border border-white/10 whitespace-nowrap"
+          >
+            Dashboard
+          </Link>
+          <Link
+            to="/congregados"
+            className="px-3 py-1.5 text-xs rounded-full bg-white/5 text-zinc-300 whitespace-nowrap"
+          >
+            Congregados
+          </Link>
+          <Link
+            to="/materiales"
+            className="px-3 py-1.5 text-xs rounded-full bg-white/5 text-zinc-300 whitespace-nowrap"
+          >
+            Materiales
+          </Link>
+          <Link
+            to="/asistencia"
+            className="px-3 py-1.5 text-xs rounded-full bg-white/5 text-zinc-300 whitespace-nowrap"
+          >
+            Asistencia
+          </Link>
+          <Link
+            to="/ajustes"
+            className="px-3 py-1.5 text-xs rounded-full bg-white/5 text-zinc-300 whitespace-nowrap"
+          >
+            Ajustes
+          </Link>
+          <button
+            onClick={handleSignOut}
+            className="px-3 py-1.5 text-xs rounded-full bg-white/5 text-red-400 whitespace-nowrap"
+          >
+            Salir
+          </button>
+        </nav>
       </header>
 
-      <main className="max-w-7xl mx-auto px-4 py-6 sm:p-6 space-y-8">
+      <main className="w-full max-w-7xl mx-auto px-4 py-4 sm:p-6 space-y-8">
       {/* Invitación al equipo */}
       <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
@@ -666,7 +647,7 @@ function DashboardPage() {
       </div>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full">
         <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl hover:border-zinc-700/60 transition-all shadow-sm">
           <p className="text-zinc-400 text-xs uppercase flex items-center gap-2">
             <Users className="w-3.5 h-3.5" /> Congregados
