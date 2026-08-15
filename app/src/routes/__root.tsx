@@ -1,7 +1,5 @@
-import { createFileRoute, Outlet, Link, useNavigate } from '@tanstack/react-router';
+import { createRootRoute, Outlet, Link, useNavigate } from '@tanstack/react-router';
 import { supabase } from '../lib/supabase';
-// Importamos el archivo CSS principal para los estilos globales
-import '../styles.css'; 
 
 export const Route = createRootRoute({
   component: RootComponent,
