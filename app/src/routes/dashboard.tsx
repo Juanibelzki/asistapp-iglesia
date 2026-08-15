@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { CalendarDays, Users, GraduationCap, Plus, CheckCircle2, Pencil, Trash2, Eraser, ChevronDown } from 'lucide-react';
+import { CalendarDays, Users, GraduationCap, Plus, CheckCircle2, Pencil, Trash2, Eraser, ChevronDown, CalendarCheck, LayoutGrid } from 'lucide-react';
 
 export const Route = createFileRoute('/dashboard')({
   component: DashboardPage,
@@ -9,8 +9,13 @@ export const Route = createFileRoute('/dashboard')({
 
 interface DashboardStats {
   memberCount: number;
+  newMembers30d: number;
   studentCount: number;
-  eventCount: number;
+  stageCounts: { 'niño': number; 'adolescente': number; 'adulto': number };
+  lastEventAttendance: number;
+  lastEventTitle: string;
+  lastEventDate: string;
+  activePrograms: number;
 }
 
 interface EventItem {
@@ -29,7 +34,16 @@ function DashboardPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
   const [profile, setProfile] = useState<{ fullName: string; churchName: string; orgId: string } | null>(null);
-  const [stats, setStats] = useState<DashboardStats>({ memberCount: 0, studentCount: 0, eventCount: 0 });
+  const [stats, setStats] = useState<DashboardStats>({
+    memberCount: 0,
+    newMembers30d: 0,
+    studentCount: 0,
+    stageCounts: { 'niño': 0, 'adolescente': 0, 'adulto': 0 },
+    lastEventAttendance: 0,
+    lastEventTitle: '',
+    lastEventDate: '',
+    activePrograms: 0,
+  });
   const [events, setEvents] = useState<EventItem[]>([]);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
@@ -77,7 +91,19 @@ function DashboardPage() {
           });
         }
 
-        const [{ count: memberCount }, { count: studentCount }, { data: eventData }] = await Promise.all([
+        const today = new Date().toISOString().slice(0, 10);
+        const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
+
+        const [
+          { count: memberCount },
+          { count: newMembers30d },
+          { count: studentCount },
+          { count: niñoCount },
+          { count: adolescenteCount },
+          { count: adultoCount },
+          { data: eventData },
+          { data: lastEventData },
+        ] = await Promise.all([
           supabase
             .from('congregados')
             .select('*', { count: 'exact', head: true })
@@ -86,20 +112,75 @@ function DashboardPage() {
             .from('congregados')
             .select('*', { count: 'exact', head: true })
             .eq('organization_id', orgId)
+            .gte('created_at', thirtyDaysAgo),
+          supabase
+            .from('congregados')
+            .select('*', { count: 'exact', head: true })
+            .eq('organization_id', orgId)
             .eq('is_student', true),
+          supabase
+            .from('congregados')
+            .select('*', { count: 'exact', head: true })
+            .eq('organization_id', orgId)
+            .eq('is_student', true)
+            .eq('student_stage', 'niño'),
+          supabase
+            .from('congregados')
+            .select('*', { count: 'exact', head: true })
+            .eq('organization_id', orgId)
+            .eq('is_student', true)
+            .eq('student_stage', 'adolescente'),
+          supabase
+            .from('congregados')
+            .select('*', { count: 'exact', head: true })
+            .eq('organization_id', orgId)
+            .eq('is_student', true)
+            .eq('student_stage', 'adulto'),
           supabase
             .from('events')
             .select('*')
             .eq('organization_id', orgId)
             .order('event_date', { ascending: true })
             .limit(100),
+          supabase
+            .from('events')
+            .select('id, title, event_date')
+            .eq('organization_id', orgId)
+            .lte('event_date', today)
+            .order('event_date', { ascending: false })
+            .limit(1),
         ]);
+
+        let lastEventAttendance = 0;
+        if (lastEventData && lastEventData.length > 0) {
+          const lastEvent = lastEventData[0];
+          const { count: attCount } = await supabase
+            .from('attendance')
+            .select('*', { count: 'exact', head: true })
+            .eq('event_id', lastEvent.id)
+            .eq('organization_id', orgId);
+          lastEventAttendance = attCount || 0;
+        }
+
+        const uniquePrograms = new Set<string>();
+        for (const evt of eventData || []) {
+          if (evt.event_date >= today) uniquePrograms.add(evt.title);
+        }
 
         if (isMounted) {
           setStats({
             memberCount: memberCount || 0,
+            newMembers30d: newMembers30d || 0,
             studentCount: studentCount || 0,
-            eventCount: eventData?.length || 0,
+            stageCounts: {
+              'niño': niñoCount || 0,
+              'adolescente': adolescenteCount || 0,
+              'adulto': adultoCount || 0,
+            },
+            lastEventAttendance,
+            lastEventTitle: (lastEventData && lastEventData[0]?.title) || '',
+            lastEventDate: (lastEventData && lastEventData[0]?.event_date) || '',
+            activePrograms: uniquePrograms.size,
           });
           setEvents(
             (eventData || []).map((e) => ({
@@ -180,7 +261,12 @@ function DashboardPage() {
           event_date: e.event_date,
         })),
       );
-      setStats((s) => ({ ...s, eventCount: eventData.length }));
+      const today = new Date().toISOString().slice(0, 10);
+      const active = new Set<string>();
+      for (const evt of eventData) {
+        if (evt.event_date >= today) active.add(evt.title);
+      }
+      setStats((s) => ({ ...s, activePrograms: active.size }));
     }
   };
 
@@ -402,24 +488,53 @@ function DashboardPage() {
       </header>
 
       {/* Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
           <p className="text-zinc-400 text-xs uppercase flex items-center gap-2">
             <Users className="w-3.5 h-3.5" /> Congregados
           </p>
           <p className="text-3xl font-bold mt-2">{stats.memberCount}</p>
+          <p className="text-xs text-zinc-500 mt-2 flex items-center gap-1.5">
+            <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[11px] font-semibold">
+              +{stats.newMembers30d}
+            </span>
+            altas en los últimos 30 días
+          </p>
         </div>
         <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
           <p className="text-zinc-400 text-xs uppercase flex items-center gap-2">
-            <GraduationCap className="w-3.5 h-3.5" /> Alumnos Formativos
+            <GraduationCap className="w-3.5 h-3.5" /> Alumnos en Formación
           </p>
           <p className="text-3xl font-bold mt-2">{stats.studentCount}</p>
+          <div className="flex items-center gap-1.5 mt-2 flex-wrap">
+            <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[11px] font-semibold">
+              {stats.stageCounts['niño']} niños
+            </span>
+            <span className="bg-sky-500/10 text-sky-400 border border-sky-500/30 px-2 py-0.5 rounded-full text-[11px] font-semibold">
+              {stats.stageCounts['adolescente']} adolescentes
+            </span>
+            <span className="bg-purple-500/10 text-purple-400 border border-purple-500/30 px-2 py-0.5 rounded-full text-[11px] font-semibold">
+              {stats.stageCounts['adulto']} adultos
+            </span>
+          </div>
         </div>
         <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
           <p className="text-zinc-400 text-xs uppercase flex items-center gap-2">
-            <CalendarDays className="w-3.5 h-3.5" /> Próximos Eventos
+            <CalendarCheck className="w-3.5 h-3.5" /> Asistencia del Último Evento
           </p>
-          <p className="text-3xl font-bold mt-2">{stats.eventCount}</p>
+          <p className="text-3xl font-bold mt-2">{stats.lastEventAttendance}</p>
+          <p className="text-xs text-zinc-400 mt-2 truncate">
+            {stats.lastEventTitle
+              ? `${stats.lastEventAttendance} presentes · ${stats.lastEventTitle}`
+              : 'Sin eventos con asistencia registrada'}
+          </p>
+        </div>
+        <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+          <p className="text-zinc-400 text-xs uppercase flex items-center gap-2">
+            <LayoutGrid className="w-3.5 h-3.5" /> Programas Activos
+          </p>
+          <p className="text-3xl font-bold mt-2">{stats.activePrograms}</p>
+          <p className="text-xs text-zinc-500 mt-2">Cursos programados con fechas futuras</p>
         </div>
       </div>
 
