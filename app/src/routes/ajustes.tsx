@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { readLocalSession } from '../lib/session';
 
 export const Route = createFileRoute('/ajustes')({
   component: AjustesPage,
@@ -35,29 +36,32 @@ function AjustesPage() {
 
     async function loadData() {
       try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        if (sessionError || !session) {
+        const { data: { session } } = await supabase.auth.getSession();
+        let orgForLoad: string | null = null;
+
+        if (session) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('organization_id')
+            .eq('auth_user_id', session.user.id)
+            .maybeSingle();
+          orgForLoad = profile?.organization_id ?? null;
+        } else {
+          const local = readLocalSession();
+          orgForLoad = local?.organization_id ?? null;
+        }
+
+        if (!orgForLoad) {
           if (isMounted) navigate({ to: '/login' });
           return;
         }
 
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('organization_id')
-          .eq('auth_user_id', session.user.id)
-          .maybeSingle();
-
-        if (!profile?.organization_id) {
-          if (isMounted) setFormError('No se pudo determinar tu organización.');
-          return;
-        }
-
-        if (isMounted) setOrgId(profile.organization_id);
+        if (isMounted) setOrgId(orgForLoad);
 
         const { data: org } = await supabase
           .from('organizations')
           .select('name, motto, address, phone, logo_url')
-          .eq('id', profile.organization_id)
+          .eq('id', orgForLoad)
           .maybeSingle();
 
         if (org && isMounted) {

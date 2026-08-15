@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { RefreshCw, CloudOff } from 'lucide-react';
 import { supabase } from '../lib/supabase';
+import { readLocalSession } from '../lib/session';
 
 export const Route = createFileRoute('/asistencia')({
   component: AsistenciaPage,
@@ -115,32 +116,30 @@ function AsistenciaPage() {
       try {
         let orgForLoad: string | null = null;
 
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
 
-        if (sessionError || !session) {
-          const staff = readStaffSession();
-          if (staff?.organization_id) {
-            orgForLoad = staff.organization_id;
-            const welcomeMsg = localStorage.getItem(WELCOME_MSG_KEY);
-            if (welcomeMsg) {
-              localStorage.removeItem(WELCOME_MSG_KEY);
-              if (isMounted) showToast(welcomeMsg);
-            }
-          } else {
-            if (isMounted) navigate({ to: '/login' });
-            return;
-          }
-        } else {
+        if (session) {
           const { data: profile } = await supabase
             .from('profiles')
             .select('organization_id')
             .eq('auth_user_id', session.user.id)
             .maybeSingle();
           orgForLoad = profile?.organization_id ?? null;
+        } else {
+          const staff = readStaffSession();
+          const local = readLocalSession();
+          orgForLoad = staff?.organization_id ?? local?.organization_id ?? null;
+          if (orgForLoad) {
+            const welcomeMsg = localStorage.getItem(WELCOME_MSG_KEY);
+            if (welcomeMsg) {
+              localStorage.removeItem(WELCOME_MSG_KEY);
+              if (isMounted) showToast(welcomeMsg);
+            }
+          }
         }
 
         if (!orgForLoad) {
-          if (isMounted) setLoading(false);
+          if (isMounted) navigate({ to: '/login' });
           return;
         }
 

@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { readLocalSession } from '../lib/session';
 import { QRCodeSVG } from 'qrcode.react';
 
 export const Route = createFileRoute('/congregados')({
@@ -77,41 +78,46 @@ function CongregadosPage() {
 
     async function loadData() {
       try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        const { data: { session } } = await supabase.auth.getSession();
+        let orgForLoad: string | null = null;
 
-        if (sessionError || !session) {
+        if (session) {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('organization_id')
+            .eq('auth_user_id', session.user.id)
+            .maybeSingle();
+          orgForLoad = profile?.organization_id ?? null;
+        } else {
+          const local = readLocalSession();
+          orgForLoad = local?.organization_id ?? null;
+        }
+
+        if (!orgForLoad) {
           if (isMounted) navigate({ to: '/login' });
           return;
         }
 
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('organization_id, full_name')
-          .eq('auth_user_id', session.user.id)
+        if (isMounted) setOrgId(orgForLoad);
+
+        const { data: org } = await supabase
+          .from('organizations')
+          .select('name')
+          .eq('id', orgForLoad)
           .maybeSingle();
 
-        if (profile?.organization_id) {
-          if (isMounted) setOrgId(profile.organization_id);
+        if (org && isMounted) {
+          setChurchName(org.name || 'Mi Congregación');
+        }
 
-          const { data: org } = await supabase
-            .from('organizations')
-            .select('name')
-            .eq('id', profile.organization_id)
-            .maybeSingle();
+        const { data: members, error: membersError } = await supabase
+          .from('congregados')
+          .select('*')
+          .eq('organization_id', orgForLoad)
+          .order('created_at', { ascending: false });
 
-          if (org && isMounted) {
-            setChurchName(org.name || 'Mi Congregación');
-          }
-
-          const { data: members, error: membersError } = await supabase
-            .from('congregados')
-            .select('*')
-            .eq('organization_id', profile.organization_id)
-            .order('created_at', { ascending: false });
-
-          if (!membersError && members && isMounted) {
-            setCongregados(members);
-          }
+        if (!membersError && members && isMounted) {
+          setCongregados(members);
         }
       } catch (err) {
         console.error('Error al cargar congregados:', err);

@@ -1,31 +1,12 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { readLocalSession, clearLocalSessions } from '../lib/session';
 import { CalendarDays, Users, GraduationCap, Plus, CheckCircle2, Pencil, Trash2, Eraser, ChevronDown, CalendarCheck, LayoutGrid, Link2 } from 'lucide-react';
 
 export const Route = createFileRoute('/dashboard')({
   component: DashboardPage,
 });
-
-const USER_SESSION_KEY = 'asistapp_user_session';
-
-interface LocalUserSession {
-  organization_id?: string;
-  role?: string;
-  full_name?: string;
-  church_name?: string;
-}
-
-const readLocalUserSession = (): LocalUserSession | null => {
-  try {
-    const raw = localStorage.getItem(USER_SESSION_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    return parsed?.organization_id ? (parsed as LocalUserSession) : null;
-  } catch {
-    return null;
-  }
-};
 
 interface DashboardStats {
   memberCount: number;
@@ -92,7 +73,7 @@ function DashboardPage() {
         let profileForLoad: { fullName: string; churchName: string; orgId: string } | null = null;
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
-          const local = readLocalUserSession();
+          const local = readLocalSession();
           const localRole = (local?.role || '').toLowerCase();
           const isDirectiveRole =
             localRole !== 'staff' && localRole !== 'usher' && localRole !== 'ujier';
@@ -103,7 +84,7 @@ function DashboardPage() {
               orgId: local.organization_id,
             };
           } else {
-            navigate({ to: '/login' });
+            navigate({ to: '/asistencia' });
             return;
           }
         } else {
@@ -244,6 +225,7 @@ function DashboardPage() {
   }, [navigate]);
 
   const handleSignOut = async () => {
+    clearLocalSessions();
     await supabase.auth.signOut();
     navigate({ to: '/login' });
   };
