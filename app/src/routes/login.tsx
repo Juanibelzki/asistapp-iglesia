@@ -42,29 +42,29 @@ function Login() {
 
       let { data, error } = await supabase
         .from('profiles')
-        .select('id, organization_id, role, full_name, phone, organizations(name)')
+        .select('*')
         .eq('phone', cleanDigits)
         .eq('pin', cleanPin)
         .limit(1)
         .maybeSingle()
 
       if (error) {
-        console.error('Error al consultar profiles en login:', error)
-        setErrorMsg('Error al conectar con el servidor. Revisá los permisos de la base de datos.')
+        console.error('SUPABASE LOGIN ERROR:', error)
+        setErrorMsg(error.message || 'Error al conectar con la base de datos')
         return
       }
 
       if (!data && cleanDigits.length >= 8) {
         const { data: candidates, error: flexError } = await supabase
           .from('profiles')
-          .select('id, organization_id, role, full_name, phone, organizations(name)')
+          .select('*')
           .eq('pin', cleanPin)
           .not('phone', 'is', null)
           .limit(20)
 
         if (flexError) {
-          console.error('Error al buscar coincidencia flexible en login:', flexError)
-          setErrorMsg('Error al conectar con el servidor. Revisá los permisos de la base de datos.')
+          console.error('SUPABASE LOGIN ERROR:', flexError)
+          setErrorMsg(flexError.message || 'Error al conectar con la base de datos')
           return
         }
 
@@ -84,19 +84,11 @@ function Login() {
 
       if (!data) {
         console.warn(`Login sin coincidencia: phone="${cleanDigits}" pin="${cleanPin}"`)
-        setErrorMsg('Teléfono o PIN incorrectos. Si no tenés cuenta, registrate con tu iglesia.')
+        setErrorMsg('Teléfono o PIN incorrectos.')
         return
       }
 
-      const session = {
-        id: data.id,
-        organization_id: data.organization_id,
-        role: data.role,
-        full_name: data.full_name,
-        phone: data.phone,
-        church_name: (data.organizations as any)?.name || '',
-      }
-      localStorage.setItem(USER_SESSION_KEY, JSON.stringify(session))
+      localStorage.setItem(USER_SESSION_KEY, JSON.stringify(data))
 
       const role = data.role || 'staff'
       if (role === 'admin') {
@@ -109,7 +101,7 @@ function Login() {
             full_name: data.full_name,
             role,
             pin: cleanPin,
-            church_name: (data.organizations as any)?.name || '',
+            church_name: '',
           }),
         )
         navigate({ to: '/asistencia' })
