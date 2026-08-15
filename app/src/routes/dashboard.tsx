@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { CalendarDays, Users, GraduationCap, Plus, CheckCircle2 } from 'lucide-react';
+import { CalendarDays, Users, GraduationCap, Plus, CheckCircle2, Pencil, Trash2, Eraser } from 'lucide-react';
 
 export const Route = createFileRoute('/dashboard')({
   component: DashboardPage,
@@ -27,6 +27,7 @@ function DashboardPage() {
   const [events, setEvents] = useState<EventItem[]>([]);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
+  const [editingEventId, setEditingEventId] = useState<string | null>(null);
   const [eventForm, setEventForm] = useState({
     title: '',
     event_date: '',
@@ -125,7 +126,22 @@ function DashboardPage() {
   };
 
   const openEventModal = () => {
+    setEditingEventId(null);
     setEventForm({ title: '', event_date: '', is_recurring: false, frequency: 'semanal', end_date: '' });
+    setEventError('');
+    setSuccessMsg('');
+    setIsOpenModal(true);
+  };
+
+  const openEditModal = (event: EventItem) => {
+    setEditingEventId(event.id);
+    setEventForm({
+      title: event.title,
+      event_date: event.event_date,
+      is_recurring: false,
+      frequency: 'semanal',
+      end_date: '',
+    });
     setEventError('');
     setSuccessMsg('');
     setIsOpenModal(true);
@@ -133,13 +149,35 @@ function DashboardPage() {
 
   const closeEventModal = () => {
     setIsOpenModal(false);
+    setEditingEventId(null);
     setEventError('');
   };
 
   const toDateString = (d: Date) =>
     `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
-  const handleCreateEvent = async (e: React.FormEvent) => {
+  const reloadEvents = async () => {
+    if (!profile) return;
+    const { data: eventData } = await supabase
+      .from('events')
+      .select('*')
+      .eq('organization_id', profile.orgId)
+      .order('event_date', { ascending: true })
+      .limit(5);
+
+    if (eventData) {
+      setEvents(
+        eventData.map((e) => ({
+          id: e.id,
+          title: e.title,
+          event_date: e.event_date,
+        })),
+      );
+      setStats((s) => ({ ...s, eventCount: eventData.length }));
+    }
+  };
+
+  const handleSubmitEvent = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!profile) {
       setEventError('No se pudo determinar tu organización. Intenta recargar la página.');
@@ -149,81 +187,119 @@ function DashboardPage() {
       setEventError('Título y Fecha son obligatorios.');
       return;
     }
-    if (eventForm.is_recurring && !eventForm.end_date) {
-      setEventError('Indica la fecha límite de repetición.');
-      return;
-    }
-    if (eventForm.is_recurring && eventForm.end_date <= eventForm.event_date) {
-      setEventError('La fecha límite debe ser posterior a la fecha del evento.');
-      return;
-    }
 
     setSavingEvent(true);
     setEventError('');
     try {
-      let insertedCount = 1;
-
-      if (!eventForm.is_recurring) {
-        const { error } = await supabase.from('events').insert({
-          organization_id: profile.orgId,
-          title: eventForm.title.trim(),
-          event_date: eventForm.event_date,
-        });
+      if (editingEventId) {
+        const { error } = await supabase
+          .from('events')
+          .update({ title: eventForm.title.trim(), event_date: eventForm.event_date })
+          .eq('id', editingEventId)
+          .eq('organization_id', profile.orgId);
         if (error) throw error;
+        setSuccessMsg('Evento actualizado con éxito.');
       } else {
-        const intervalDays = eventForm.frequency === 'quincenal' ? 14 : 7;
-        const eventsToInsert: { title: string; event_date: string; organization_id: string }[] = [];
-        const currentDate = new Date(`${eventForm.event_date}T00:00:00`);
-        const finalDate = new Date(`${eventForm.end_date}T00:00:00`);
-
-        while (currentDate <= finalDate) {
-          eventsToInsert.push({
-            title: eventForm.title.trim(),
-            event_date: toDateString(currentDate),
-            organization_id: profile.orgId,
-          });
-          currentDate.setDate(currentDate.getDate() + intervalDays);
+        if (eventForm.is_recurring && !eventForm.end_date) {
+          setEventError('Indica la fecha límite de repetición.');
+          return;
         }
-
-        if (eventsToInsert.length === 0) {
-          setEventError('No se pudo generar ninguna fecha para la recurrencia.');
+        if (eventForm.is_recurring && eventForm.end_date <= eventForm.event_date) {
+          setEventError('La fecha límite debe ser posterior a la fecha del evento.');
           return;
         }
 
-        const { error } = await supabase.from('events').insert(eventsToInsert);
-        if (error) throw error;
-        insertedCount = eventsToInsert.length;
-      }
+        let insertedCount = 1;
 
-      setSuccessMsg(
-        insertedCount === 1
-          ? 'Evento programado con éxito.'
-          : `Se programaron ${insertedCount} clases con éxito.`,
-      );
+        if (!eventForm.is_recurring) {
+          const { error } = await supabase.from('events').insert({
+            organization_id: profile.orgId,
+            title: eventForm.title.trim(),
+            event_date: eventForm.event_date,
+          });
+          if (error) throw error;
+        } else {
+          const intervalDays = eventForm.frequency === 'quincenal' ? 14 : 7;
+          const eventsToInsert: { title: string; event_date: string; organization_id: string }[] = [];
+          const currentDate = new Date(`${eventForm.event_date}T00:00:00`);
+          const finalDate = new Date(`${eventForm.end_date}T00:00:00`);
 
-      const { data: eventData } = await supabase
-        .from('events')
-        .select('*')
-        .eq('organization_id', profile.orgId)
-        .order('event_date', { ascending: true })
-        .limit(5);
+          while (currentDate <= finalDate) {
+            eventsToInsert.push({
+              title: eventForm.title.trim(),
+              event_date: toDateString(currentDate),
+              organization_id: profile.orgId,
+            });
+            currentDate.setDate(currentDate.getDate() + intervalDays);
+          }
 
-      if (eventData) {
-        setEvents(
-          eventData.map((e) => ({
-            id: e.id,
-            title: e.title,
-            event_date: e.event_date,
-          })),
+          if (eventsToInsert.length === 0) {
+            setEventError('No se pudo generar ninguna fecha para la recurrencia.');
+            return;
+          }
+
+          const { error } = await supabase.from('events').insert(eventsToInsert);
+          if (error) throw error;
+          insertedCount = eventsToInsert.length;
+        }
+
+        setSuccessMsg(
+          insertedCount === 1
+            ? 'Evento programado con éxito.'
+            : `Se programaron ${insertedCount} clases con éxito.`,
         );
-        setStats((s) => ({ ...s, eventCount: eventData.length }));
       }
+
+      await reloadEvents();
       closeEventModal();
     } catch (err) {
-      console.error('Error al crear evento:', err);
-      setEventError(err instanceof Error ? err.message : 'Error al crear el evento.');
+      console.error('Error al guardar evento:', err);
+      setEventError(err instanceof Error ? err.message : 'Error al guardar el evento.');
     } finally {
       setSavingEvent(false);
+    }
+  };
+
+  const handleDeleteEvent = async (event: EventItem) => {
+    if (!profile) return;
+    if (!window.confirm(`¿Eliminar el evento "${event.title}"? Esta acción no se puede deshacer.`)) return;
+
+    setEventError('');
+    setSuccessMsg('');
+    try {
+      const { error } = await supabase
+        .from('events')
+        .delete()
+        .eq('id', event.id)
+        .eq('organization_id', profile.orgId);
+      if (error) throw error;
+      setSuccessMsg('Evento eliminado.');
+      await reloadEvents();
+    } catch (err) {
+      console.error('Error al eliminar evento:', err);
+      setEventError(err instanceof Error ? err.message : 'Error al eliminar el evento.');
+    }
+  };
+
+  const handleCleanupPast = async () => {
+    if (!profile) return;
+    if (!window.confirm('¿Eliminar todos los eventos con fecha anterior a hoy?')) return;
+
+    setEventError('');
+    setSuccessMsg('');
+    try {
+      const today = toDateString(new Date());
+      const { error } = await supabase
+        .from('events')
+        .delete()
+        .eq('organization_id', profile.orgId)
+        .lt('event_date', today);
+      if (error) throw error;
+      setSuccessMsg('Eventos pasados eliminados.');
+      await reloadEvents();
+    } catch (err) {
+      console.error('Error al limpiar eventos pasados:', err);
+      setEventError(err instanceof Error ? err.message : 'Error al limpiar eventos pasados.');
     }
   };
 
@@ -292,11 +368,21 @@ function DashboardPage() {
         </div>
       )}
       <div className="bg-zinc-900 rounded-2xl border border-zinc-800 overflow-hidden">
-        <div className="p-6 border-b border-zinc-800 flex justify-between items-center">
+        <div className="p-6 border-b border-zinc-800 flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-bold">Próximos Eventos</h2>
-          <button onClick={openEventModal} className="text-xs bg-emerald-500 text-black px-3 py-1.5 rounded-lg flex items-center gap-1 font-bold">
-            <Plus className="w-3 h-3" /> Nuevo Evento
-          </button>
+          <div className="flex items-center gap-2">
+            {events.length > 0 && (
+              <button
+                onClick={handleCleanupPast}
+                className="text-xs text-zinc-400 px-3 py-1.5 rounded-lg border border-zinc-800 flex items-center gap-1 font-semibold transition hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/30"
+              >
+                <Eraser className="w-3 h-3" /> Limpiar Pasados
+              </button>
+            )}
+            <button onClick={openEventModal} className="text-xs bg-emerald-500 text-black px-3 py-1.5 rounded-lg flex items-center gap-1 font-bold">
+              <Plus className="w-3 h-3" /> Nuevo Evento
+            </button>
+          </div>
         </div>
         {events.length === 0 ? (
           <div className="p-12 text-center flex flex-col items-center justify-center">
@@ -315,6 +401,7 @@ function DashboardPage() {
               <tr>
                 <th className="p-4 text-left">Evento</th>
                 <th className="p-4 text-left">Fecha</th>
+                <th className="p-4 text-right">Acciones</th>
               </tr>
             </thead>
             <tbody>
@@ -322,6 +409,24 @@ function DashboardPage() {
                 <tr key={evt.id} className="border-t border-zinc-800 hover:bg-zinc-800/30 transition">
                   <td className="p-4 font-bold text-white">{evt.title}</td>
                   <td className="p-4">{formatDate(evt.event_date)}</td>
+                  <td className="p-4">
+                    <div className="flex items-center justify-end gap-1">
+                      <button
+                        onClick={() => openEditModal(evt)}
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 transition hover:text-emerald-400 hover:bg-emerald-500/10"
+                        aria-label={`Editar ${evt.title}`}
+                      >
+                        <Pencil className="w-3.5 h-3.5" />
+                      </button>
+                      <button
+                        onClick={() => handleDeleteEvent(evt)}
+                        className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 transition hover:text-red-400 hover:bg-red-500/10"
+                        aria-label={`Eliminar ${evt.title}`}
+                      >
+                        <Trash2 className="w-3.5 h-3.5" />
+                      </button>
+                    </div>
+                  </td>
                 </tr>
               ))}
             </tbody>
@@ -340,7 +445,7 @@ function DashboardPage() {
             onClick={(e) => e.stopPropagation()}
           >
             <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
-              <h2 className="text-lg font-bold text-white">Nuevo Evento</h2>
+              <h2 className="text-lg font-bold text-white">{editingEventId ? 'Editar Evento' : 'Nuevo Evento'}</h2>
               <button
                 onClick={closeEventModal}
                 className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition"
@@ -352,7 +457,7 @@ function DashboardPage() {
               </button>
             </div>
 
-            <form onSubmit={handleCreateEvent} className="p-6 space-y-5">
+            <form onSubmit={handleSubmitEvent} className="p-6 space-y-5">
               <div>
                 <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Título *</label>
                 <input
@@ -376,64 +481,68 @@ function DashboardPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-between bg-zinc-950/60 border border-zinc-800 rounded-xl px-4 py-3">
-                <div>
-                  <p className="text-sm font-semibold text-white">¿Es un evento recurrente?</p>
-                  <p className="text-xs text-zinc-500 mt-0.5">Se repetirá automáticamente hasta la fecha límite.</p>
-                </div>
-                <button
-                  type="button"
-                  role="switch"
-                  aria-checked={eventForm.is_recurring}
-                  onClick={() => setEventForm((f) => ({ ...f, is_recurring: !f.is_recurring }))}
-                  className={`relative shrink-0 w-11 h-6 rounded-full transition ${
-                    eventForm.is_recurring ? 'bg-emerald-500' : 'bg-zinc-700'
-                  }`}
-                >
-                  <span
-                    className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
-                      eventForm.is_recurring ? 'translate-x-5' : ''
-                    }`}
-                  />
-                </button>
-              </div>
-
-              {eventForm.is_recurring && (
-                <div className="space-y-4 border-t border-zinc-800 pt-4">
-                  <div>
-                    <label className="block text-xs font-semibold text-zinc-400 mb-2">Frecuencia</label>
-                    <div className="grid grid-cols-2 gap-2">
-                      {(['semanal', 'quincenal'] as const).map((freq) => (
-                        <button
-                          key={freq}
-                          type="button"
-                          onClick={() => setEventForm((f) => ({ ...f, frequency: freq }))}
-                          className={`px-3 py-2 rounded-lg text-xs font-bold transition border ${
-                            eventForm.frequency === freq
-                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                              : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-zinc-200 hover:border-zinc-700'
-                          }`}
-                        >
-                          {freq === 'semanal' ? 'Semanal (7 días)' : 'Cada 14 días'}
-                        </button>
-                      ))}
+              {!editingEventId && (
+                <>
+                  <div className="flex items-center justify-between bg-zinc-950/60 border border-zinc-800 rounded-xl px-4 py-3">
+                    <div>
+                      <p className="text-sm font-semibold text-white">¿Es un evento recurrente?</p>
+                      <p className="text-xs text-zinc-500 mt-0.5">Se repetirá automáticamente hasta la fecha límite.</p>
                     </div>
+                    <button
+                      type="button"
+                      role="switch"
+                      aria-checked={eventForm.is_recurring}
+                      onClick={() => setEventForm((f) => ({ ...f, is_recurring: !f.is_recurring }))}
+                      className={`relative shrink-0 w-11 h-6 rounded-full transition ${
+                        eventForm.is_recurring ? 'bg-emerald-500' : 'bg-zinc-700'
+                      }`}
+                    >
+                      <span
+                        className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                          eventForm.is_recurring ? 'translate-x-5' : ''
+                        }`}
+                      />
+                    </button>
                   </div>
-                  <div>
-                    <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Repetir hasta *</label>
-                    <input
-                      type="date"
-                      min={minEndDate}
-                      value={eventForm.end_date}
-                      onChange={(e) => setEventForm((f) => ({ ...f, end_date: e.target.value }))}
-                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/40 transition [color-scheme:dark]"
-                      required
-                    />
-                    {eventForm.end_date && eventForm.end_date <= eventForm.event_date && (
-                      <p className="text-[11px] text-red-400 mt-1">La fecha límite debe ser posterior a la fecha del evento.</p>
-                    )}
-                  </div>
-                </div>
+
+                  {eventForm.is_recurring && (
+                    <div className="space-y-4 border-t border-zinc-800 pt-4">
+                      <div>
+                        <label className="block text-xs font-semibold text-zinc-400 mb-2">Frecuencia</label>
+                        <div className="grid grid-cols-2 gap-2">
+                          {(['semanal', 'quincenal'] as const).map((freq) => (
+                            <button
+                              key={freq}
+                              type="button"
+                              onClick={() => setEventForm((f) => ({ ...f, frequency: freq }))}
+                              className={`px-3 py-2 rounded-lg text-xs font-bold transition border ${
+                                eventForm.frequency === freq
+                                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                                  : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-zinc-200 hover:border-zinc-700'
+                              }`}
+                            >
+                              {freq === 'semanal' ? 'Semanal (7 días)' : 'Cada 14 días'}
+                            </button>
+                          ))}
+                        </div>
+                      </div>
+                      <div>
+                        <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Repetir hasta *</label>
+                        <input
+                          type="date"
+                          min={minEndDate}
+                          value={eventForm.end_date}
+                          onChange={(e) => setEventForm((f) => ({ ...f, end_date: e.target.value }))}
+                          className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/40 transition [color-scheme:dark]"
+                          required
+                        />
+                        {eventForm.end_date && eventForm.end_date <= eventForm.event_date && (
+                          <p className="text-[11px] text-red-400 mt-1">La fecha límite debe ser posterior a la fecha del evento.</p>
+                        )}
+                      </div>
+                    </div>
+                  )}
+                </>
               )}
 
               {eventError && (
@@ -460,6 +569,8 @@ function DashboardPage() {
                       <span className="w-4 h-4 border-2 border-zinc-950/40 border-t-zinc-950 rounded-full animate-spin" />
                       Guardando...
                     </>
+                  ) : editingEventId ? (
+                    'Guardar Cambios'
                   ) : (
                     'Crear Evento'
                   )}
