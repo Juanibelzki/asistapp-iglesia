@@ -17,19 +17,17 @@ interface EventItem {
   id: string;
   title: string;
   event_date: string;
-  start_time: string | null;
-  event_type: string;
 }
 
 function DashboardPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState<{ fullName: string; churchName: string; orgId: string; profileId: string } | null>(null);
+  const [profile, setProfile] = useState<{ fullName: string; churchName: string; orgId: string } | null>(null);
   const [stats, setStats] = useState<DashboardStats>({ memberCount: 0, studentCount: 0, eventCount: 0 });
   const [events, setEvents] = useState<EventItem[]>([]);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [eventForm, setEventForm] = useState({ title: '', event_type: 'clase_sabado', event_date: '', start_time: '' });
+  const [eventForm, setEventForm] = useState({ title: '', event_date: '' });
   const [savingEvent, setSavingEvent] = useState(false);
   const [eventError, setEventError] = useState('');
 
@@ -49,7 +47,7 @@ function DashboardPage() {
 
         const { data: profileData } = await supabase
           .from('profiles')
-          .select('id, full_name, organization_id, organizations(name)')
+          .select('full_name, organization_id, organizations(name)')
           .eq('auth_user_id', session.user.id)
           .single();
 
@@ -61,7 +59,6 @@ function DashboardPage() {
             fullName: profileData.full_name || 'Admin',
             churchName: (profileData.organizations as any)?.name || 'Mi Iglesia',
             orgId,
-            profileId: profileData.id,
           });
         }
 
@@ -94,8 +91,6 @@ function DashboardPage() {
               id: e.id,
               title: e.title,
               event_date: e.event_date,
-              start_time: e.start_time ?? null,
-              event_type: e.event_type,
             })),
           );
         }
@@ -123,7 +118,7 @@ function DashboardPage() {
   };
 
   const openEventModal = () => {
-    setEventForm({ title: '', event_type: 'clase_sabado', event_date: '', start_time: '' });
+    setEventForm({ title: '', event_date: '' });
     setEventError('');
     setIsOpenModal(true);
   };
@@ -150,10 +145,7 @@ function DashboardPage() {
       const { error } = await supabase.from('events').insert({
         organization_id: profile.orgId,
         title: eventForm.title.trim(),
-        event_type: eventForm.event_type,
         event_date: eventForm.event_date,
-        start_time: eventForm.start_time || null,
-        created_by: profile.profileId || null,
       });
       if (error) throw error;
 
@@ -170,8 +162,6 @@ function DashboardPage() {
             id: e.id,
             title: e.title,
             event_date: e.event_date,
-            start_time: e.start_time ?? null,
-            event_type: e.event_type,
           })),
         );
         setStats((s) => ({ ...s, eventCount: eventData.length }));
@@ -260,8 +250,6 @@ function DashboardPage() {
               <tr>
                 <th className="p-4 text-left">Evento</th>
                 <th className="p-4 text-left">Fecha</th>
-                <th className="p-4 text-left">Hora</th>
-                <th className="p-4 text-left">Tipo</th>
               </tr>
             </thead>
             <tbody>
@@ -269,8 +257,6 @@ function DashboardPage() {
                 <tr key={evt.id} className="border-t border-zinc-800 hover:bg-zinc-800/30 transition">
                   <td className="p-4 font-bold text-white">{evt.title}</td>
                   <td className="p-4">{formatDate(evt.event_date)}</td>
-                  <td className="p-4">{evt.start_time || '—'}</td>
-                  <td className="p-4 text-emerald-400 capitalize">{String(evt.event_type).replace('_', ' ')}</td>
                 </tr>
               ))}
             </tbody>
@@ -315,45 +301,14 @@ function DashboardPage() {
               </div>
 
               <div>
-                <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Tipo</label>
-                <div className="grid grid-cols-2 gap-2">
-                  {(['clase_sabado', 'actividad_semana'] as const).map((type) => (
-                    <button
-                      key={type}
-                      type="button"
-                      onClick={() => setEventForm((f) => ({ ...f, event_type: type }))}
-                      className={`px-3 py-2 rounded-lg text-xs font-bold capitalize transition border ${
-                        eventForm.event_type === type
-                          ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                          : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-zinc-200 hover:border-zinc-700'
-                      }`}
-                    >
-                      {type.replace('_', ' ')}
-                    </button>
-                  ))}
-                </div>
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Fecha *</label>
-                  <input
-                    type="date"
-                    value={eventForm.event_date}
-                    onChange={(e) => setEventForm((f) => ({ ...f, event_date: e.target.value }))}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/40 transition [color-scheme:dark]"
-                    required
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Hora (opcional)</label>
-                  <input
-                    type="time"
-                    value={eventForm.start_time}
-                    onChange={(e) => setEventForm((f) => ({ ...f, start_time: e.target.value }))}
-                    className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/40 transition [color-scheme:dark]"
-                  />
-                </div>
+                <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Fecha *</label>
+                <input
+                  type="date"
+                  value={eventForm.event_date}
+                  onChange={(e) => setEventForm((f) => ({ ...f, event_date: e.target.value }))}
+                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/40 transition [color-scheme:dark]"
+                  required
+                />
               </div>
 
               {eventError && (
