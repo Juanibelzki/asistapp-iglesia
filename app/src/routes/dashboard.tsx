@@ -114,8 +114,12 @@ function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 space-y-8">
-      <header className="flex justify-between items-center">
+      <header className="flex justify-between items-center border-b border-zinc-800 pb-6">
         <h1 className="text-2xl font-bold">{profile?.churchName}</h1>
+        <nav className="flex gap-4">
+          <Link to="/dashboard" className="text-sm font-bold text-white">Dashboard</Link>
+          <Link to="/congregados" className="text-sm text-zinc-400 hover:text-white">Congregados</Link>
+        </nav>
         <button onClick={handleSignOut} className="text-sm text-zinc-400 hover:text-white">Salir</button>
       </header>
 
