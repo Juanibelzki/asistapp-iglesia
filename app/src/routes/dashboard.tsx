@@ -1,20 +1,18 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
-import { supabase } from '../lib/supabase'; // Ajuste de ruta basado en la estructura previa
-
+import { supabase } from '../lib/supabase';
+import { QrCode, ShieldCheck, WifiOff, BarChart3, Plus } from 'lucide-react';
 
 export const Route = createFileRoute('/dashboard')({
   component: DashboardPage,
 });
 
-
-interface UserProfile {
-  fullName: string;
-  churchName: string;
-  role: string;
-  email: string;
+interface DashboardStats {
+  memberCount: number;
+  activeAttendance: number;
+  eventCount: number;
+  teacherCount: number;
 }
-
 
 interface EventItem {
   id: string;
@@ -25,328 +23,155 @@ interface EventItem {
   status: 'Confirmado' | 'Pendiente' | 'En curso';
 }
 
-
 function DashboardPage() {
   const navigate = useNavigate();
   const [loading, setLoading] = useState(true);
-  const [profile, setProfile] = useState<UserProfile | null>(null);
-
-
-  // Lista de eventos de ejemplo (o vinculada a Supabase)
-  const [events] = useState<EventItem[]>([
-    {
-      id: '1',
-      title: 'Clase Bíblica Infantil - Nivel Cuna & Párvulos',
-      date: '2026-06-01',
-      time: '10:00 AM',
-      groupName: 'Niños (3-6 años)',
-      status: 'Confirmado',
-    },
-    {
-      id: '2',
-      title: 'Reunión de Preadolescentes & Dinámica QR',
-      date: '2026-06-07',
-      time: '11:30 AM',
-      groupName: 'Preadolescentes (12-14)',
-      status: 'Pendiente',
-    },
-    {
-      id: '3',
-      title: 'Escuela de Servidores & Maestros',
-      date: '2026-06-14',
-      time: '18:00 PM',
-      groupName: 'Liderazgo',
-      status: 'Confirmado',
-    },
-  ]);
-
+  const [profile, setProfile] = useState<{ fullName: string; churchName: string; orgId: string } | null>(null);
+  const [stats, setStats] = useState<DashboardStats>({ memberCount: 0, activeAttendance: 0, eventCount: 0, teacherCount: 0 });
+  const [events, setEvents] = useState<EventItem[]>([]);
 
   useEffect(() => {
-    async function checkAuthAndLoadData() {
+    async function loadData() {
       try {
-        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
-        
-        if (sessionError || !session) {
+        const { data: { session } } = await supabase.auth.getSession();
+        if (!session) {
           navigate({ to: '/login' });
           return;
         }
 
-
-        // Obtener datos del perfil y de la iglesia
+        // 1. Get Profile & Org
         const { data: profileData } = await supabase
           .from('profiles')
-          .select('full_name, role, email, organizations(name)')
+          .select('full_name, organization_id, organizations(name)')
           .eq('auth_user_id', session.user.id)
-          .maybeSingle();
+          .single();
 
-
-        if (profileData) {
-          setProfile({
-            fullName: profileData.full_name || session.user.email?.split('@')[0] || 'Administrador',
-            email: session.user.email || '',
-            role: profileData.role || 'Admin',
-            churchName: (profileData.organizations as any)?.name || 'Mi Congregación',
-          });
-        } else {
-          setProfile({
-            fullName: session.user.email?.split('@')[0] || 'Administrador',
-            email: session.user.email || '',
-            role: 'Admin',
-            churchName: 'Mi Congregación',
-          });
+        if (!profileData || !profileData.organization_id) {
+          throw new Error('No profile or organization found');
         }
+
+        const orgId = profileData.organization_id;
+        setProfile({
+          fullName: profileData.full_name || 'Admin',
+          churchName: (profileData.organizations as any)?.name || 'Mi Iglesia',
+          orgId
+        });
+
+        // 2. Fetch Real Data
+        // Alumnos (Children)
+        const { count: memberCount } = await supabase
+          .from('children')
+          .select('*', { count: 'exact', head: true })
+          .eq('organization_id', orgId);
+
+        // Eventos
+        const { data: eventData } = await supabase
+          .from('events')
+          .select('*')
+          .eq('organization_id', orgId)
+          .order('date', { ascending: true })
+          .limit(5);
+
+        // Maestros
+        const { count: teacherCount } = await supabase
+          .from('profiles')
+          .select('*', { count: 'exact', head: true })
+          .eq('organization_id', orgId)
+          .eq('role', 'teacher');
+
+        setStats({
+          memberCount: memberCount || 0,
+          activeAttendance: 0, // Implementar cuando tabla attendance esté lista
+          eventCount: eventData?.length || 0,
+          teacherCount: teacherCount || 0,
+        });
+
+        setEvents((eventData || []).map(e => ({
+          id: e.id,
+          title: e.title,
+          date: e.date,
+          time: '10:00 AM', // Ajustar según esquema real
+          groupName: 'General',
+          status: 'Pendiente'
+        })));
+
       } catch (err) {
-        console.error('Error cargando dashboard:', err);
+        console.error('Error loading dashboard:', err);
       } finally {
         setLoading(false);
       }
     }
 
-
-    checkAuthAndLoadData();
+    loadData();
   }, [navigate]);
-
 
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate({ to: '/login' });
   };
 
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-zinc-100">
-        <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mb-4"></div>
-        <p className="text-sm text-zinc-400 font-medium tracking-wide">Cargando ecosistema AsistApp...</p>
-      </div>
-    );
-  }
-
+  if (loading) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-zinc-400">Cargando...</div>;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-zinc-950">
-      
-      {/* NAVBAR SUPERIOR */}
-      <header className="sticky top-0 z-30 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md px-6 py-4">
-        <div className="max-w-7xl mx-auto flex items-center justify-between">
-          
-          <div className="flex items-center gap-6">
-            <Link className="flex items-center gap-2.5" to="/dashboard">
-              <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-zinc-950 font-black text-lg shadow-lg shadow-emerald-500/20">
-                A
-              </div>
-              <span className="text-xl font-extrabold tracking-tight text-white">
-                Asist<span className="text-emerald-400">App</span>
-              </span>
-            </Link>
-
-
-            <nav className="hidden md:flex items-center gap-1 text-sm font-medium">
-              <span className="px-3 py-1.5 rounded-lg bg-zinc-900 text-emerald-400 border border-zinc-800">
-                Panel General
-              </span>
-              <span className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 transition">
-                Asistencia QR
-              </span>
-              <span className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 transition">
-                Alumnos & Familias
-              </span>
-              <span className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 transition">
-                Eventos
-              </span>
-            </nav>
-          </div>
-
-
-          <div className="flex items-center gap-4">
-            <div className="hidden sm:flex flex-col text-right">
-              <span className="text-sm font-bold text-zinc-100">{profile?.fullName}</span>
-              <span className="text-xs text-emerald-400 font-medium">{profile?.churchName}</span>
-            </div>
-
-
-            <button
-              onClick={handleSignOut}
-              className="px-3.5 py-2 rounded-xl text-xs font-semibold text-zinc-300 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 transition flex items-center gap-2 shadow-sm"
-              title="Cerrar sesión"
-            >
-              <svg className="w-4 h-4 text-zinc-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-              </svg>
-              <span>Salir</span>
-            </button>
-          </div>
-        </div>
+    <div className="min-h-screen bg-zinc-950 text-zinc-100 p-6 space-y-8">
+      <header className="flex justify-between items-center">
+        <h1 className="text-2xl font-bold">{profile?.churchName}</h1>
+        <button onClick={handleSignOut} className="text-sm text-zinc-400 hover:text-white">Salir</button>
       </header>
 
-
-      {/* CONTENIDO PRINCIPAL */}
-      <main className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8 space-y-8">
-        
-        {/* HEADER DE BIENVENIDA Y ACCIONES */}
-        <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-zinc-800/60 pb-6">
-          <div>
-            <h1 className="text-3xl font-extrabold text-white tracking-tight">
-              Panel de Control
-            </h1>
-            <p className="text-sm text-zinc-400 mt-1">
-              Monitoreo en tiempo real para <strong className="text-zinc-200">{profile?.churchName}</strong>
-            </p>
-          </div>
-
-
-          <div className="flex items-center gap-3">
-            <button className="px-4 py-2.5 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-zinc-200 font-medium text-sm transition">
-              Descargar Reporte
-            </button>
-            <button className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-sm transition shadow-lg shadow-emerald-500/20 flex items-center gap-2">
-              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
-              </svg>
-              <span>Tomar Asistencia QR</span>
-            </button>
-          </div>
+      {/* Stats */}
+      <div className="grid grid-cols-1 md:grid-cols-4 gap-4">
+        <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+          <p className="text-zinc-400 text-xs uppercase">Alumnos</p>
+          <p className="text-3xl font-bold mt-2">{stats.memberCount}</p>
         </div>
-
-
-        {/* GRID DE KPIs (TARJETAS MÉTRICAS CON CONTRASTE) */}
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-          
-          {/* Card 1 */}
-          <div className="bg-zinc-900/70 border border-zinc-800/80 rounded-2xl p-5 hover:border-zinc-700 transition">
-            <div className="flex items-center justify-between text-zinc-400 mb-3">
-              <span className="text-xs font-semibold uppercase tracking-wider">Total Alumnos</span>
-              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
-                </svg>
-              </div>
-            </div>
-            <div className="text-3xl font-black text-white">48</div>
-            <div className="text-xs text-emerald-400 mt-2 font-medium flex items-center gap-1">
-              <span>↑ +12%</span>
-              <span className="text-zinc-500">vs mes anterior</span>
-            </div>
-          </div>
-
-
-          {/* Card 2 */}
-          <div className="bg-zinc-900/70 border border-zinc-800/80 rounded-2xl p-5 hover:border-zinc-700 transition">
-            <div className="flex items-center justify-between text-zinc-400 mb-3">
-              <span className="text-xs font-semibold uppercase tracking-wider">Última Asistencia</span>
-              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                </svg>
-              </div>
-            </div>
-            <div className="text-3xl font-black text-white">42 <span className="text-lg text-zinc-500 font-normal">/ 48</span></div>
-            <div className="text-xs text-emerald-400 mt-2 font-medium">87.5% de concurrencia</div>
-          </div>
-
-
-          {/* Card 3 */}
-          <div className="bg-zinc-900/70 border border-zinc-800/80 rounded-2xl p-5 hover:border-zinc-700 transition">
-            <div className="flex items-center justify-between text-zinc-400 mb-3">
-              <span className="text-xs font-semibold uppercase tracking-wider">Eventos este Mes</span>
-              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-              </div>
-            </div>
-            <div className="text-3xl font-black text-white">{events.length}</div>
-            <div className="text-xs text-zinc-400 mt-2">Próximo: Domingo 10:00 AM</div>
-          </div>
-
-
-          {/* Card 4 */}
-          <div className="bg-zinc-900/70 border border-zinc-800/80 rounded-2xl p-5 hover:border-zinc-700 transition">
-            <div className="flex items-center justify-between text-zinc-400 mb-3">
-              <span className="text-xs font-semibold uppercase tracking-wider">Maestros Activos</span>
-              <div className="p-2 rounded-lg bg-emerald-500/10 text-emerald-400">
-                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                </svg>
-              </div>
-            </div>
-            <div className="text-3xl font-black text-white">8</div>
-            <div className="text-xs text-emerald-400 mt-2 font-medium">100% verificados</div>
-          </div>
-
-
+        <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+          <p className="text-zinc-400 text-xs uppercase">Eventos</p>
+          <p className="text-3xl font-bold mt-2">{stats.eventCount}</p>
         </div>
+        <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+          <p className="text-zinc-400 text-xs uppercase">Maestros</p>
+          <p className="text-3xl font-bold mt-2">{stats.teacherCount}</p>
+        </div>
+        <div className="bg-zinc-900 p-6 rounded-2xl border border-zinc-800">
+          <p className="text-zinc-400 text-xs uppercase">Asistencia</p>
+          <p className="text-3xl font-bold mt-2">{stats.activeAttendance}</p>
+        </div>
+      </div>
 
-
-        {/* TABLA DE PRÓXIMOS EVENTOS */}
-        <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-2xl overflow-hidden backdrop-blur-sm">
-          <div className="p-5 border-b border-zinc-800/80 flex items-center justify-between">
-            <div>
-              <h2 className="text-lg font-bold text-white tracking-tight">Próximas Clases & Eventos</h2>
-              <p className="text-xs text-zinc-400 mt-0.5">Cronograma programado para el ministerio</p>
-            </div>
-            <button className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 transition">
-              + Nuevo Evento
-            </button>
+      {/* Events Table */}
+      <div className="bg-zinc-900 rounded-2xl border border-zinc-800 overflow-hidden">
+        <div className="p-6 border-b border-zinc-800 flex justify-between items-center">
+          <h2 className="font-bold">Próximos Eventos</h2>
+          <button className="text-xs bg-emerald-500 text-black px-3 py-1 rounded-lg flex items-center gap-1">
+            <Plus className="w-3 h-3" /> Crear evento
+          </button>
+        </div>
+        {events.length === 0 ? (
+          <div className="p-12 text-center text-zinc-500">
+            <p>No hay clases o eventos programados.</p>
           </div>
-
-
-          <div className="overflow-x-auto">
-            <table className="w-full text-left text-sm text-zinc-300">
-              <thead className="bg-zinc-900/80 text-xs uppercase tracking-wider text-zinc-400 border-b border-zinc-800">
-                <tr>
-                  <th className="py-3.5 px-6 font-semibold">Evento / Clase</th>
-                  <th className="py-3.5 px-6 font-semibold">Fecha & Horario</th>
-                  <th className="py-3.5 px-6 font-semibold">Grupo / Nivel</th>
-                  <th className="py-3.5 px-6 font-semibold">Estado</th>
-                  <th className="py-3.5 px-6 font-semibold text-right">Acción</th>
+        ) : (
+          <table className="w-full text-sm">
+            <thead className="text-zinc-400 text-xs uppercase">
+              <tr>
+                <th className="p-4">Evento</th>
+                <th className="p-4">Fecha</th>
+                <th className="p-4">Estado</th>
+              </tr>
+            </thead>
+            <tbody>
+              {events.map(evt => (
+                <tr key={evt.id} className="border-t border-zinc-800">
+                  <td className="p-4">{evt.title}</td>
+                  <td className="p-4">{evt.date}</td>
+                  <td className="p-4 text-emerald-400">{evt.status}</td>
                 </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800/60 font-medium">
-                {events.map((evt) => (
-                  <tr key={evt.id} className="hover:bg-zinc-800/30 transition">
-                    <td className="py-4 px-6 font-bold text-white">
-                      {evt.title}
-                    </td>
-                    <td className="py-4 px-6 text-zinc-300 whitespace-nowrap">
-                      {evt.date} <span className="text-zinc-500">· {evt.time}</span>
-                    </td>
-                    <td className="py-4 px-6 text-zinc-400">
-                      <span className="bg-zinc-800 border border-zinc-700/60 px-2.5 py-1 rounded-lg text-xs text-zinc-200">
-                        {evt.groupName}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6">
-                      <span className={`inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold ${
-                        evt.status === 'Confirmado'
-                          ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20'
-                          : 'bg-amber-500/10 text-amber-400 border border-amber-500/20'
-                      }`}>
-                        {evt.status}
-                      </span>
-                    </td>
-                    <td className="py-4 px-6 text-right whitespace-nowrap">
-                      <button className="text-xs font-semibold text-emerald-400 hover:text-emerald-300 bg-emerald-500/10 hover:bg-emerald-500/20 px-3 py-1.5 rounded-lg border border-emerald-500/20 transition">
-                        Iniciar QR
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-        </div>
-
-
-      </main>
-
-
-      {/* FOOTER */}
-      <footer className="border-t border-zinc-900 mt-auto py-6 px-6 text-center text-xs text-zinc-500">
-        AsistApp &copy; {new Date().getFullYear()} — Plataforma Multi-Tenant para Iglesias.
-      </footer>
-
-
+              ))}
+            </tbody>
+          </table>
+        )}
+      </div>
     </div>
   );
 }
