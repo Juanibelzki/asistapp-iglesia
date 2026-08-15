@@ -27,15 +27,17 @@ function CongregadosPage() {
   const [churchName, setChurchName] = useState('Mi Congregación');
   const [congregados, setCongregados] = useState<Congregado[]>([]);
   
-  // Filtros de navegación
   const [mainTab, setMainTab] = useState<MainTab>('todos');
   const [studentStage, setStudentStage] = useState<StudentStage>('todos');
 
   useEffect(() => {
+    let isMounted = true;
+
     async function loadData() {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
+        const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+        
+        if (sessionError || !session) {
           navigate({ to: '/login' });
           return;
         }
@@ -43,37 +45,49 @@ function CongregadosPage() {
         // Obtener organización
         const { data: profile } = await supabase
           .from('profiles')
-          .select('organization_id, organizations(name)')
+          .select('organization_id, full_name')
           .eq('auth_user_id', session.user.id)
           .maybeSingle();
 
-        if (profile?.organizations) {
-          setChurchName((profile.organizations as any).name || 'Mi Congregación');
-        }
-
         if (profile?.organization_id) {
-          // Consultar registros reales de la tabla congregados
-          const { data, error } = await supabase
+          // Obtener nombre de iglesia
+          const { data: org } = await supabase
+            .from('organizations')
+            .select('name')
+            .eq('id', profile.organization_id)
+            .maybeSingle();
+
+          if (org && isMounted) {
+            setChurchName(org.name || 'Mi Congregación');
+          }
+
+          // Consultar congregados
+          const { data: members, error: membersError } = await supabase
             .from('congregados')
             .select('*')
             .eq('organization_id', profile.organization_id)
             .order('created_at', { ascending: false });
 
-          if (!error && data) {
-            setCongregados(data as Congregado[]);
+          if (!membersError && members && isMounted) {
+            setCongregados(members);
           }
         }
       } catch (err) {
-        console.error('Error cargando congregados:', err);
+        console.error('Error al cargar congregados:', err);
       } finally {
-        setLoading(false);
+        if (isMounted) {
+          setLoading(false);
+        }
       }
     }
 
     loadData();
+
+    return () => {
+      isMounted = false;
+    };
   }, [navigate]);
 
-  // Filtrado reactivo en memoria
   const filteredList = congregados.filter((item) => {
     if (mainTab === 'todos') return true;
     if (mainTab === 'alumnos') {
@@ -88,7 +102,7 @@ function CongregadosPage() {
     return (
       <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-zinc-100">
         <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mb-4" />
-        <p className="text-sm text-zinc-400">Cargando directorio de congregados...</p>
+        <p className="text-sm text-zinc-400 font-medium">Cargando directorio de congregados...</p>
       </div>
     );
   }
@@ -115,12 +129,6 @@ function CongregadosPage() {
               </Link>
               <span className="px-3 py-1.5 rounded-lg bg-zinc-900 text-emerald-400 border border-zinc-800">
                 Congregados
-              </span>
-              <span className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 transition cursor-not-allowed opacity-60">
-                Asistencia QR
-              </span>
-              <span className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 transition cursor-not-allowed opacity-60">
-                Eventos
               </span>
             </nav>
           </div>
@@ -237,39 +245,54 @@ function CongregadosPage() {
             </button>
           </div>
         ) : (
-          <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden">
-            <table className="w-full text-sm text-left">
-              <thead className="bg-zinc-900/80 text-zinc-400 text-xs uppercase tracking-wider border-b border-zinc-800">
-                <tr>
-                  <th className="p-4 font-semibold">Nombre y Apellido</th>
-                  <th className="p-4 font-semibold">Categoría / Etapa</th>
-                  <th className="p-4 font-semibold">Tutor / Contacto</th>
-                  <th className="p-4 font-semibold">Estado</th>
-                  <th className="p-4 font-semibold text-right">Acciones</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-zinc-800">
-                {filteredList.map((c) => (
-                  <tr key={c.id} className="hover:bg-zinc-800/30 transition">
-                    <td className="p-4 font-medium text-white">{c.first_name} {c.last_name}</td>
-                    <td className="p-4 capitalize text-zinc-300">{c.student_stage || '-'}</td>
-                    <td className="p-4 text-zinc-300">
-                        {c.guardian_name || '-'}<br/>
-                        <span className="text-xs text-zinc-500">{c.guardian_phone || '-'}</span>
-                    </td>
-                    <td className="p-4">
-                        <span className="bg-emerald-500/10 text-emerald-400 px-2.5 py-1 rounded-full text-xs font-semibold border border-emerald-500/20">
-                            {c.status}
-                        </span>
-                    </td>
-                    <td className="p-4 text-right">
-                      <button className="text-emerald-400 hover:text-emerald-300 mr-4 font-medium text-xs">Ver QR</button>
-                      <button className="text-zinc-500 hover:text-white font-medium text-xs">Editar</button>
-                    </td>
+          <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-2xl overflow-hidden">
+            <div className="overflow-x-auto">
+              <table className="w-full text-left text-sm text-zinc-300">
+                <thead className="bg-zinc-900/80 text-xs uppercase tracking-wider text-zinc-400 border-b border-zinc-800">
+                  <tr>
+                    <th className="py-3.5 px-6 font-semibold">Nombre Completo</th>
+                    <th className="py-3.5 px-6 font-semibold">Categoría / Etapa</th>
+                    <th className="py-3.5 px-6 font-semibold">Tutor / Contacto</th>
+                    <th className="py-3.5 px-6 font-semibold">Estado</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-zinc-800/60 font-medium">
+                  {filteredList.map((item) => (
+                    <tr key={item.id} className="hover:bg-zinc-800/30 transition">
+                      <td className="py-4 px-6 font-bold text-white">
+                        {item.first_name} {item.last_name}
+                      </td>
+                      <td className="py-4 px-6">
+                        {item.is_student ? (
+                          <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-lg text-xs font-semibold capitalize">
+                            Alumno ({item.student_stage || 'General'})
+                          </span>
+                        ) : (
+                          <span className="bg-zinc-800 text-zinc-300 border border-zinc-700/60 px-2.5 py-1 rounded-lg text-xs font-semibold">
+                            Congregado
+                          </span>
+                        )}
+                      </td>
+                      <td className="py-4 px-6 text-zinc-400 text-xs">
+                        {item.guardian_name ? (
+                          <div>
+                            <span className="text-zinc-200 font-semibold">{item.guardian_name}</span>
+                            {item.guardian_phone && <span className="block text-zinc-500">{item.guardian_phone}</span>}
+                          </div>
+                        ) : (
+                          item.phone || 'Sin contacto'
+                        )}
+                      </td>
+                      <td className="py-4 px-6">
+                        <span className="inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          {item.status || 'Activo'}
+                        </span>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
           </div>
         )}
       </main>

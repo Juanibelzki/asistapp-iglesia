@@ -1,6 +1,7 @@
-import { createRootRoute, Outlet, Link, useNavigate } from '@tanstack/react-router';
-import { supabase } from '../lib/supabase'; // Ajuste: usando la ruta correcta definida en el proyecto
-
+import { createFileRoute, Outlet, Link, useNavigate } from '@tanstack/react-router';
+import { supabase } from '../lib/supabase';
+// Importamos el archivo CSS principal para los estilos globales
+import '../styles.css'; 
 
 export const Route = createRootRoute({
   component: RootComponent,
@@ -15,17 +16,7 @@ export const Route = createRootRoute({
   ),
 });
 
-
 function RootComponent() {
-  const navigate = useNavigate();
-
-
-  const handleLogout = async () => {
-    await supabase.auth.signOut();
-    navigate({ to: '/login' });
-  };
-
-
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans flex flex-col selection:bg-emerald-500 selection:text-zinc-950">
       <Outlet/>
