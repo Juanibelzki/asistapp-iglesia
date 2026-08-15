@@ -20,6 +20,18 @@ interface Attendee {
   created_at: string;
 }
 
+interface ExportRow {
+  event_date: string;
+  event_title: string;
+  first_name: string;
+  last_name: string;
+  phone: string;
+  student_stage: string;
+  guardian_name: string;
+  guardian_phone: string;
+  check_in_time: string;
+}
+
 interface ToastState {
   message: string;
   type: 'success' | 'error' | 'info';
@@ -157,6 +169,93 @@ function AsistenciaPage() {
     setAttendees([]);
     loadAttendees(selectedEventId);
   }, [selectedEventId, orgId]);
+
+  const selectedEvent = events.find((evt) => evt.id === selectedEventId) || null;
+
+  const csvEscape = (value: string | number | null | undefined): string => {
+    const str = value == null ? '' : String(value);
+    return `"${str.replace(/"/g, '""')}"`;
+  };
+
+  const handleExport = async () => {
+    if (!orgId || !selectedEvent) return;
+
+    const { data, error } = await supabase
+      .from('attendance')
+      .select('congregado_id, check_in_time, congregados(first_name, last_name, phone, student_stage, guardian_name, guardian_phone)')
+      .eq('event_id', selectedEvent.id)
+      .eq('organization_id', orgId)
+      .order('check_in_time', { ascending: true });
+
+    if (error) {
+      showToast('No se pudo generar el reporte.', 'error');
+      return;
+    }
+
+    const rows: ExportRow[] = (data || [])
+      .map((row: any) => {
+        const member = row.congregados;
+        if (!member) return null;
+        return {
+          event_date: selectedEvent.event_date,
+          event_title: selectedEvent.title,
+          first_name: member.first_name || '',
+          last_name: member.last_name || '',
+          phone: member.phone || '',
+          student_stage: member.student_stage || '',
+          guardian_name: member.guardian_name || '',
+          guardian_phone: member.guardian_phone || '',
+          check_in_time: formatTime(row.check_in_time || row.created_at),
+        };
+      })
+      .filter((row: ExportRow | null): row is ExportRow => row !== null);
+
+    const headers = [
+      'Fecha del Evento',
+      'Evento / Clase',
+      'Nombre',
+      'Apellido',
+      'Teléfono',
+      'Etapa Formativa',
+      'Nombre del Tutor',
+      'Teléfono del Tutor',
+      'Hora de Check-in',
+    ];
+
+    const csvLines = [
+      headers.map(csvEscape).join(';'),
+      ...rows.map((row) =>
+        [
+          csvEscape(row.event_date),
+          csvEscape(row.event_title),
+          csvEscape(row.first_name),
+          csvEscape(row.last_name),
+          csvEscape(row.phone),
+          csvEscape(row.student_stage),
+          csvEscape(row.guardian_name),
+          csvEscape(row.guardian_phone),
+          csvEscape(row.check_in_time),
+        ].join(';'),
+      ),
+    ];
+
+    const csvContent = '\uFEFF' + csvLines.join('\r\n');
+    const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+    const url = URL.createObjectURL(blob);
+
+    const safeTitle = selectedEvent.title.toLowerCase().replace(/\s+/g, '_');
+    const filename = `asistencia_${safeTitle}_${selectedEvent.event_date}.csv`;
+
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = filename;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+
+    showToast('Reporte descargado exitosamente');
+  };
 
   const stopScanner = async () => {
     const scanner = scannerRef.current;
@@ -321,7 +420,23 @@ function AsistenciaPage() {
 
         {/* SELECTOR DE EVENTO */}
         <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-2xl p-5 space-y-3">
-          <label className="block text-xs font-semibold text-zinc-400">Evento / Clase</label>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <label className="block text-xs font-semibold text-zinc-400">Evento / Clase</label>
+            <button
+              onClick={handleExport}
+              disabled={!selectedEvent || attendees.length === 0}
+              className={`px-4 py-2 rounded-lg text-sm inline-flex items-center gap-2 transition-colors ${
+                selectedEvent && attendees.length > 0
+                  ? 'border border-zinc-700 bg-zinc-900/80 hover:bg-zinc-800 text-zinc-200'
+                  : 'border border-zinc-800 bg-zinc-900/40 text-zinc-600 opacity-50 cursor-not-allowed'
+              }`}
+            >
+              <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5M16.5 12L12 16.5m0 0L7.5 12m4.5 4.5V3" />
+              </svg>
+              Exportar Lista (CSV)
+            </button>
+          </div>
           {events.length === 0 ? (
             <p className="text-sm text-zinc-500">No hay eventos disponibles. Creá uno desde el Dashboard.</p>
           ) : (
