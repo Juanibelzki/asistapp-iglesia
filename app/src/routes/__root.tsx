@@ -21,6 +21,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
   return (
     <html lang="es" className="dark" suppressHydrationWarning>
       <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="theme-color" content="#09090b" />
+        <link rel="apple-touch-icon" href="/pwa-192x192.png" />
         <HeadContent />
       </head>
       <body className="min-h-screen bg-zinc-950 text-zinc-100 font-sans antialiased flex flex-col">
