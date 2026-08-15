@@ -1,7 +1,6 @@
 import { useEffect, useState } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { AnimatePresence, motion } from 'framer-motion'
-import ThemeToggle from '../components/ThemeToggle'
 import { Reveal } from '../components/Reveal'
 import {
   QrCode,
@@ -399,17 +398,10 @@ function LandingPage() {
           <div className="flex items-center gap-4">
             <Link
               to="/login"
-              className="text-sm text-zinc-300 hover:text-white transition-colors hidden sm:block"
+              className="px-5 py-2 rounded-full text-sm font-medium text-zinc-200 bg-zinc-900/80 hover:text-white hover:bg-zinc-800/90 border border-white/10 hover:border-emerald-500/40 shadow-sm hover:shadow-emerald-500/10 transition-all duration-200 backdrop-blur-md"
             >
               Ingresar
             </Link>
-            <Link
-              to="/registerCongregacion"
-              className="px-4 py-2 rounded-full bg-emerald-400 text-zinc-950 font-mono font-bold text-xs uppercase tracking-widest hover:bg-emerald-300 transition-all duration-200 active:scale-95"
-            >
-              Registrar mi Iglesia
-            </Link>
-            <ThemeToggle />
           </div>
         </div>
       </header>

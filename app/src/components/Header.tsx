@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router'
-import ThemeToggle from './ThemeToggle'
 import { supabase } from '../lib/supabase'
 import { useEffect, useState } from 'react'
 
@@ -46,11 +45,15 @@ export default function Header() {
             <button onClick={logout} className="demo-button demo-button-secondary text-xs">Cerrar sesión</button>
           ) : (
             <>
-              <Link to="/login" className="demo-button demo-button-secondary text-xs">Login</Link>
+              <Link
+                to="/login"
+                className="px-5 py-2 rounded-full text-sm font-medium text-zinc-200 bg-zinc-900/80 hover:text-white hover:bg-zinc-800/90 border border-white/10 hover:border-emerald-500/40 shadow-sm hover:shadow-emerald-500/10 transition-all duration-200 backdrop-blur-md"
+              >
+                Ingresar
+              </Link>
               <Link to="/registro" className="demo-button text-xs">Registro</Link>
             </>
           )}
-          <ThemeToggle />
         </div>
       </nav>
     </header>
