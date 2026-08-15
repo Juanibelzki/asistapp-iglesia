@@ -388,6 +388,7 @@ function PhoneDemo() {
 }
 
 function LandingPage() {
+  const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly')
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-emerald-500 selection:text-zinc-950 pb-16 overflow-x-hidden">
       {/* 0. NAVBAR */}
@@ -529,48 +530,201 @@ function LandingPage() {
       </section>
 
       {/* 3. PRECIOS */}
-      <section className="max-w-md mx-auto px-6 py-12 text-center">
+      <section className="max-w-6xl mx-auto px-6 py-12 text-center">
         <Reveal variant="up">
-          <div className="bg-zinc-900/80 border border-emerald-500/30 rounded-3xl p-8 backdrop-blur-xl relative overflow-hidden shadow-2xl shadow-emerald-500/5">
-            <div className="absolute top-0 right-0 px-4 py-1 bg-emerald-400 text-zinc-950 font-mono text-[10px] font-bold uppercase rounded-bl-xl">
-              Plan Único
-            </div>
+          <p className="font-mono text-xs text-emerald-400 uppercase tracking-[0.3em] mb-3">
+            Planes simples
+          </p>
+          <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-3">
+            Precios que crecen con tu congregación
+          </h2>
+          <p className="text-sm text-zinc-400 mb-8">
+            Sin guardias 24/7 ni promesas irreales: planes pensados para una operación
+            sostenible, de inicio en solitario.
+          </p>
 
-            <h3 className="text-xl font-bold text-white mb-2">Plan Iglesia</h3>
-            <p className="text-xs text-zinc-400 mb-6">
-              Acceso ilimitado a todas las funciones sin restricciones.
-            </p>
-
-            <div className="flex items-baseline justify-center gap-1 mb-6">
-              <span className="text-4xl font-bold text-white">$9</span>
-              <span className="text-sm text-zinc-400">USD / mes</span>
-            </div>
-
-            <ul className="space-y-3 text-left text-xs text-zinc-300 mb-8 font-mono">
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                Miembros y familias ilimitados
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                Escáner QR ilimitado
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                Soporte PWA Offline
-              </li>
-              <li className="flex items-center gap-2">
-                <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                14 días de prueba gratis
-              </li>
-            </ul>
-
-            <Link
-              to="/registro"
-              className="block w-full py-3.5 rounded-full bg-emerald-400 text-zinc-950 font-mono font-bold text-xs uppercase tracking-widest hover:bg-emerald-300 transition-all duration-200 active:scale-95"
+          {/* Toggle mensual / anual */}
+          <div className="inline-flex items-center gap-3 bg-zinc-900/80 border border-zinc-800 rounded-full px-3 py-1.5 mb-12">
+            <button
+              onClick={() => setBilling('monthly')}
+              className={`px-4 py-1.5 rounded-full font-mono text-xs font-bold transition-all duration-200 ${
+                billing === 'monthly'
+                  ? 'bg-emerald-400 text-zinc-950'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
             >
-              Suscribirse Ahora
-            </Link>
+              Mensual
+            </button>
+            <button
+              onClick={() => setBilling('annual')}
+              className={`px-4 py-1.5 rounded-full font-mono text-xs font-bold transition-all duration-200 ${
+                billing === 'annual'
+                  ? 'bg-emerald-400 text-zinc-950'
+                  : 'text-zinc-400 hover:text-white'
+              }`}
+            >
+              Anual
+            </button>
+          </div>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
+            {/* Plan Semilla */}
+            <div className="flex flex-col bg-zinc-900/60 border border-zinc-800 rounded-3xl p-8 backdrop-blur-xl text-left">
+              <h3 className="text-lg font-bold text-white mb-1">Semilla</h3>
+              <p className="text-xs text-zinc-400 mb-2 font-mono">Hasta 40 miembros</p>
+              <p className="text-xs text-zinc-400 mb-6">
+                Ideal para grupos pequeños y pruebas dominicales.
+              </p>
+
+              <div className="flex items-baseline gap-1 mb-6">
+                <span className="text-4xl font-bold text-white">$0</span>
+                <span className="text-sm text-zinc-400">USD / mes</span>
+              </div>
+
+              <ul className="space-y-3 text-xs text-zinc-300 mb-8 font-mono">
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  Escaneo QR en vivo
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  Credencial digital
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  1 usuario admin
+                </li>
+              </ul>
+
+              <Link
+                to="/registro"
+                className="mt-auto block w-full py-3 rounded-full bg-zinc-800 text-white font-mono font-bold text-xs uppercase tracking-widest hover:bg-zinc-700 transition-all duration-200 active:scale-95"
+              >
+                Comenzar Gratis
+              </Link>
+            </div>
+
+            {/* Plan Comunidad [DESTACADO] */}
+            <motion.div
+              initial={{ opacity: 0, y: 40 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true, margin: '-100px' }}
+              transition={{ duration: 0.6, ease: 'easeOut' }}
+              className="relative flex flex-col bg-gradient-to-b from-emerald-400/15 to-zinc-900/80 border border-emerald-500/40 rounded-3xl p-8 backdrop-blur-xl shadow-2xl shadow-emerald-500/10 text-left"
+            >
+              <div className="absolute top-0 right-0 px-4 py-1 bg-emerald-400 text-zinc-950 font-mono text-[10px] font-bold uppercase rounded-bl-xl">
+                Recomendado
+              </div>
+
+              <h3 className="text-lg font-bold text-white mb-1">Comunidad</h3>
+              <p className="text-xs text-zinc-400 mb-2 font-mono">Hasta 250 miembros</p>
+              <p className="text-xs text-zinc-400 mb-6">
+                Para congregaciones en desarrollo que buscan orden y agilidad.
+              </p>
+
+              <div className="flex items-baseline gap-1 mb-6">
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.span
+                    key={billing}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.2 }}
+                    className="text-4xl font-bold text-white"
+                  >
+                    ${billing === 'monthly' ? '24' : '19'}
+                  </motion.span>
+                </AnimatePresence>
+                <span className="text-sm text-zinc-400">USD / mes</span>
+              </div>
+              {billing === 'annual' && (
+                <p className="text-[10px] text-emerald-400 font-mono -mt-4 mb-4">
+                  Facturado anualmente
+                </p>
+              )}
+
+              <ul className="space-y-3 text-xs text-zinc-300 mb-8 font-mono">
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  Modo Offline PWA
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  Métricas de asistencia
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  Reportes exportables
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  Soporte vía WhatsApp / Email
+                </li>
+              </ul>
+
+              <Link
+                to="/registro"
+                className="mt-auto block w-full py-3 rounded-full bg-emerald-400 text-zinc-950 font-mono font-bold text-xs uppercase tracking-widest hover:bg-emerald-300 transition-all duration-200 active:scale-95"
+              >
+                Iniciar Prueba Gratis
+              </Link>
+            </motion.div>
+
+            {/* Plan Iglesia Pro */}
+            <div className="flex flex-col bg-zinc-900/60 border border-zinc-800 rounded-3xl p-8 backdrop-blur-xl text-left">
+              <h3 className="text-lg font-bold text-white mb-1">Iglesia Pro</h3>
+              <p className="text-xs text-zinc-400 mb-2 font-mono">Hasta 800 miembros</p>
+              <p className="text-xs text-zinc-400 mb-6">
+                Auditorios medianos y múltiples ministerios bajo una misma cuenta.
+              </p>
+
+              <div className="flex items-baseline gap-1 mb-6">
+                <AnimatePresence mode="wait" initial={false}>
+                  <motion.span
+                    key={billing}
+                    initial={{ opacity: 0, y: 8 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -8 }}
+                    transition={{ duration: 0.2 }}
+                    className="text-4xl font-bold text-white"
+                  >
+                    ${billing === 'monthly' ? '49' : '39'}
+                  </motion.span>
+                </AnimatePresence>
+                <span className="text-sm text-zinc-400">USD / mes</span>
+              </div>
+              {billing === 'annual' && (
+                <p className="text-[10px] text-emerald-400 font-mono -mt-4 mb-4">
+                  Facturado anualmente
+                </p>
+              )}
+
+              <ul className="space-y-3 text-xs text-zinc-300 mb-8 font-mono">
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  Ministerios / áreas ilimitadas
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  Alertas de ausentismo avanzadas
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  Backup automático
+                </li>
+                <li className="flex items-center gap-2">
+                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  Atención prioritaria
+                </li>
+              </ul>
+
+              <Link
+                to="/registro"
+                className="mt-auto block w-full py-3 rounded-full bg-zinc-800 text-white font-mono font-bold text-xs uppercase tracking-widest hover:bg-zinc-700 transition-all duration-200 active:scale-95"
+              >
+                Elegir Plan Pro
+              </Link>
+            </div>
           </div>
         </Reveal>
       </section>
