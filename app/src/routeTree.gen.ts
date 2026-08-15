@@ -22,6 +22,7 @@ import { Route as MaterialesRouteImport } from './routes/materiales'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as RegisterCongregacionRouteImport } from './routes/registerCongregacion'
+import { Route as RegisterstaffRouteImport } from './routes/registerstaff'
 import { Route as RegistroRouteImport } from './routes/registro'
 import { Route as ConfiguracionSuscripcionRouteImport } from './routes/configuracion/suscripcion'
 import { Route as EventosEventIdAsistenciaRouteImport } from './routes/eventos.$eventId.asistencia'
@@ -92,6 +93,11 @@ const RegisterCongregacionRoute = RegisterCongregacionRouteImport.update({
   path: '/registerCongregacion',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RegisterstaffRoute = RegisterstaffRouteImport.update({
+  id: '/registerstaff',
+  path: '/registerstaff',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RegistroRoute = RegistroRouteImport.update({
   id: '/registro',
   path: '/registro',
@@ -129,6 +135,7 @@ export interface FileRoutesByFullPath {
   '/portal': typeof PortalRoute
   '/privacidad': typeof PrivacidadRoute
   '/registerCongregacion': typeof RegisterCongregacionRoute
+  '/registerstaff': typeof RegisterstaffRoute
   '/registro': typeof RegistroRoute
   '/configuracion/suscripcion': typeof ConfiguracionSuscripcionRoute
   '/eventos/$eventId/asistencia': typeof EventosEventIdAsistenciaRoute
@@ -148,6 +155,7 @@ export interface FileRoutesByTo {
   '/portal': typeof PortalRoute
   '/privacidad': typeof PrivacidadRoute
   '/registerCongregacion': typeof RegisterCongregacionRoute
+  '/registerstaff': typeof RegisterstaffRoute
   '/registro': typeof RegistroRoute
   '/configuracion/suscripcion': typeof ConfiguracionSuscripcionRoute
   '/eventos/$eventId/asistencia': typeof EventosEventIdAsistenciaRoute
@@ -168,6 +176,7 @@ export interface FileRoutesById {
   '/portal': typeof PortalRoute
   '/privacidad': typeof PrivacidadRoute
   '/registerCongregacion': typeof RegisterCongregacionRoute
+  '/registerstaff': typeof RegisterstaffRoute
   '/registro': typeof RegistroRoute
   '/configuracion/suscripcion': typeof ConfiguracionSuscripcionRoute
   '/eventos/$eventId/asistencia': typeof EventosEventIdAsistenciaRoute
@@ -189,6 +198,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/privacidad'
     | '/registerCongregacion'
+    | '/registerstaff'
     | '/registro'
     | '/configuracion/suscripcion'
     | '/eventos/$eventId/asistencia'
@@ -208,6 +218,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/privacidad'
     | '/registerCongregacion'
+    | '/registerstaff'
     | '/registro'
     | '/configuracion/suscripcion'
     | '/eventos/$eventId/asistencia'
@@ -227,6 +238,7 @@ export interface FileRouteTypes {
     | '/portal'
     | '/privacidad'
     | '/registerCongregacion'
+    | '/registerstaff'
     | '/registro'
     | '/configuracion/suscripcion'
     | '/eventos/$eventId/asistencia'
@@ -247,6 +259,7 @@ export interface RootRouteChildren {
   PortalRoute: typeof PortalRoute
   PrivacidadRoute: typeof PrivacidadRoute
   RegisterCongregacionRoute: typeof RegisterCongregacionRoute
+  RegisterstaffRoute: typeof RegisterstaffRoute
   RegistroRoute: typeof RegistroRoute
   ConfiguracionSuscripcionRoute: typeof ConfiguracionSuscripcionRoute
 }
@@ -344,6 +357,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterCongregacionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/registerstaff': {
+      id: '/registerstaff'
+      path: '/registerstaff'
+      fullPath: '/registerstaff'
+      preLoaderRoute: typeof RegisterstaffRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/registro': {
       id: '/registro'
       path: '/registro'
@@ -402,6 +422,7 @@ const rootRouteChildren: RootRouteChildren = {
   PortalRoute: PortalRoute,
   PrivacidadRoute: PrivacidadRoute,
   RegisterCongregacionRoute: RegisterCongregacionRoute,
+  RegisterstaffRoute: RegisterstaffRoute,
   RegistroRoute: RegistroRoute,
   ConfiguracionSuscripcionRoute: ConfiguracionSuscripcionRoute,
 }

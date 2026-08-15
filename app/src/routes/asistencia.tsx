@@ -42,6 +42,27 @@ const QR_READER_ID = 'qr-reader';
 
 const OFFLINE_QUEUE_KEY = 'asistapp_offline_queue';
 const MEMBERS_CACHE_KEY = 'asistapp_members_cache';
+const STAFF_SESSION_KEY = 'asistapp_staff_session';
+const WELCOME_MSG_KEY = 'asistapp_welcome_msg';
+
+interface StaffSession {
+  organization_id: string;
+  full_name: string;
+  role: string;
+  pin: string;
+  church_name?: string;
+}
+
+const readStaffSession = (): StaffSession | null => {
+  try {
+    const raw = localStorage.getItem(STAFF_SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.organization_id ? (parsed as StaffSession) : null;
+  } catch {
+    return null;
+  }
+};
 
 interface MemberEntry {
   id: string;
@@ -117,30 +138,44 @@ function AsistenciaPage() {
 
     async function loadData() {
       try {
+        let orgForLoad: string | null = null;
+
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
+
         if (sessionError || !session) {
-          if (isMounted) navigate({ to: '/login' });
-          return;
+          const staff = readStaffSession();
+          if (staff?.organization_id) {
+            orgForLoad = staff.organization_id;
+            const welcomeMsg = localStorage.getItem(WELCOME_MSG_KEY);
+            if (welcomeMsg) {
+              localStorage.removeItem(WELCOME_MSG_KEY);
+              if (isMounted) showToast(welcomeMsg);
+            }
+          } else {
+            if (isMounted) navigate({ to: '/login' });
+            return;
+          }
+        } else {
+          const { data: profile } = await supabase
+            .from('profiles')
+            .select('organization_id')
+            .eq('auth_user_id', session.user.id)
+            .maybeSingle();
+          orgForLoad = profile?.organization_id ?? null;
         }
 
-        const { data: profile } = await supabase
-          .from('profiles')
-          .select('organization_id')
-          .eq('auth_user_id', session.user.id)
-          .maybeSingle();
-
-        if (!profile?.organization_id) {
+        if (!orgForLoad) {
           if (isMounted) setLoading(false);
           return;
         }
 
-        if (isMounted) setOrgId(profile.organization_id);
-        hydrateMembersCache(profile.organization_id);
+        if (isMounted) setOrgId(orgForLoad);
+        hydrateMembersCache(orgForLoad);
 
         const { data, error } = await supabase
           .from('events')
           .select('*')
-          .eq('organization_id', profile.organization_id)
+          .eq('organization_id', orgForLoad)
           .order('event_date', { ascending: true });
 
         if (!error && data && isMounted) {

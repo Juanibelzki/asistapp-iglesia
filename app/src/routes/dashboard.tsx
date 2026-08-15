@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { CalendarDays, Users, GraduationCap, Plus, CheckCircle2, Pencil, Trash2, Eraser, ChevronDown, CalendarCheck, LayoutGrid } from 'lucide-react';
+import { CalendarDays, Users, GraduationCap, Plus, CheckCircle2, Pencil, Trash2, Eraser, ChevronDown, CalendarCheck, LayoutGrid, Link2 } from 'lucide-react';
 
 export const Route = createFileRoute('/dashboard')({
   component: DashboardPage,
@@ -59,6 +59,7 @@ function DashboardPage() {
   const [eventError, setEventError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
   const [expandedPrograms, setExpandedPrograms] = useState<Record<string, boolean>>({});
+  const [copiedStaffLink, setCopiedStaffLink] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -211,6 +212,19 @@ function DashboardPage() {
   const handleSignOut = async () => {
     await supabase.auth.signOut();
     navigate({ to: '/login' });
+  };
+
+  const staffLink = profile ? `${window.location.origin}/registerstaff?org=${profile.orgId}` : '';
+
+  const copyStaffLink = async () => {
+    if (!staffLink) return;
+    try {
+      await navigator.clipboard.writeText(staffLink);
+      setCopiedStaffLink(true);
+      setTimeout(() => setCopiedStaffLink(false), 2500);
+    } catch {
+      /* portapapeles no disponible */
+    }
   };
 
   const openEventModal = () => {
@@ -527,6 +541,37 @@ function DashboardPage() {
       </header>
 
       <main className="max-w-7xl mx-auto p-6 space-y-8">
+      {/* Invitación al equipo */}
+      <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl">
+        <div className="flex flex-wrap items-center justify-between gap-4">
+          <div className="flex items-start gap-3 min-w-0">
+            <Link2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+            <div className="min-w-0">
+              <p className="text-sm font-semibold text-white">
+                Compartir enlace de registro para tu equipo de ujieres y servidores
+              </p>
+              <p className="text-xs text-zinc-500 mt-0.5">
+                Voluntarios, ujieres y líderes se registran con su rol y PIN para usar el escáner de puerta.
+              </p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 w-full sm:w-auto">
+            <input
+              readOnly
+              value={staffLink}
+              onFocus={(e) => e.currentTarget.select()}
+              className="flex-1 sm:flex-none sm:w-72 bg-zinc-950/70 border border-zinc-800 text-zinc-300 text-xs rounded-lg px-3 py-2.5 truncate focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+            />
+            <button
+              onClick={copyStaffLink}
+              className="shrink-0 px-3 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs transition active:scale-95"
+            >
+              {copiedStaffLink ? '¡Copiado!' : 'Copiar'}
+            </button>
+          </div>
+        </div>
+      </div>
+
       {/* Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
         <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl hover:border-zinc-700/60 transition-all shadow-sm">
