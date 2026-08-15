@@ -5,7 +5,6 @@ import ThemeToggle from '../components/ThemeToggle'
 import { Reveal } from '../components/Reveal'
 import {
   QrCode,
-  ShieldCheck,
   WifiOff,
   BarChart3,
   ArrowRight,
@@ -15,10 +14,10 @@ import {
   BadgeCheck,
   CircleCheck,
   AlertTriangle,
-  KeyRound,
   Clock,
   RefreshCw,
   Activity,
+  Users,
   type LucideIcon,
 } from 'lucide-react'
 
@@ -97,38 +96,38 @@ function ScannerMockup() {
   )
 }
 
-function TutorMockup() {
+function MemberMockup() {
   return (
     <div className="bg-zinc-900/90 border border-white/10 rounded-2xl p-6 backdrop-blur-xl shadow-2xl shadow-black/40 relative overflow-hidden">
       <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none" />
       <div className="flex items-center justify-between gap-3 mb-5">
         <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">
-          Credencial de Tutor
+          Credencial de Miembro
         </span>
         <span className="inline-flex items-center gap-1 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold font-mono">
-          <BadgeCheck className="w-3.5 h-3.5" /> Verificado
+          <BadgeCheck className="w-3.5 h-3.5" /> Miembro Activo
         </span>
       </div>
       <div className="flex items-center gap-4">
         <div className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-400 to-indigo-500 flex items-center justify-center text-zinc-950 font-black text-xl shrink-0 shadow-lg shadow-emerald-500/20">
-          M
+          L
         </div>
         <div className="min-w-0">
-          <p className="font-bold text-white truncate">Marcos Pérez</p>
-          <p className="text-xs text-zinc-400">DNI 31.204.556</p>
-          <p className="text-xs text-zinc-500 mt-0.5">Tutor autorizado · Sala 3</p>
+          <p className="font-bold text-white truncate">Lucas Martínez</p>
+          <p className="text-xs text-zinc-400">DNI 33.102.890</p>
+          <p className="text-xs text-zinc-500 mt-0.5">Ministerio de Jóvenes</p>
         </div>
       </div>
       <div className="mt-5 flex items-center justify-between gap-3 bg-zinc-950/60 border border-white/10 rounded-xl px-4 py-3">
         <span className="flex items-center gap-2 text-xs text-zinc-400">
-          <KeyRound className="w-4 h-4 text-emerald-400" /> PIN de entrega
+          <Users className="w-4 h-4 text-emerald-400" /> Grupo Familiar
         </span>
         <span className="font-mono text-lg font-bold tracking-widest text-emerald-400">
-          4821
+          Martínez
         </span>
       </div>
       <div className="mt-3 flex items-center gap-2 text-xs text-zinc-500">
-        <Clock className="w-3.5 h-3.5" /> Retiro confirmado hace 2 min
+        <Clock className="w-3.5 h-3.5" /> Registro actualizado hace 2 min
       </div>
     </div>
   )
@@ -351,11 +350,11 @@ function PhoneDemo() {
                 >
                   <Check className="w-8 h-8 text-zinc-950" strokeWidth={3} />
                 </motion.div>
-                <p className="mt-5 font-bold text-white text-sm">¡Asistencia Registrada!</p>
-                <p className="mt-1 text-xs text-zinc-400">Mateo Benítez · Salón Infantes</p>
+                <p className="mt-5 font-bold text-white text-sm">¡Asistencia Confirmada!</p>
+                <p className="mt-1 text-xs text-zinc-400">Lucas Martínez · Ministerio de Jóvenes</p>
                 <span className="mt-4 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[10px] font-semibold">
-                  <ShieldCheck className="w-3.5 h-3.5" />
-                  Tutor: Carlos Benítez (DNI ***890)
+                  <BadgeCheck className="w-3.5 h-3.5" />
+                  Miembro Activo · Grupo Familiar Martínez
                 </span>
               </motion.div>
             )}
@@ -375,7 +374,7 @@ function PhoneDemo() {
                 <p className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">
                   Asistencia hoy
                 </p>
-                <p className="mt-1 text-2xl font-bold text-white">142 niños</p>
+                <p className="mt-1 text-2xl font-bold text-white">142 presentes</p>
                 <span className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold font-mono">
                   +1
                 </span>
@@ -423,21 +422,21 @@ function LandingPage() {
             <Reveal variant="up">
               <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-                SaaS para Escuelas Dominicales y Ministerios
+                Plataforma de Gestión y Asistencia Eclesial
               </div>
             </Reveal>
 
             <Reveal variant="up" delay={120}>
               <h1 className="text-4xl md:text-5xl xl:text-6xl font-bold tracking-tight text-white leading-tight">
-                Gestión de asistencia y seguridad infantil para tu iglesia,{' '}
+                Gestión de asistencia y membresía para tu iglesia,{' '}
                 <span className="text-gradient">sin complicaciones.</span>
               </h1>
             </Reveal>
 
             <Reveal variant="up" delay={240}>
               <p className="text-lg text-zinc-400 max-w-xl mx-auto lg:mx-0 leading-relaxed">
-                Toma asistencia en segundos con código QR, protege el retiro de los niños con
-                validación de tutores y mantén informada a tu iglesia en tiempo real.
+                Tomá asistencia en segundos con código QR, organizá tus ministerios y grupos de
+                conexión, y mantené informada a tu congregación en tiempo real.
               </p>
             </Reveal>
 
@@ -488,20 +487,20 @@ function LandingPage() {
               tag="01. Asistencia"
               icon={QrCode}
               title="Escáner QR Ultra Rápido"
-              what="Registra la entrada en menos de 2 segundos desde cualquier teléfono inteligente, sin comprar lectores ni hardware costoso."
-              why="Elimina las filas lentas en la entrada del culto y las planillas de papel extraviadas."
+              what="Registra la entrada a tu culto general y eventos multitudinarios en menos de 2 segundos desde cualquier teléfono inteligente, sin lectores ni hardware costoso."
+              why="Elimina las filas lentas en la entrada del auditorio y las planillas de papel extraviadas."
               mockup={<ScannerMockup />}
             />
           </div>
           <div className="py-20">
             <ShowcaseBlock
               index={1}
-              tag="02. Protección"
-              icon={ShieldCheck}
-              title="Seguridad y Protección de Menores"
-              what="Validación estricta de retiro mediante código QR dinámico y DNI del tutor autorizado."
-              why="Garantiza tranquilidad total a los padres durante la predicación, evitando retiros no autorizados en el ministerio infantil."
-              mockup={<TutorMockup />}
+              tag="02. Membresía"
+              icon={Users}
+              title="Gestión de Familias y Membresía"
+              what="Credenciales digitales unificadas para que cada familia gestione sus datos y registros desde un solo lugar."
+              why="Centraliza la información de cada miembro y su grupo familiar, reduciendo planillas duplicadas y errores de registro."
+              mockup={<MemberMockup />}
             />
           </div>
           <div className="py-20">
@@ -509,9 +508,9 @@ function LandingPage() {
               index={2}
               tag="03. Resiliencia"
               icon={WifiOff}
-              title="Modo Offline y Resiliencia"
-              what="La app sigue tomando asistencia aunque se caiga el Wi-Fi o no haya señal en los salones y sincroniza en segundo plano al volver la conexión."
-              why="La infraestructura de red de los templos suele ser inestable; el ingreso nunca debe detenerse."
+              title="Modo Offline PWA"
+              what="La app sigue tomando asistencia aunque se caiga el Wi-Fi o no haya señal en los salones, y sincroniza en segundo plano al volver la conexión."
+              why="La infraestructura de red de los templos suele ser inestable; el registro no debe detenerse en ningún punto del auditorio."
               mockup={<OfflineMockup />}
             />
           </div>
@@ -521,8 +520,8 @@ function LandingPage() {
               tag="04. Métricas"
               icon={BarChart3}
               title="Dashboard Pastoral en Tiempo Real"
-              what="Gráficos de asistencia por servicio, detección automática de ausentismo y reportes exportables."
-              why="Permite al equipo pastoral pastorear intencionalmente y contactar a familias que llevan más de 2 semanas sin asistir."
+              what="Métricas de crecimiento, seguimiento de nuevos creyentes y detección automática de ausentismo."
+              why="Permite al equipo pastoral pastorear intencionalmente y contactar a las familias que llevan más de 2 semanas sin asistir."
               mockup={<DashboardMockup />}
             />
           </div>
@@ -550,7 +549,7 @@ function LandingPage() {
             <ul className="space-y-3 text-left text-xs text-zinc-300 mb-8 font-mono">
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
-                Niños y tutores ilimitados
+                Miembros y familias ilimitados
               </li>
               <li className="flex items-center gap-2">
                 <Check className="w-4 h-4 text-emerald-400 shrink-0" />
