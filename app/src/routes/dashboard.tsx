@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
-import { useEffect, useState } from 'react';
+import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { CalendarDays, Users, GraduationCap, Plus, CheckCircle2, Pencil, Trash2, Eraser } from 'lucide-react';
+import { CalendarDays, Users, GraduationCap, Plus, CheckCircle2, Pencil, Trash2, Eraser, ChevronDown } from 'lucide-react';
 
 export const Route = createFileRoute('/dashboard')({
   component: DashboardPage,
@@ -17,6 +17,12 @@ interface EventItem {
   id: string;
   title: string;
   event_date: string;
+}
+
+interface EventProgram {
+  title: string;
+  sessions: EventItem[];
+  rangeLabel: string;
 }
 
 function DashboardPage() {
@@ -38,6 +44,7 @@ function DashboardPage() {
   const [savingEvent, setSavingEvent] = useState(false);
   const [eventError, setEventError] = useState('');
   const [successMsg, setSuccessMsg] = useState('');
+  const [expandedPrograms, setExpandedPrograms] = useState<Record<string, boolean>>({});
 
   useEffect(() => {
     let isMounted = true;
@@ -85,7 +92,7 @@ function DashboardPage() {
             .select('*')
             .eq('organization_id', orgId)
             .order('event_date', { ascending: true })
-            .limit(5),
+            .limit(100),
         ]);
 
         if (isMounted) {
@@ -163,7 +170,7 @@ function DashboardPage() {
       .select('*')
       .eq('organization_id', profile.orgId)
       .order('event_date', { ascending: true })
-      .limit(5);
+      .limit(100);
 
     if (eventData) {
       setEvents(
@@ -315,6 +322,58 @@ function DashboardPage() {
     }
   };
 
+  const programs = useMemo<EventProgram[]>(() => {
+    const grouped = new Map<string, EventItem[]>();
+    for (const evt of events) {
+      const list = grouped.get(evt.title) || [];
+      list.push(evt);
+      grouped.set(evt.title, list);
+    }
+
+    return Array.from(grouped.entries())
+      .map(([title, sessions]) => {
+        sessions.sort((a, b) => a.event_date.localeCompare(b.event_date));
+        const first = sessions[0].event_date;
+        const last = sessions[sessions.length - 1].event_date;
+        return {
+          title,
+          sessions,
+          rangeLabel: first === last ? formatDate(first) : `${formatDate(first)} — ${formatDate(last)}`,
+        };
+      })
+      .sort((a, b) => a.sessions[0].event_date.localeCompare(b.sessions[0].event_date));
+  }, [events]);
+
+  const toggleProgram = (title: string) => {
+    setExpandedPrograms((prev) => ({ ...prev, [title]: !prev[title] }));
+  };
+
+  const handleDeleteProgram = async (program: EventProgram) => {
+    if (!profile) return;
+    if (!window.confirm(`¿Eliminar todo el programa "${program.title}" (${program.sessions.length} clases)? Esta acción no se puede deshacer.`)) return;
+
+    setEventError('');
+    setSuccessMsg('');
+    try {
+      const { error } = await supabase
+        .from('events')
+        .delete()
+        .eq('organization_id', profile.orgId)
+        .eq('title', program.title);
+      if (error) throw error;
+      setSuccessMsg(`Programa "${program.title}" eliminado.`);
+      setExpandedPrograms((prev) => {
+        const next = { ...prev };
+        delete next[program.title];
+        return next;
+      });
+      await reloadEvents();
+    } catch (err) {
+      console.error('Error al eliminar programa:', err);
+      setEventError(err instanceof Error ? err.message : 'Error al eliminar el programa.');
+    }
+  };
+
   const minEndDate = eventForm.event_date
     ? (() => {
         const d = new Date(`${eventForm.event_date}T00:00:00`);
@@ -398,41 +457,70 @@ function DashboardPage() {
             </button>
           </div>
         ) : (
-          <table className="w-full text-sm">
-            <thead className="text-zinc-400 text-xs uppercase">
-              <tr>
-                <th className="p-4 text-left">Evento</th>
-                <th className="p-4 text-left">Fecha</th>
-                <th className="p-4 text-right">Acciones</th>
-              </tr>
-            </thead>
-            <tbody>
-              {events.map((evt) => (
-                <tr key={evt.id} className="border-t border-zinc-800 hover:bg-zinc-800/30 transition">
-                  <td className="p-4 font-bold text-white">{evt.title}</td>
-                  <td className="p-4">{formatDate(evt.event_date)}</td>
-                  <td className="p-4">
-                    <div className="flex items-center justify-end gap-1">
-                      <button
-                        onClick={() => openEditModal(evt)}
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 transition hover:text-emerald-400 hover:bg-emerald-500/10"
-                        aria-label={`Editar ${evt.title}`}
-                      >
-                        <Pencil className="w-3.5 h-3.5" />
-                      </button>
-                      <button
-                        onClick={() => handleDeleteEvent(evt)}
-                        className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 transition hover:text-red-400 hover:bg-red-500/10"
-                        aria-label={`Eliminar ${evt.title}`}
-                      >
-                        <Trash2 className="w-3.5 h-3.5" />
-                      </button>
+          <div className="divide-y divide-zinc-800">
+            {programs.map((program) => {
+              const isOpen = !!expandedPrograms[program.title];
+              return (
+                <div key={program.title}>
+                  <div className="flex flex-wrap items-center gap-3 p-4 hover:bg-zinc-800/30 transition">
+                    <button
+                      onClick={() => toggleProgram(program.title)}
+                      className="flex items-center gap-3 flex-1 min-w-[200px] text-left"
+                      aria-expanded={isOpen}
+                      aria-label={`${isOpen ? 'Colapsar' : 'Expandir'} programa ${program.title}`}
+                    >
+                      <ChevronDown
+                        className={`w-4 h-4 shrink-0 text-zinc-500 transition-transform ${isOpen ? 'rotate-180' : ''}`}
+                      />
+                      <span className="font-medium text-white">{program.title}</span>
+                      <span className="bg-zinc-800 text-zinc-300 text-xs px-2.5 py-0.5 rounded-full shrink-0">
+                        {program.sessions.length} {program.sessions.length === 1 ? 'clase' : 'clases'}
+                      </span>
+                    </button>
+                    <span className="text-sm text-zinc-400">{program.rangeLabel}</span>
+                    <button
+                      onClick={() => handleDeleteProgram(program)}
+                      className="text-xs text-zinc-400 px-3 py-1.5 rounded-lg border border-zinc-800 flex items-center gap-1 font-semibold transition hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/30"
+                    >
+                      <Trash2 className="w-3 h-3" /> Eliminar Programa
+                    </button>
+                  </div>
+
+                  {isOpen && (
+                    <div className="pl-6 ml-4 border-l border-zinc-800 space-y-2 py-3 pr-4">
+                      {program.sessions.map((evt, index) => (
+                        <div
+                          key={evt.id}
+                          className="flex items-center justify-between gap-3 py-2 px-3 rounded-lg hover:bg-zinc-800/30 transition"
+                        >
+                          <div className="flex items-center gap-3 min-w-0">
+                            <span className="shrink-0 text-xs font-bold text-zinc-500">Clase {index + 1}</span>
+                            <span className="text-sm text-zinc-300">{formatDate(evt.event_date)}</span>
+                          </div>
+                          <div className="flex items-center gap-1 shrink-0">
+                            <button
+                              onClick={() => openEditModal(evt)}
+                              className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 transition hover:text-emerald-400 hover:bg-emerald-500/10"
+                              aria-label={`Editar clase ${index + 1} de ${program.title}`}
+                            >
+                              <Pencil className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              onClick={() => handleDeleteEvent(evt)}
+                              className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 transition hover:text-red-400 hover:bg-red-500/10"
+                              aria-label={`Eliminar clase ${index + 1} de ${program.title}`}
+                            >
+                              <Trash2 className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
+                  )}
+                </div>
+              );
+            })}
+          </div>
         )}
       </div>
 
