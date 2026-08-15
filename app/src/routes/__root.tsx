@@ -1,5 +1,7 @@
 import { createRootRoute, Outlet, Link, useNavigate } from '@tanstack/react-router';
 import { supabase } from '../lib/supabase';
+// Asegurar la importación del CSS principal que contiene Tailwind
+import '../styles.css'; 
 
 export const Route = createRootRoute({
   component: RootComponent,

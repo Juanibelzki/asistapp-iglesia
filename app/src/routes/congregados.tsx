@@ -32,13 +32,18 @@ function CongregadosPage() {
 
   useEffect(() => {
     let isMounted = true;
+    
+    // Timeout de seguridad de 3 segundos
+    const timer = setTimeout(() => {
+      if (isMounted) setLoading(false);
+    }, 3000);
 
     async function loadData() {
       try {
         const { data: { session }, error: sessionError } = await supabase.auth.getSession();
         
         if (sessionError || !session) {
-          navigate({ to: '/login' });
+          if (isMounted) navigate({ to: '/login' });
           return;
         }
 
@@ -77,6 +82,7 @@ function CongregadosPage() {
       } finally {
         if (isMounted) {
           setLoading(false);
+          clearTimeout(timer);
         }
       }
     }
@@ -85,6 +91,7 @@ function CongregadosPage() {
 
     return () => {
       isMounted = false;
+      clearTimeout(timer);
     };
   }, [navigate]);
 
