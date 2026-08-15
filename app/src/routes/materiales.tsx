@@ -266,6 +266,12 @@ function MaterialesPage() {
             >
               ← Volver al Dashboard
             </Link>
+            <Link
+              to="/ajustes"
+              className="text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-800 px-3 py-1.5 rounded-lg transition"
+            >
+              Ajustes
+            </Link>
             <button
               onClick={openModal}
               className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-sm transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"

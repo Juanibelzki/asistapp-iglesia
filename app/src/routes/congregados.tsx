@@ -331,6 +331,9 @@ function CongregadosPage() {
               <Link className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 transition" to="/asistencia">
                 Asistencia
               </Link>
+              <Link className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 transition" to="/ajustes">
+                Ajustes
+              </Link>
             </nav>
           </div>
 

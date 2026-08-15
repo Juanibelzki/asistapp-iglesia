@@ -396,6 +396,7 @@ function DashboardPage() {
           <Link to="/congregados" className="text-sm text-zinc-400 hover:text-white">Congregados</Link>
           <Link to="/materiales" className="text-sm text-zinc-400 hover:text-white">Materiales</Link>
           <Link to="/asistencia" className="text-sm text-zinc-400 hover:text-white">Asistencia</Link>
+          <Link to="/ajustes" className="text-sm text-zinc-400 hover:text-white">Ajustes</Link>
         </nav>
         <button onClick={handleSignOut} className="text-sm text-zinc-400 hover:text-white">Salir</button>
       </header>

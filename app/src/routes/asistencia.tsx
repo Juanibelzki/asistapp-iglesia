@@ -311,6 +311,12 @@ function AsistenciaPage() {
           >
             ← Volver al Dashboard
           </Link>
+          <Link
+            to="/ajustes"
+            className="text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-800 px-3 py-1.5 rounded-lg transition"
+          >
+            Ajustes
+          </Link>
         </div>
 
         {/* SELECTOR DE EVENTO */}

@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AjustesRouteImport } from './routes/ajustes'
 import { Route as AsistenciaRouteImport } from './routes/asistencia'
 import { Route as CongregadosRouteImport } from './routes/congregados'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -33,6 +34,11 @@ const IndexRoute = IndexRouteImport.update({
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AjustesRoute = AjustesRouteImport.update({
+  id: '/ajustes',
+  path: '/ajustes',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AsistenciaRoute = AsistenciaRouteImport.update({
@@ -106,6 +112,7 @@ const EventosEventIdQrRoute = EventosEventIdQrRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/ajustes': typeof AjustesRoute
   '/asistencia': typeof AsistenciaRoute
   '/congregados': typeof CongregadosRoute
   '/dashboard': typeof DashboardRoute
@@ -123,6 +130,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/ajustes': typeof AjustesRoute
   '/asistencia': typeof AsistenciaRoute
   '/congregados': typeof CongregadosRoute
   '/dashboard': typeof DashboardRoute
@@ -141,6 +149,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/ajustes': typeof AjustesRoute
   '/asistencia': typeof AsistenciaRoute
   '/congregados': typeof CongregadosRoute
   '/dashboard': typeof DashboardRoute
@@ -160,6 +169,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/ajustes'
     | '/asistencia'
     | '/congregados'
     | '/dashboard'
@@ -177,6 +187,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/ajustes'
     | '/asistencia'
     | '/congregados'
     | '/dashboard'
@@ -194,6 +205,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/ajustes'
     | '/asistencia'
     | '/congregados'
     | '/dashboard'
@@ -212,6 +224,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AjustesRoute: typeof AjustesRoute
   AsistenciaRoute: typeof AsistenciaRoute
   CongregadosRoute: typeof CongregadosRoute
   DashboardRoute: typeof DashboardRoute
@@ -239,6 +252,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/ajustes': {
+      id: '/ajustes'
+      path: '/ajustes'
+      fullPath: '/ajustes'
+      preLoaderRoute: typeof AjustesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/asistencia': {
@@ -351,6 +371,7 @@ const EventosRouteWithChildren =
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AjustesRoute: AjustesRoute,
   AsistenciaRoute: AsistenciaRoute,
   CongregadosRoute: CongregadosRoute,
   DashboardRoute: DashboardRoute,
