@@ -25,12 +25,13 @@ function Login() {
   const login = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrorMsg('')
-    const tel = phone.trim()
-    if (!/^[\d\s-]{6,20}$/.test(tel)) {
+    const cleanPhone = phone.replace(/\D/g, '').trim()
+    const cleanPin = pin.trim()
+    if (!cleanPhone) {
       setErrorMsg('Ingresá tu número de teléfono / WhatsApp.')
       return
     }
-    if (!/^\d{4}$/.test(pin)) {
+    if (!/^\d{4}$/.test(cleanPin)) {
       setErrorMsg('El PIN debe tener exactamente 4 dígitos.')
       return
     }
@@ -40,15 +41,19 @@ function Login() {
       const { data, error } = await supabase
         .from('profiles')
         .select('id, organization_id, role, full_name, phone, organizations(name)')
-        .eq('phone', tel)
-        .eq('pin', pin)
+        .eq('phone', cleanPhone)
+        .eq('pin', cleanPin)
         .limit(1)
         .maybeSingle()
 
-      if (error) throw error
+      if (error) {
+        console.error('Error al consultar profiles en login:', error)
+        setErrorMsg('Error al conectar con el servidor. Revisá los permisos de la base de datos.')
+        return
+      }
 
       if (!data) {
-        setErrorMsg('Teléfono o PIN incorrectos. Verificá tus datos o registrate con tu pastor.')
+        setErrorMsg('Teléfono o PIN incorrectos. Si no tenés cuenta, registrate con tu iglesia.')
         return
       }
 
