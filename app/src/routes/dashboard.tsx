@@ -7,6 +7,26 @@ export const Route = createFileRoute('/dashboard')({
   component: DashboardPage,
 });
 
+const USER_SESSION_KEY = 'asistapp_user_session';
+
+interface LocalUserSession {
+  organization_id?: string;
+  role?: string;
+  full_name?: string;
+  church_name?: string;
+}
+
+const readLocalUserSession = (): LocalUserSession | null => {
+  try {
+    const raw = localStorage.getItem(USER_SESSION_KEY);
+    if (!raw) return null;
+    const parsed = JSON.parse(raw);
+    return parsed?.organization_id ? (parsed as LocalUserSession) : null;
+  } catch {
+    return null;
+  }
+};
+
 interface DashboardStats {
   memberCount: number;
   newMembers30d: number;
@@ -69,28 +89,39 @@ function DashboardPage() {
 
     async function loadData() {
       try {
+        let profileForLoad: { fullName: string; churchName: string; orgId: string } | null = null;
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
-          navigate({ to: '/login' });
-          return;
-        }
+          const local = readLocalUserSession();
+          if (local?.role === 'admin' && local.organization_id) {
+            profileForLoad = {
+              fullName: local.full_name || 'Admin',
+              churchName: local.church_name || 'Mi Iglesia',
+              orgId: local.organization_id,
+            };
+          } else {
+            navigate({ to: '/login' });
+            return;
+          }
+        } else {
+          const { data: profileData } = await supabase
+            .from('profiles')
+            .select('full_name, organization_id, organizations(name)')
+            .eq('auth_user_id', session.user.id)
+            .single();
 
-        const { data: profileData } = await supabase
-          .from('profiles')
-          .select('full_name, organization_id, organizations(name)')
-          .eq('auth_user_id', session.user.id)
-          .single();
+          if (!profileData?.organization_id) return;
 
-        if (!profileData?.organization_id) return;
-
-        const orgId = profileData.organization_id;
-        if (isMounted) {
-          setProfile({
+          profileForLoad = {
             fullName: profileData.full_name || 'Admin',
             churchName: (profileData.organizations as any)?.name || 'Mi Iglesia',
-            orgId,
-          });
+            orgId: profileData.organization_id,
+          };
         }
+
+        if (!profileForLoad) return;
+        if (isMounted) setProfile(profileForLoad);
+        const orgId = profileForLoad.orgId;
 
         const today = new Date().toISOString().slice(0, 10);
         const thirtyDaysAgo = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString();
