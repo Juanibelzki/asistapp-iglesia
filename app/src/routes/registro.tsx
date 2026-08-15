@@ -154,23 +154,36 @@ function RegistroPage() {
     try {
       const generatedQr = crypto.randomUUID();
 
-      const { error } = await supabase.from('congregados').insert({
-        organization_id: selectedChurchId,
-        first_name: form.first_name.trim(),
-        last_name: form.last_name.trim(),
-        phone: form.phone.trim(),
-        is_student: form.is_student,
-        student_stage: form.is_student ? form.student_stage : null,
-        guardian_name: needsGuardian ? form.guardian_name.trim() || null : null,
-        guardian_phone: needsGuardian ? form.guardian_phone.trim() || null : null,
-        qr_code: generatedQr,
-        status: 'activo',
-      });
+      const { data: insertedRows, error } = await supabase
+        .from('congregados')
+        .insert({
+          organization_id: selectedChurchId,
+          first_name: form.first_name.trim(),
+          last_name: form.last_name.trim(),
+          phone: form.phone.trim(),
+          is_student: form.is_student,
+          student_stage: form.is_student ? form.student_stage : null,
+          guardian_name: needsGuardian ? form.guardian_name.trim() || null : null,
+          guardian_phone: needsGuardian ? form.guardian_phone.trim() || null : null,
+          qr_code: generatedQr,
+          status: 'activo',
+        })
+        .select('id, qr_code');
       if (error) throw error;
 
+      const memberId = insertedRows?.[0]?.id || generatedQr;
+      const fullName = `${form.first_name.trim()} ${form.last_name.trim()}`;
+
       localStorage.setItem('asistapp_congregado_code', generatedQr);
-      setSuccessCode(generatedQr);
-      setSuccessName(`${form.first_name.trim()} ${form.last_name.trim()}`);
+      setSuccessCode(
+        JSON.stringify({
+          id: memberId,
+          qr_code: generatedQr,
+          phone: form.phone.trim(),
+          name: fullName,
+        }),
+      );
+      setSuccessName(fullName);
       setSuccess(true);
     } catch (err) {
       console.error('Error al inscribirse:', err);

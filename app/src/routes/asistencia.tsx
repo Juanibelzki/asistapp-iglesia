@@ -64,6 +64,48 @@ const isNetworkError = (err: any): boolean => {
   return !err?.code && /fetch|network|internet|offline|load failed|envelope|timeout/i.test(msg);
 };
 
+interface QrPayload {
+  id?: string | null;
+  phone?: string | null;
+  qr?: string | null;
+}
+
+const parseQrPayload = (text: string): QrPayload => {
+  const t = (text || '').trim();
+
+  if (t.startsWith('{') || t.startsWith('[')) {
+    try {
+      const parsed = JSON.parse(t);
+      const obj = Array.isArray(parsed) ? parsed[0] : parsed;
+      if (obj && typeof obj === 'object') {
+        return {
+          id: obj.id ?? obj.member_id ?? null,
+          phone: obj.phone ?? obj.telefono ?? null,
+          qr: obj.qr_code ?? obj.qr ?? obj.code ?? null,
+        };
+      }
+    } catch {
+      /* no es JSON */
+    }
+  }
+
+  try {
+    const u = new URL(t);
+    if (u.protocol === 'http:' || u.protocol === 'https:') {
+      const sp = u.searchParams;
+      return {
+        id: sp.get('id') ?? sp.get('member') ?? null,
+        phone: sp.get('phone') ?? sp.get('tel') ?? null,
+        qr: sp.get('code') ?? sp.get('qr') ?? null,
+      };
+    }
+  } catch {
+    /* no es URL */
+  }
+
+  return { id: null, phone: null, qr: t };
+};
+
 const readQueue = (): PendingCheckIn[] => {
   try {
     const raw = localStorage.getItem(OFFLINE_QUEUE_KEY);
@@ -170,6 +212,7 @@ function AsistenciaPage() {
       const map = new Map<string, MemberEntry>();
       (data as MemberEntry[]).forEach((m) => {
         if (m.qr_code) map.set(m.qr_code, m);
+        map.set(m.id, m);
       });
       membersCacheRef.current = map;
       try {
@@ -191,9 +234,11 @@ function AsistenciaPage() {
       if (raw) {
         const cached = JSON.parse(raw);
         if (cached?.orgId === orgId && Array.isArray(cached.members)) {
-          membersCacheRef.current = new Map(
-            (cached.members as MemberEntry[]).map((m) => [m.qr_code, m]),
-          );
+          membersCacheRef.current = new Map();
+          (cached.members as MemberEntry[]).forEach((m) => {
+            if (m.qr_code) membersCacheRef.current.set(m.qr_code, m);
+            membersCacheRef.current.set(m.id, m);
+          });
         }
       }
     } catch {
@@ -280,6 +325,40 @@ function AsistenciaPage() {
     };
   }, []);
 
+  const resolveMember = async (decodedText: string): Promise<MemberEntry | null> => {
+    const payload = parseQrPayload(decodedText);
+
+    const lookups: Array<{ column: string; value: string }> = [];
+    if (payload.qr) lookups.push({ column: 'qr_code', value: payload.qr });
+    if (payload.id) lookups.push({ column: 'id', value: payload.id });
+    if (payload.phone) lookups.push({ column: 'phone', value: payload.phone });
+    if (lookups.length === 0) lookups.push({ column: 'qr_code', value: decodedText.trim() });
+
+    for (const lookup of lookups) {
+      const cached = membersCacheRef.current.get(lookup.value);
+      if (cached) return cached;
+    }
+
+    for (const lookup of lookups) {
+      try {
+        const { data, error } = await supabase
+          .from('congregados')
+          .select('id, first_name, last_name, qr_code')
+          .eq(lookup.column, lookup.value)
+          .maybeSingle();
+        if (!error && data) {
+          const member = data as MemberEntry;
+          membersCacheRef.current.set(member.qr_code, member);
+          membersCacheRef.current.set(member.id, member);
+          return member;
+        }
+      } catch {
+        /* intentar el siguiente criterio */
+      }
+    }
+    return null;
+  };
+
   const startScanner = async () => {
     if (!orgIdRef.current) {
       setScannerError('Esperando la conexión a tu iglesia...');
@@ -322,32 +401,17 @@ function AsistenciaPage() {
       try {
         await scanner.pause(true);
 
-        let member = membersCacheRef.current.get(decodedText);
+        let member: MemberEntry | null = membersCacheRef.current.get(decodedText) ?? null;
 
         if (!member) {
-          try {
-            const { data, error } = await supabase
-              .from('congregados')
-              .select('id, first_name, last_name, qr_code')
-              .eq('qr_code', decodedText)
-              .maybeSingle();
+          member = await resolveMember(decodedText);
+        }
 
-            if (error || !data) {
-              if (isOffline() || isNetworkError(error)) {
-                showToast('Modo Offline: miembro no disponible sin conexión', 'error');
-              } else {
-                showToast('Código QR no reconocido', 'error');
-              }
-            } else {
-              member = data as MemberEntry;
-              membersCacheRef.current.set(member.qr_code, member);
-            }
-          } catch {
-            if (isOffline()) {
-              showToast('Modo Offline: miembro no disponible sin conexión', 'error');
-            } else {
-              showToast('Error de red. Intentalo nuevamente', 'error');
-            }
+        if (!member) {
+          if (isOffline()) {
+            showToast('Modo Offline: miembro no disponible sin conexión', 'error');
+          } else {
+            showToast('Código QR no reconocido', 'error');
           }
         }
 

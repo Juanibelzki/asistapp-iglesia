@@ -284,6 +284,12 @@ function DashboardPage() {
   const toDateString = (d: Date) =>
     `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
+  const normalizeDate = (raw: string): string => {
+    const d = new Date(`${raw}T00:00:00`);
+    if (isNaN(d.getTime())) return raw;
+    return d.toISOString();
+  };
+
   const reloadEvents = async () => {
     if (!profile) return;
     const { data: eventData } = await supabase
@@ -327,7 +333,7 @@ function DashboardPage() {
       if (editingEventId) {
         const { error } = await supabase
           .from('events')
-          .update({ title: eventForm.title.trim(), event_date: eventForm.event_date })
+          .update({ title: eventForm.title.trim(), event_date: normalizeDate(eventForm.event_date) })
           .eq('id', editingEventId)
           .eq('organization_id', profile.orgId);
         if (error) throw error;
@@ -348,7 +354,7 @@ function DashboardPage() {
           const { error } = await supabase.from('events').insert({
             organization_id: profile.orgId,
             title: eventForm.title.trim(),
-            event_date: eventForm.event_date,
+            event_date: normalizeDate(eventForm.event_date),
           });
           if (error) throw error;
         } else {
@@ -386,8 +392,9 @@ function DashboardPage() {
       await reloadEvents();
       closeEventModal();
     } catch (err) {
-      console.error('Error al guardar evento:', err);
-      setEventError(err instanceof Error ? err.message : 'Error al guardar el evento.');
+      const eventError = err instanceof Error ? err : new Error(String(err));
+      console.error('EVENT CREATE ERROR:', eventError);
+      setEventError(eventError.message);
     } finally {
       setSavingEvent(false);
     }
