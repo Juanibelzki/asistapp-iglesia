@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { CalendarDays, Users, GraduationCap, Plus } from 'lucide-react';
+import { CalendarDays, Users, GraduationCap, Plus, CheckCircle2 } from 'lucide-react';
 
 export const Route = createFileRoute('/dashboard')({
   component: DashboardPage,
@@ -27,9 +27,16 @@ function DashboardPage() {
   const [events, setEvents] = useState<EventItem[]>([]);
 
   const [isOpenModal, setIsOpenModal] = useState(false);
-  const [eventForm, setEventForm] = useState({ title: '', event_date: '' });
+  const [eventForm, setEventForm] = useState({
+    title: '',
+    event_date: '',
+    is_recurring: false,
+    frequency: 'semanal',
+    end_date: '',
+  });
   const [savingEvent, setSavingEvent] = useState(false);
   const [eventError, setEventError] = useState('');
+  const [successMsg, setSuccessMsg] = useState('');
 
   useEffect(() => {
     let isMounted = true;
@@ -118,8 +125,9 @@ function DashboardPage() {
   };
 
   const openEventModal = () => {
-    setEventForm({ title: '', event_date: '' });
+    setEventForm({ title: '', event_date: '', is_recurring: false, frequency: 'semanal', end_date: '' });
     setEventError('');
+    setSuccessMsg('');
     setIsOpenModal(true);
   };
 
@@ -127,6 +135,9 @@ function DashboardPage() {
     setIsOpenModal(false);
     setEventError('');
   };
+
+  const toDateString = (d: Date) =>
+    `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
 
   const handleCreateEvent = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -138,16 +149,57 @@ function DashboardPage() {
       setEventError('Título y Fecha son obligatorios.');
       return;
     }
+    if (eventForm.is_recurring && !eventForm.end_date) {
+      setEventError('Indica la fecha límite de repetición.');
+      return;
+    }
+    if (eventForm.is_recurring && eventForm.end_date <= eventForm.event_date) {
+      setEventError('La fecha límite debe ser posterior a la fecha del evento.');
+      return;
+    }
 
     setSavingEvent(true);
     setEventError('');
     try {
-      const { error } = await supabase.from('events').insert({
-        organization_id: profile.orgId,
-        title: eventForm.title.trim(),
-        event_date: eventForm.event_date,
-      });
-      if (error) throw error;
+      let insertedCount = 1;
+
+      if (!eventForm.is_recurring) {
+        const { error } = await supabase.from('events').insert({
+          organization_id: profile.orgId,
+          title: eventForm.title.trim(),
+          event_date: eventForm.event_date,
+        });
+        if (error) throw error;
+      } else {
+        const intervalDays = eventForm.frequency === 'quincenal' ? 14 : 7;
+        const eventsToInsert: { title: string; event_date: string; organization_id: string }[] = [];
+        const currentDate = new Date(`${eventForm.event_date}T00:00:00`);
+        const finalDate = new Date(`${eventForm.end_date}T00:00:00`);
+
+        while (currentDate <= finalDate) {
+          eventsToInsert.push({
+            title: eventForm.title.trim(),
+            event_date: toDateString(currentDate),
+            organization_id: profile.orgId,
+          });
+          currentDate.setDate(currentDate.getDate() + intervalDays);
+        }
+
+        if (eventsToInsert.length === 0) {
+          setEventError('No se pudo generar ninguna fecha para la recurrencia.');
+          return;
+        }
+
+        const { error } = await supabase.from('events').insert(eventsToInsert);
+        if (error) throw error;
+        insertedCount = eventsToInsert.length;
+      }
+
+      setSuccessMsg(
+        insertedCount === 1
+          ? 'Evento programado con éxito.'
+          : `Se programaron ${insertedCount} clases con éxito.`,
+      );
 
       const { data: eventData } = await supabase
         .from('events')
@@ -186,6 +238,14 @@ function DashboardPage() {
       return d;
     }
   };
+
+  const minEndDate = eventForm.event_date
+    ? (() => {
+        const d = new Date(`${eventForm.event_date}T00:00:00`);
+        d.setDate(d.getDate() + 1);
+        return toDateString(d);
+      })()
+    : '';
 
   if (loading) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-zinc-400">Cargando...</div>;
 
@@ -226,6 +286,11 @@ function DashboardPage() {
       </div>
 
       {/* Events */}
+      {successMsg && (
+        <div className="bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-sm font-medium rounded-xl px-4 py-3 flex items-center gap-2">
+          <CheckCircle2 className="w-4 h-4 shrink-0" /> {successMsg}
+        </div>
+      )}
       <div className="bg-zinc-900 rounded-2xl border border-zinc-800 overflow-hidden">
         <div className="p-6 border-b border-zinc-800 flex justify-between items-center">
           <h2 className="font-bold">Próximos Eventos</h2>
@@ -310,6 +375,66 @@ function DashboardPage() {
                   required
                 />
               </div>
+
+              <div className="flex items-center justify-between bg-zinc-950/60 border border-zinc-800 rounded-xl px-4 py-3">
+                <div>
+                  <p className="text-sm font-semibold text-white">¿Es un evento recurrente?</p>
+                  <p className="text-xs text-zinc-500 mt-0.5">Se repetirá automáticamente hasta la fecha límite.</p>
+                </div>
+                <button
+                  type="button"
+                  role="switch"
+                  aria-checked={eventForm.is_recurring}
+                  onClick={() => setEventForm((f) => ({ ...f, is_recurring: !f.is_recurring }))}
+                  className={`relative shrink-0 w-11 h-6 rounded-full transition ${
+                    eventForm.is_recurring ? 'bg-emerald-500' : 'bg-zinc-700'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform ${
+                      eventForm.is_recurring ? 'translate-x-5' : ''
+                    }`}
+                  />
+                </button>
+              </div>
+
+              {eventForm.is_recurring && (
+                <div className="space-y-4 border-t border-zinc-800 pt-4">
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-400 mb-2">Frecuencia</label>
+                    <div className="grid grid-cols-2 gap-2">
+                      {(['semanal', 'quincenal'] as const).map((freq) => (
+                        <button
+                          key={freq}
+                          type="button"
+                          onClick={() => setEventForm((f) => ({ ...f, frequency: freq }))}
+                          className={`px-3 py-2 rounded-lg text-xs font-bold transition border ${
+                            eventForm.frequency === freq
+                              ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
+                              : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-zinc-200 hover:border-zinc-700'
+                          }`}
+                        >
+                          {freq === 'semanal' ? 'Semanal (7 días)' : 'Cada 14 días'}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Repetir hasta *</label>
+                    <input
+                      type="date"
+                      min={minEndDate}
+                      value={eventForm.end_date}
+                      onChange={(e) => setEventForm((f) => ({ ...f, end_date: e.target.value }))}
+                      className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/40 transition [color-scheme:dark]"
+                      required
+                    />
+                    {eventForm.end_date && eventForm.end_date <= eventForm.event_date && (
+                      <p className="text-[11px] text-red-400 mt-1">La fecha límite debe ser posterior a la fecha del evento.</p>
+                    )}
+                  </div>
+                </div>
+              )}
 
               {eventError && (
                 <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-medium rounded-lg px-3 py-2.5">
