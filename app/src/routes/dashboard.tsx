@@ -93,7 +93,10 @@ function DashboardPage() {
         const { data: { session } } = await supabase.auth.getSession();
         if (!session) {
           const local = readLocalUserSession();
-          if (local?.role === 'admin' && local.organization_id) {
+          const localRole = (local?.role || '').toLowerCase();
+          const isDirectiveRole =
+            localRole !== 'staff' && localRole !== 'usher' && localRole !== 'ujier';
+          if (local?.organization_id && isDirectiveRole) {
             profileForLoad = {
               fullName: local.full_name || 'Admin',
               churchName: local.church_name || 'Mi Iglesia',

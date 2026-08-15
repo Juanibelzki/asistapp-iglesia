@@ -90,21 +90,21 @@ function Login() {
 
       localStorage.setItem(USER_SESSION_KEY, JSON.stringify(data))
 
-      const role = data.role || 'staff'
-      if (role === 'admin') {
-        navigate({ to: '/dashboard' })
-      } else {
+      const userRole = (data.role || '').toLowerCase()
+      if (userRole === 'staff' || userRole === 'usher' || userRole === 'ujier') {
         localStorage.setItem(
           STAFF_SESSION_KEY,
           JSON.stringify({
             organization_id: data.organization_id,
             full_name: data.full_name,
-            role,
+            role: data.role || 'staff',
             pin: cleanPin,
             church_name: '',
           }),
         )
         navigate({ to: '/asistencia' })
+      } else {
+        navigate({ to: '/dashboard' })
       }
     } catch (err) {
       console.error('Error al iniciar sesión:', err)

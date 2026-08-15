@@ -25,10 +25,12 @@ const EMPTY_FORM: StaffForm = {
 };
 
 const ROLES = [
-  { id: 'ujier', value: 'staff', label: 'Ujier / Recepción (Escáner de Puerta)' },
-  { id: 'lider', value: 'leader', label: 'Líder de Área / Ministerio' },
-  { id: 'maestro', value: 'leader', label: 'Maestro / Formador' },
+  { value: 'staff', label: 'Ujier / Recepción (Escáner de puerta)' },
+  { value: 'leader', label: 'Líder de Ministerio / Maestro (Dashboard y Gestión)' },
+  { value: 'admin', label: 'Pastor / Administrador General (Control Total)' },
 ];
+
+const USER_SESSION_KEY = 'asistapp_user_session';
 
 function RegisterStaffPage() {
   const navigate = useNavigate();
@@ -170,18 +172,6 @@ function RegisterStaffPage() {
         if (/row-level security/i.test(error.message)) break;
       }
 
-      localStorage.setItem(
-        'asistapp_staff_session',
-        JSON.stringify({
-          organization_id: selectedChurchId,
-          full_name: form.fullName.trim(),
-          role: selectedRole,
-          pin: cleanPin,
-          church_name: selectedChurch.name,
-        }),
-      );
-      localStorage.setItem('asistapp_welcome_msg', `¡Bienvenido al equipo de ${selectedChurch.name}!`);
-
       if (saved) {
         localStorage.removeItem('asistapp_staff_cloud_pending');
       } else {
@@ -189,7 +179,34 @@ function RegisterStaffPage() {
         localStorage.setItem('asistapp_staff_cloud_pending', '1');
       }
 
-      navigate({ to: '/asistencia' });
+      localStorage.setItem('asistapp_welcome_msg', `¡Bienvenido al equipo de ${selectedChurch.name}!`);
+
+      const isUsher = selectedRole === 'staff' || selectedRole === 'usher' || selectedRole === 'ujier';
+      if (isUsher) {
+        localStorage.setItem(
+          'asistapp_staff_session',
+          JSON.stringify({
+            organization_id: selectedChurchId,
+            full_name: form.fullName.trim(),
+            role: selectedRole,
+            pin: cleanPin,
+            church_name: selectedChurch.name,
+          }),
+        );
+        navigate({ to: '/asistencia' });
+      } else {
+        localStorage.setItem(
+          USER_SESSION_KEY,
+          JSON.stringify({
+            organization_id: selectedChurchId,
+            role: selectedRole,
+            full_name: form.fullName.trim(),
+            phone: cleanPhone,
+            church_name: selectedChurch.name,
+          }),
+        );
+        navigate({ to: '/dashboard' });
+      }
     } catch (err) {
       console.error('Error al registrar staff:', err);
       const msg = err instanceof Error ? err.message : 'Error al registrarte en el equipo.';
@@ -318,7 +335,7 @@ function RegisterStaffPage() {
               <div className="space-y-2">
                 {ROLES.map((r) => (
                   <button
-                    key={r.id}
+                    key={r.value}
                     type="button"
                     onClick={() => setSelectedRole(r.value)}
                     className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition border ${
