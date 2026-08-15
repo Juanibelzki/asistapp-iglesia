@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { QRCodeSVG } from 'qrcode.react';
 
 export const Route = createFileRoute('/registro')({
   component: RegistroPage,
@@ -49,6 +50,8 @@ function RegistroPage() {
   const [form, setForm] = useState<RegisterForm>(EMPTY_FORM);
   const [formError, setFormError] = useState('');
   const [success, setSuccess] = useState(false);
+  const [successCode, setSuccessCode] = useState('');
+  const [successName, setSuccessName] = useState('');
 
   useEffect(() => {
     let isMounted = true;
@@ -166,6 +169,8 @@ function RegistroPage() {
       if (error) throw error;
 
       localStorage.setItem('asistapp_congregado_code', generatedQr);
+      setSuccessCode(generatedQr);
+      setSuccessName(`${form.first_name.trim()} ${form.last_name.trim()}`);
       setSuccess(true);
     } catch (err) {
       console.error('Error al inscribirse:', err);
@@ -225,15 +230,25 @@ function RegistroPage() {
                 </svg>
               </div>
               <h2 className="text-lg font-bold text-white">¡Inscripción exitosa!</h2>
-              <p className="text-sm text-zinc-400">
-                Tu credencial digital ya está lista con tu código QR. Presentalo en la puerta para registrar tu asistencia.
-              </p>
+
+              <div>
+                <p className="text-sm text-zinc-400">Tu credencial digital está lista.</p>
+                <p className="text-base font-bold text-white mt-1">{successName}</p>
+              </div>
+
+              <div className="bg-white p-4 rounded-2xl shadow-lg inline-block mx-auto">
+                <QRCodeSVG value={successCode} size={180} level="M" />
+              </div>
+
               <button
                 onClick={goToPortal}
                 className="w-full px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-sm transition shadow-lg shadow-emerald-500/20"
               >
-                Ver mi Credencial Digital
+                Guardar / Descargar QR
               </button>
+              <p className="text-xs text-zinc-500">
+                Mostrá este código en la entrada o guardá una captura de pantalla.
+              </p>
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-5">
