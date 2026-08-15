@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { CalendarDays, Users, GraduationCap, Plus, CheckCircle2, Pencil, Trash2, Eraser, ChevronDown, CalendarCheck, LayoutGrid, Link2 } from 'lucide-react';
+import { CalendarDays, Users, GraduationCap, Plus, CheckCircle2, Pencil, Trash2, Eraser, ChevronDown, CalendarCheck, LayoutGrid, Link2, Menu, X } from 'lucide-react';
 
 export const Route = createFileRoute('/dashboard')({
   component: DashboardPage,
@@ -80,6 +80,7 @@ function DashboardPage() {
   const [successMsg, setSuccessMsg] = useState('');
   const [expandedPrograms, setExpandedPrograms] = useState<Record<string, boolean>>({});
   const [copiedStaffLink, setCopiedStaffLink] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     let isMounted = true;
@@ -521,7 +522,7 @@ function DashboardPage() {
   return (
     <div className="min-h-screen bg-zinc-950 text-zinc-100">
       <header className="sticky top-0 z-40 backdrop-blur-md bg-zinc-950/80 border-b border-zinc-800/80 px-4 py-3 sm:px-6 sm:py-4">
-        <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
+        <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-zinc-950 font-black text-lg shadow-lg shadow-emerald-500/20 shrink-0">
               {(profile?.churchName || 'A').charAt(0).toUpperCase()}
@@ -531,7 +532,8 @@ function DashboardPage() {
               <p className="text-xs text-zinc-400 truncate">Hola, {profile?.fullName}</p>
             </div>
           </div>
-          <div className="flex items-center gap-3 flex-wrap">
+
+          <div className="hidden md:flex items-center gap-3">
             <nav className="flex items-center gap-1">
               <Link
                 to="/dashboard"
@@ -571,13 +573,70 @@ function DashboardPage() {
               Salir
             </button>
           </div>
+
+          <button
+            onClick={() => setMenuOpen((o) => !o)}
+            className="md:hidden w-11 h-11 rounded-xl border border-zinc-800 bg-zinc-900/60 flex items-center justify-center text-zinc-200 active:scale-95 transition"
+            aria-label={menuOpen ? 'Cerrar menú' : 'Abrir menú'}
+            aria-expanded={menuOpen}
+          >
+            {menuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+          </button>
         </div>
+
+        {menuOpen && (
+          <div className="md:hidden absolute top-full left-0 right-0 border-t border-zinc-800 bg-zinc-950/95 backdrop-blur-md shadow-2xl shadow-black/40 animate-[fadeInUp_0.2s_ease-out]">
+            <nav className="flex flex-col gap-1 px-4 py-3">
+              <Link
+                to="/dashboard"
+                onClick={() => setMenuOpen(false)}
+                className="px-4 py-3 rounded-xl text-base font-medium text-white bg-zinc-900/60 border border-zinc-800/60"
+              >
+                Dashboard
+              </Link>
+              <Link
+                to="/congregados"
+                onClick={() => setMenuOpen(false)}
+                className="px-4 py-3 rounded-xl text-base font-medium text-zinc-300 hover:bg-zinc-900/60 transition"
+              >
+                Congregados
+              </Link>
+              <Link
+                to="/materiales"
+                onClick={() => setMenuOpen(false)}
+                className="px-4 py-3 rounded-xl text-base font-medium text-zinc-300 hover:bg-zinc-900/60 transition"
+              >
+                Materiales
+              </Link>
+              <Link
+                to="/asistencia"
+                onClick={() => setMenuOpen(false)}
+                className="px-4 py-3 rounded-xl text-base font-medium text-zinc-300 hover:bg-zinc-900/60 transition"
+              >
+                Asistencia
+              </Link>
+              <Link
+                to="/ajustes"
+                onClick={() => setMenuOpen(false)}
+                className="px-4 py-3 rounded-xl text-base font-medium text-zinc-300 hover:bg-zinc-900/60 transition"
+              >
+                Ajustes
+              </Link>
+              <button
+                onClick={handleSignOut}
+                className="px-4 py-3 rounded-xl text-base font-medium text-red-400 hover:bg-red-500/10 text-left transition"
+              >
+                Salir
+              </button>
+            </nav>
+          </div>
+        )}
       </header>
 
       <main className="max-w-7xl mx-auto px-4 py-6 sm:p-6 space-y-8">
       {/* Invitación al equipo */}
       <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl">
-        <div className="flex flex-wrap items-center justify-between gap-4">
+        <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
           <div className="flex items-start gap-3 min-w-0">
             <Link2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
             <div className="min-w-0">
@@ -589,16 +648,16 @@ function DashboardPage() {
               </p>
             </div>
           </div>
-          <div className="flex items-center gap-2 w-full sm:w-auto">
+          <div className="flex flex-col sm:flex-row items-stretch gap-2 w-full sm:w-auto sm:flex-none">
             <input
               readOnly
               value={staffLink}
               onFocus={(e) => e.currentTarget.select()}
-              className="flex-1 sm:flex-none sm:w-72 bg-zinc-950/70 border border-zinc-800 text-zinc-300 text-xs rounded-lg px-3 py-2.5 truncate focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+              className="w-full sm:w-72 bg-zinc-950/70 border border-zinc-800 text-zinc-300 text-xs rounded-lg px-3 py-3 truncate focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
             />
             <button
               onClick={copyStaffLink}
-              className="shrink-0 px-3 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs transition active:scale-95"
+              className="w-full sm:w-auto px-3 py-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs transition active:scale-95"
             >
               {copiedStaffLink ? '¡Copiado!' : 'Copiar'}
             </button>
