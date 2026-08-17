@@ -105,8 +105,8 @@ function SuscripcionPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-zinc-100">
-        <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mb-4" />
+      <div className="min-h-screen bg-[#0B0F17] flex flex-col items-center justify-center text-zinc-100">
+        <div className="w-10 h-10 border-4 border-yellow-500/20 border-t-yellow-500 rounded-full animate-spin mb-4" />
         <p className="text-sm text-zinc-400 font-medium">Cargando módulo de suscripciones...</p>
       </div>
     )
@@ -117,11 +117,11 @@ function SuscripcionPage() {
   const memberLimit = org?.member_limit ?? 50
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-zinc-950">
+    <div className="min-h-screen bg-[#0B0F17] text-zinc-100 flex flex-col font-sans selection:bg-yellow-500 selection:text-slate-950">
       <main className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8 space-y-8">
         
         {/* HEADER */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800/60 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/60 pb-6">
           <div>
             <h1 className="text-3xl font-extrabold text-white tracking-tight">Planes y Facturación</h1>
             <p className="text-sm text-zinc-400 mt-1">
@@ -129,11 +129,11 @@ function SuscripcionPage() {
             </p>
           </div>
           <div className="flex items-center gap-3">
-            <div className="flex items-center bg-zinc-900 border border-zinc-800 p-1 rounded-xl">
+            <div className="flex items-center bg-[#141C2B] border border-slate-700 p-1 rounded-xl">
               <button
                 onClick={() => setGateway('mercadopago')}
                 className={`px-3 py-1.5 rounded-lg text-xs font-bold transition ${
-                  gateway === 'mercadopago' ? 'bg-sky-500 text-zinc-950' : 'text-zinc-400 hover:text-white'
+                  gateway === 'mercadopago' ? 'bg-sky-500 text-slate-950' : 'text-zinc-400 hover:text-white'
                 }`}
               >
                 🇦🇷 Mercado Pago
@@ -149,7 +149,7 @@ function SuscripcionPage() {
             </div>
             <Link
               to="/ajustes"
-              className="text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-800 px-3 py-2 rounded-xl transition"
+              className="text-xs text-zinc-400 hover:text-zinc-200 border border-slate-700 px-3 py-2 rounded-xl transition"
             >
               ← Ajustes
             </Link>
@@ -157,10 +157,10 @@ function SuscripcionPage() {
         </div>
 
         {/* STATUS BANNER */}
-        <div className="bg-zinc-900/60 border border-zinc-800/80 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
+        <div className="bg-[#141C2B]/60 border border-slate-700/60 rounded-2xl p-6 flex flex-col md:flex-row md:items-center justify-between gap-6">
           <div className="space-y-1">
             <div className="flex items-center gap-3">
-              <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/30">
+              <span className="text-xs font-bold uppercase tracking-wider px-3 py-1 rounded-full bg-yellow-500/10 text-yellow-500 border border-yellow-500/30">
                 Plan Activo: {currentPlan.toUpperCase()}
               </span>
               <span className={`text-xs font-bold px-2.5 py-1 rounded-full ${
@@ -179,12 +179,12 @@ function SuscripcionPage() {
             )}
           </div>
 
-          <div className="w-full md:w-72 bg-zinc-950/80 border border-zinc-800/80 rounded-xl p-4 space-y-2">
+          <div className="w-full md:w-72 bg-[#0B0F17] border border-slate-700/60 rounded-xl p-4 space-y-2">
             <div className="flex justify-between text-xs text-zinc-400">
               <span>Cupo utilizado</span>
               <span>{Math.round((memberCount / (memberLimit === 99999 ? Math.max(memberCount, 1) : memberLimit)) * 100)}%</span>
             </div>
-            <div className="w-full bg-zinc-900 h-2 rounded-full overflow-hidden">
+            <div className="w-full bg-slate-800 h-2 rounded-full overflow-hidden">
               <div
                 className={`h-full transition-all duration-500 ${
                   memberCount >= memberLimit ? 'bg-red-500' : memberCount >= memberLimit * 0.8 ? 'bg-amber-500' : 'bg-emerald-500'
@@ -202,11 +202,11 @@ function SuscripcionPage() {
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
             
             {/* PLAN 1: SEMILLA */}
-            <div className={`bg-zinc-950/60 border rounded-2xl p-6 flex flex-col justify-between relative transition ${
-              currentPlan === 'free' || currentPlan === 'semilla' ? 'border-emerald-500 shadow-xl shadow-emerald-500/10' : 'border-zinc-800 hover:border-zinc-700'
+            <div className={`bg-[#0B0F17] border rounded-2xl p-6 flex flex-col justify-between relative transition ${
+              currentPlan === 'free' || currentPlan === 'semilla' ? 'border-yellow-500 shadow-xl shadow-yellow-500/10' : 'border-slate-700/60 hover:border-slate-600'
             }`}>
               { (currentPlan === 'free' || currentPlan === 'semilla') && (
-                <div className="absolute -top-3 left-6 bg-emerald-500 text-zinc-950 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow">
+                <div className="absolute -top-3 left-6 bg-yellow-500 text-slate-950 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow">
                   Plan Actual
                 </div>
               )}
@@ -219,7 +219,7 @@ function SuscripcionPage() {
                   <span className="text-3xl font-black text-white">$0</span>
                   <span className="text-xs text-zinc-500">/ mes</span>
                 </div>
-                <ul className="space-y-2.5 text-xs text-zinc-300 pt-4 border-t border-zinc-900">
+                <ul className="space-y-2.5 text-xs text-zinc-300 pt-4 border-t border-slate-800">
                   <li className="flex items-center gap-2">✅ Hasta <strong>50 miembros</strong></li>
                   <li className="flex items-center gap-2">✅ Escáner QR de asistencia ilimitado</li>
                   <li className="flex items-center gap-2">✅ Métricas y dashboard básico</li>
@@ -227,16 +227,16 @@ function SuscripcionPage() {
                 </ul>
               </div>
 
-              <div className="pt-6 mt-6 border-t border-zinc-900">
+              <div className="pt-6 mt-6 border-t border-slate-800">
                 {currentPlan === 'free' || currentPlan === 'semilla' ? (
-                  <button disabled className="w-full py-2.5 rounded-xl bg-zinc-900 text-zinc-400 font-bold text-xs cursor-default">
+                  <button disabled className="w-full py-2.5 rounded-xl bg-slate-800 text-zinc-400 font-bold text-xs cursor-default">
                     Plan Activo
                   </button>
                 ) : (
                   <button
                     onClick={() => handleUpgrade('free', 50, 'Plan Semilla')}
                     disabled={upgrading !== null}
-                    className="w-full py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-200 font-bold text-xs transition"
+                    className="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-zinc-200 font-bold text-xs transition"
                   >
                     Cambiar a Semilla
                   </button>
@@ -245,15 +245,15 @@ function SuscripcionPage() {
             </div>
 
             {/* PLAN 2: COMUNIDAD */}
-            <div className={`bg-zinc-950/60 border rounded-2xl p-6 flex flex-col justify-between relative transition ${
-              currentPlan === 'community' || currentPlan === 'pro' ? 'border-emerald-500 shadow-xl shadow-emerald-500/10' : 'border-zinc-800 hover:border-zinc-700'
+            <div className={`bg-[#0B0F17] border rounded-2xl p-6 flex flex-col justify-between relative transition ${
+              currentPlan === 'community' || currentPlan === 'pro' ? 'border-yellow-500 shadow-xl shadow-yellow-500/10' : 'border-slate-700/60 hover:border-slate-600'
             }`}>
               { (currentPlan === 'community' || currentPlan === 'pro') && (
-                <div className="absolute -top-3 left-6 bg-emerald-500 text-zinc-950 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow">
+                <div className="absolute -top-3 left-6 bg-yellow-500 text-slate-950 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow">
                   Plan Actual
                 </div>
               )}
-              <div className="absolute top-4 right-4 bg-emerald-500/10 text-emerald-400 text-[10px] font-bold px-2.5 py-1 rounded-full border border-emerald-500/30">
+              <div className="absolute top-4 right-4 bg-yellow-500/10 text-yellow-500 text-[10px] font-bold px-2.5 py-1 rounded-full border border-yellow-500/30">
                 Más Popular ⭐
               </div>
 
@@ -266,7 +266,7 @@ function SuscripcionPage() {
                   <span className="text-3xl font-black text-white">{gateway === 'mercadopago' ? '$18.900' : '$29'}</span>
                   <span className="text-xs text-zinc-500">/ mes ({gateway === 'mercadopago' ? 'ARS' : 'USD'})</span>
                 </div>
-                <ul className="space-y-2.5 text-xs text-zinc-300 pt-4 border-t border-zinc-900">
+                <ul className="space-y-2.5 text-xs text-zinc-300 pt-4 border-t border-slate-800">
                   <li className="flex items-center gap-2">✅ Hasta <strong>300 miembros</strong></li>
                   <li className="flex items-center gap-2">✅ Reportes avanzados en Excel / CSV</li>
                   <li className="flex items-center gap-2">✅ Escáner QR y control de niños</li>
@@ -274,20 +274,20 @@ function SuscripcionPage() {
                 </ul>
               </div>
 
-              <div className="pt-6 mt-6 border-t border-zinc-900">
+              <div className="pt-6 mt-6 border-t border-slate-800">
                 {currentPlan === 'community' || currentPlan === 'pro' ? (
-                  <button disabled className="w-full py-2.5 rounded-xl bg-emerald-500/20 text-emerald-400 font-bold text-xs border border-emerald-500/30 cursor-default">
+                  <button disabled className="w-full py-2.5 rounded-xl bg-yellow-500/20 text-yellow-500 font-bold text-xs border border-yellow-500/30 cursor-default">
                     Plan Activo
                   </button>
                 ) : (
                   <button
                     onClick={() => handleUpgrade('community', 300, 'Plan Comunidad')}
                     disabled={upgrading !== null}
-                    className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
+                    className="w-full py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold text-xs transition shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2"
                   >
                     {upgrading === 'community' ? (
                       <>
-                        <span className="w-3.5 h-3.5 border-2 border-zinc-950/40 border-t-zinc-950 rounded-full animate-spin" />
+                        <span className="w-3.5 h-3.5 border-2 border-slate-950/40 border-t-slate-950 rounded-full animate-spin" />
                         Procesando checkout...
                       </>
                     ) : (
@@ -299,11 +299,11 @@ function SuscripcionPage() {
             </div>
 
             {/* PLAN 3: CATEDRAL */}
-            <div className={`bg-zinc-950/60 border rounded-2xl p-6 flex flex-col justify-between relative transition ${
-              currentPlan === 'catedral' || currentPlan === 'enterprise' ? 'border-emerald-500 shadow-xl shadow-emerald-500/10' : 'border-zinc-800 hover:border-zinc-700'
+            <div className={`bg-[#0B0F17] border rounded-2xl p-6 flex flex-col justify-between relative transition ${
+              currentPlan === 'catedral' || currentPlan === 'enterprise' ? 'border-yellow-500 shadow-xl shadow-yellow-500/10' : 'border-slate-700/60 hover:border-slate-600'
             }`}>
               { (currentPlan === 'catedral' || currentPlan === 'enterprise') && (
-                <div className="absolute -top-3 left-6 bg-emerald-500 text-zinc-950 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow">
+                <div className="absolute -top-3 left-6 bg-yellow-500 text-slate-950 text-[10px] font-black uppercase tracking-wider px-3 py-1 rounded-full shadow">
                   Plan Actual
                 </div>
               )}
@@ -316,7 +316,7 @@ function SuscripcionPage() {
                   <span className="text-3xl font-black text-white">{gateway === 'mercadopago' ? '$49.900' : '$79'}</span>
                   <span className="text-xs text-zinc-500">/ mes ({gateway === 'mercadopago' ? 'ARS' : 'USD'})</span>
                 </div>
-                <ul className="space-y-2.5 text-xs text-zinc-300 pt-4 border-t border-zinc-900">
+                <ul className="space-y-2.5 text-xs text-zinc-300 pt-4 border-t border-slate-800">
                   <li className="flex items-center gap-2">✅ Miembros <strong>ilimitados</strong></li>
                   <li className="flex items-center gap-2">✅ Múltiples sedes / campus</li>
                   <li className="flex items-center gap-2">✅ Roles y permisos personalizados</li>
@@ -324,20 +324,20 @@ function SuscripcionPage() {
                 </ul>
               </div>
 
-              <div className="pt-6 mt-6 border-t border-zinc-900">
+              <div className="pt-6 mt-6 border-t border-slate-800">
                 {currentPlan === 'catedral' || currentPlan === 'enterprise' ? (
-                  <button disabled className="w-full py-2.5 rounded-xl bg-emerald-500/20 text-emerald-400 font-bold text-xs border border-emerald-500/30 cursor-default">
+                  <button disabled className="w-full py-2.5 rounded-xl bg-yellow-500/20 text-yellow-500 font-bold text-xs border border-yellow-500/30 cursor-default">
                     Plan Activo
                   </button>
                 ) : (
                   <button
                     onClick={() => handleUpgrade('catedral', 99999, 'Plan Catedral')}
                     disabled={upgrading !== null}
-                    className="w-full py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
+                    className="w-full py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold text-xs transition shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2"
                   >
                     {upgrading === 'catedral' ? (
                       <>
-                        <span className="w-3.5 h-3.5 border-2 border-zinc-950/40 border-t-zinc-950 rounded-full animate-spin" />
+                        <span className="w-3.5 h-3.5 border-2 border-slate-950/40 border-t-slate-950 rounded-full animate-spin" />
                         Procesando checkout...
                       </>
                     ) : (

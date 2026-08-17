@@ -205,8 +205,8 @@ function PortalPage() {
 
   if (status === 'loading') {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-zinc-100">
-        <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mb-4" />
+      <div className="min-h-screen bg-[#0B0F17] flex flex-col items-center justify-center text-zinc-100">
+        <div className="w-10 h-10 border-4 border-yellow-500/20 border-t-yellow-500 rounded-full animate-spin mb-4" />
         <p className="text-sm text-zinc-400 font-medium">Cargando tu credencial...</p>
       </div>
     );
@@ -214,18 +214,18 @@ function PortalPage() {
 
   if (status === 'fallback') {
     return (
-      <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-6 font-sans">
+      <div className="min-h-screen bg-[#0B0F17] text-zinc-100 flex flex-col items-center justify-center p-6 font-sans">
         <div className="w-full max-w-md space-y-6">
           <div className="flex items-center gap-2.5 justify-center">
-            <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 flex items-center justify-center overflow-hidden shadow-lg shadow-emerald-500/10 shrink-0 p-1">
+            <div className="w-10 h-10 rounded-xl bg-[#141C2B] border border-[#1E293B] flex items-center justify-center overflow-hidden shadow-lg shadow-yellow-500/10 shrink-0 p-1">
               <AppLogo className="w-full h-full object-contain" />
             </div>
             <span className="text-2xl font-extrabold tracking-tight text-white">
-              Asist<span className="text-emerald-400">App</span>
+              Asist<span className="text-yellow-500">App</span>
             </span>
           </div>
 
-          <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6 shadow-2xl shadow-black/40">
+          <div className="bg-[#141C2B] border border-slate-700/50 rounded-2xl p-6 shadow-2xl shadow-black/40">
             <h1 className="text-xl font-extrabold text-white text-center">Ingreso al Portal</h1>
             <p className="text-xs text-zinc-400 text-center mt-1 mb-6">
               Ingresá tu número de teléfono registrado para ver tu credencial y tus próximas clases.
@@ -237,17 +237,17 @@ function PortalPage() {
                 value={phoneInput}
                 onChange={(e) => setPhoneInput(e.target.value)}
                 placeholder="Ej: 611223344"
-                className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/40 transition"
+                className="w-full bg-[#0B0F17] border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/20 transition"
                 autoFocus
               />
               <button
                 type="submit"
                 disabled={phoneLoading}
-                className="w-full px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 disabled:cursor-not-allowed text-zinc-950 font-bold text-sm transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
+                className="w-full px-4 py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 disabled:opacity-60 disabled:cursor-not-allowed text-slate-950 font-bold text-sm transition shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2"
               >
                 {phoneLoading ? (
                   <>
-                    <span className="w-4 h-4 border-2 border-zinc-950/40 border-t-zinc-950 rounded-full animate-spin" />
+                    <span className="w-4 h-4 border-2 border-slate-950/40 border-t-slate-950 rounded-full animate-spin" />
                     Buscando...
                   </>
                 ) : (
@@ -272,22 +272,22 @@ function PortalPage() {
   }
 
   const stageBadge = congregado?.is_student ? (
-    <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-3 py-1 rounded-full text-xs font-semibold capitalize">
+    <span className="bg-yellow-500/10 text-yellow-500 border border-yellow-500/30 px-3 py-1 rounded-full text-xs font-semibold capitalize">
       Alumno: {STAGE_LABELS[congregado.student_stage || 'adulto']}
     </span>
   ) : (
-    <span className="bg-zinc-800 text-zinc-300 border border-zinc-700/60 px-3 py-1 rounded-full text-xs font-semibold">
+    <span className="bg-slate-800 text-slate-300 border border-slate-700/60 px-3 py-1 rounded-full text-xs font-semibold">
       Miembro General
     </span>
   );
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#0B0F17] text-zinc-100 flex flex-col font-sans">
       <main className="flex-1 w-full max-w-md mx-auto p-4 md:p-6 space-y-6 pb-10">
         {/* CREDENCIAL DIGITAL */}
-        <section className="bg-gradient-to-b from-zinc-900 to-zinc-950 border border-zinc-800/80 shadow-2xl rounded-3xl p-6 relative overflow-hidden">
-          <div className="absolute -top-20 -right-20 w-48 h-48 rounded-full bg-emerald-500/5 blur-2xl pointer-events-none" />
-          <div className="absolute -bottom-24 -left-24 w-56 h-56 rounded-full bg-emerald-500/5 blur-3xl pointer-events-none" />
+        <section className="bg-gradient-to-b from-[#1E293B] to-[#141C2B] border border-slate-700/60 shadow-2xl rounded-3xl p-6 relative overflow-hidden">
+          <div className="absolute -top-20 -right-20 w-48 h-48 rounded-full bg-yellow-500/5 blur-2xl pointer-events-none" />
+          <div className="absolute -bottom-24 -left-24 w-56 h-56 rounded-full bg-yellow-500/5 blur-3xl pointer-events-none" />
           <div className="relative">
             <div className="flex items-start justify-between gap-3">
               <div className="min-w-0">
@@ -299,7 +299,7 @@ function PortalPage() {
               </div>
               <button
                 onClick={handleLogout}
-                className="shrink-0 text-[11px] text-zinc-400 hover:text-zinc-200 border border-zinc-800 hover:border-zinc-700 px-2.5 py-1.5 rounded-lg transition"
+                className="shrink-0 text-[11px] text-zinc-400 hover:text-zinc-200 border border-slate-700 hover:border-slate-600 px-2.5 py-1.5 rounded-lg transition"
               >
                 Salir
               </button>
@@ -322,7 +322,7 @@ function PortalPage() {
         <section>
           <h2 className="text-sm font-bold text-white uppercase tracking-wider mb-3">Próximas Clases</h2>
           {events.length === 0 ? (
-            <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 text-center">
+            <div className="bg-[#141C2B]/40 border border-slate-700/60 rounded-2xl p-6 text-center">
               <p className="text-sm text-zinc-400">No hay clases programadas próximamente.</p>
             </div>
           ) : (
@@ -330,9 +330,9 @@ function PortalPage() {
               {events.map((evt) => (
                 <div
                   key={evt.id}
-                  className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-4 flex items-center gap-4"
+                  className="bg-[#141C2B] border border-slate-700/60 rounded-2xl p-4 flex items-center gap-4"
                 >
-                  <div className="shrink-0 w-14 h-14 rounded-xl bg-emerald-500/10 border border-emerald-500/30 flex flex-col items-center justify-center text-emerald-400">
+                  <div className="shrink-0 w-14 h-14 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex flex-col items-center justify-center text-yellow-500">
                     <span className="text-lg font-black leading-none">
                       {evt.event_date.slice(8, 10)}
                     </span>
@@ -354,11 +354,11 @@ function PortalPage() {
         <section>
           <h2 className="text-sm font-bold text-white uppercase tracking-wider mb-3">Mis Materiales de Estudio</h2>
           {materialsError ? (
-            <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 text-center">
+            <div className="bg-[#141C2B]/40 border border-slate-700/60 rounded-2xl p-6 text-center">
               <p className="text-sm text-zinc-400">Los materiales estarán disponibles próximamente.</p>
             </div>
           ) : materials.length === 0 ? (
-            <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-6 text-center">
+            <div className="bg-[#141C2B]/40 border border-slate-700/60 rounded-2xl p-6 text-center">
               <p className="text-sm text-zinc-400">No hay materiales asignados a tu etapa todavía.</p>
             </div>
           ) : (
@@ -366,7 +366,7 @@ function PortalPage() {
               {materials.map((mat) => (
                 <div
                   key={mat.id}
-                  className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-4"
+                  className="bg-[#141C2B] border border-slate-700/60 rounded-2xl p-4"
                 >
                   <p className="font-bold text-white">{mat.title}</p>
                   {mat.description && (
@@ -377,7 +377,7 @@ function PortalPage() {
                       href={mat.file_url}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="mt-3 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-emerald-500 hover:bg-emerald-400 active:scale-[0.98] text-zinc-950 font-bold text-xs transition-all shadow-lg shadow-emerald-500/20"
+                      className="mt-3 inline-flex items-center gap-2 px-3 py-2 rounded-lg bg-yellow-500 hover:bg-yellow-600 active:scale-[0.98] text-slate-950 font-bold text-xs transition-all shadow-lg shadow-yellow-500/20"
                     >
                       <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />

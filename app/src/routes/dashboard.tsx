@@ -515,14 +515,14 @@ function DashboardPage() {
       })()
     : '';
 
-  if (loading) return <div className="min-h-screen bg-zinc-950 flex items-center justify-center text-zinc-400">Cargando...</div>;
+  if (loading) return <div className="min-h-screen bg-[#0B0F17] flex items-center justify-center text-zinc-400">Cargando...</div>;
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 w-full max-w-full overflow-x-hidden box-border flex flex-col">
-      <header className="sticky top-0 z-40 backdrop-blur-md bg-zinc-950/80 border-b border-zinc-800/80 px-4 py-3 sm:px-6 sm:py-4">
+    <div className="min-h-screen bg-[#0B0F17] text-zinc-100 w-full max-w-full overflow-x-hidden box-border flex flex-col">
+      <header className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F17]/80 border-b border-slate-800/80 px-4 py-3 sm:px-6 sm:py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-zinc-950 font-black text-lg shadow-lg shadow-emerald-500/20 shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-yellow-500 flex items-center justify-center text-slate-950 font-black text-lg shadow-lg shadow-yellow-500/20 shrink-0">
               {(profile?.churchName || 'A').charAt(0).toUpperCase()}
             </div>
             <div className="min-w-0">
@@ -535,7 +535,7 @@ function DashboardPage() {
             <nav className="flex items-center gap-1">
               <Link
                 to="/dashboard"
-                className="text-sm text-white font-medium bg-zinc-900/60 px-3 py-1.5 rounded-lg border border-zinc-800/60"
+                className="text-sm text-white font-medium bg-[#141C2B] px-3 py-1.5 rounded-lg border border-slate-700/60"
               >
                 Dashboard
               </Link>
@@ -615,10 +615,10 @@ function DashboardPage() {
 
       <main className="w-full max-w-7xl mx-auto px-4 py-4 sm:p-6 space-y-8">
       {/* Invitación al equipo */}
-      <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl">
+      <div className="border border-slate-700/60 bg-[#141C2B]/40 p-5 rounded-2xl">
         <div className="flex flex-col sm:flex-row items-stretch sm:items-center justify-between gap-3 sm:gap-4">
           <div className="flex items-start gap-3 min-w-0">
-            <Link2 className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+            <Link2 className="w-5 h-5 text-yellow-500 shrink-0 mt-0.5" />
             <div className="min-w-0">
               <p className="text-sm font-semibold text-white">
                 Compartir enlace de registro para tu equipo de ujieres y servidores
@@ -633,11 +633,11 @@ function DashboardPage() {
               readOnly
               value={staffLink}
               onFocus={(e) => e.currentTarget.select()}
-              className="w-full sm:w-72 bg-zinc-950/70 border border-zinc-800 text-zinc-300 text-xs rounded-lg px-3 py-3 truncate focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+              className="w-full sm:w-72 bg-[#0B0F17] border border-slate-700 text-zinc-300 text-xs rounded-lg px-3 py-3 truncate focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/20 outline-none"
             />
             <button
               onClick={copyStaffLink}
-              className="w-full sm:w-auto px-3 py-3 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs transition active:scale-95"
+              className="w-full sm:w-auto px-3 py-3 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold text-xs transition active:scale-95"
             >
               {copiedStaffLink ? '¡Copiado!' : 'Copiar'}
             </button>
@@ -647,36 +647,36 @@ function DashboardPage() {
 
       {/* Stats */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 w-full">
-        <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl hover:border-zinc-700/60 transition-all shadow-sm">
+        <div className="border border-slate-700/60 bg-[#141C2B]/40 p-5 rounded-2xl hover:border-slate-600/60 transition-all shadow-sm">
           <p className="text-zinc-400 text-xs uppercase flex items-center gap-2">
             <Users className="w-3.5 h-3.5" /> Congregados
           </p>
           <p className="text-3xl font-bold tracking-tight text-white mt-2">{stats.memberCount}</p>
           <p className="text-xs text-zinc-500 mt-2 flex items-center gap-1.5">
-            <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[11px] font-semibold">
+            <span className="bg-yellow-500/10 text-yellow-500 border border-yellow-500/30 px-2 py-0.5 rounded-full text-[11px] font-semibold">
               +{stats.newMembers30d}
             </span>
             altas en los últimos 30 días
           </p>
         </div>
-        <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl hover:border-zinc-700/60 transition-all shadow-sm">
+        <div className="border border-slate-700/60 bg-[#141C2B]/40 p-5 rounded-2xl hover:border-slate-600/60 transition-all shadow-sm">
           <p className="text-zinc-400 text-xs uppercase flex items-center gap-2">
             <GraduationCap className="w-3.5 h-3.5" /> Alumnos en Formación
           </p>
           <p className="text-3xl font-bold tracking-tight text-white mt-2">{stats.studentCount}</p>
           <div className="flex items-center gap-1.5 mt-2 flex-wrap">
-            <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/30 px-2 py-0.5 rounded-full text-[11px] font-semibold">
+            <span className="bg-yellow-500/10 text-yellow-500 border border-yellow-500/30 px-2 py-0.5 rounded-full text-[11px] font-semibold">
               {stats.stageCounts['niño']} niños
             </span>
-            <span className="bg-sky-500/10 text-sky-400 border border-sky-500/30 px-2 py-0.5 rounded-full text-[11px] font-semibold">
+            <span className="bg-slate-500/10 text-slate-300 border border-slate-500/30 px-2 py-0.5 rounded-full text-[11px] font-semibold">
               {stats.stageCounts['adolescente']} adolescentes
             </span>
-            <span className="bg-purple-500/10 text-purple-400 border border-purple-500/30 px-2 py-0.5 rounded-full text-[11px] font-semibold">
+            <span className="bg-slate-500/10 text-slate-300 border border-slate-500/30 px-2 py-0.5 rounded-full text-[11px] font-semibold">
               {stats.stageCounts['adulto']} adultos
             </span>
           </div>
         </div>
-        <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl hover:border-zinc-700/60 transition-all shadow-sm">
+        <div className="border border-slate-700/60 bg-[#141C2B]/40 p-5 rounded-2xl hover:border-slate-600/60 transition-all shadow-sm">
           <p className="text-zinc-400 text-xs uppercase flex items-center gap-2">
             <CalendarCheck className="w-3.5 h-3.5" /> Asistencia del Último Evento
           </p>
@@ -687,7 +687,7 @@ function DashboardPage() {
               : 'Sin eventos con asistencia registrada'}
           </p>
         </div>
-        <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl hover:border-zinc-700/60 transition-all shadow-sm">
+        <div className="border border-slate-700/60 bg-[#141C2B]/40 p-5 rounded-2xl hover:border-slate-600/60 transition-all shadow-sm">
           <p className="text-zinc-400 text-xs uppercase flex items-center gap-2">
             <LayoutGrid className="w-3.5 h-3.5" /> Programas Activos
           </p>
@@ -702,48 +702,48 @@ function DashboardPage() {
           <CheckCircle2 className="w-4 h-4 shrink-0" /> {successMsg}
         </div>
       )}
-      <div className="bg-zinc-900 rounded-2xl border border-zinc-800 overflow-hidden">
-        <div className="p-6 border-b border-zinc-800 flex flex-wrap items-center justify-between gap-3">
+      <div className="bg-[#141C2B] rounded-2xl border border-slate-700/60 overflow-hidden">
+        <div className="p-6 border-b border-slate-700/60 flex flex-wrap items-center justify-between gap-3">
           <h2 className="font-bold">Próximos Eventos</h2>
           <div className="flex flex-wrap items-center gap-2 w-full sm:w-auto">
             <button
               onClick={handleExportAttendance}
               disabled={exportingAttendance}
-              className="w-full sm:w-auto text-xs bg-zinc-800 text-zinc-200 px-3 py-1.5 rounded-lg flex items-center justify-center gap-1 font-semibold transition hover:bg-zinc-700 disabled:opacity-60 disabled:cursor-not-allowed"
+              className="w-full sm:w-auto text-xs bg-slate-800 text-zinc-200 px-3 py-1.5 rounded-lg flex items-center justify-center gap-1 font-semibold transition hover:bg-slate-700 disabled:opacity-60 disabled:cursor-not-allowed"
             >
               📊 {exportingAttendance ? 'Exportando…' : 'Exportar Asistencias'}
             </button>
             {events.length > 0 && (
               <button
                 onClick={handleCleanupPast}
-                className="text-xs text-zinc-400 px-3 py-1.5 rounded-lg border border-zinc-800 flex items-center gap-1 font-semibold transition hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/30"
+                className="text-xs text-zinc-400 px-3 py-1.5 rounded-lg border border-slate-700 flex items-center gap-1 font-semibold transition hover:text-red-400 hover:bg-red-500/10 hover:border-red-500/30"
               >
                 <Eraser className="w-3 h-3" /> Limpiar Pasados
               </button>
             )}
-            <button onClick={openEventModal} className="text-xs bg-emerald-500 text-black px-3 py-1.5 rounded-lg flex items-center gap-1 font-bold">
+            <button onClick={openEventModal} className="text-xs bg-yellow-500 text-slate-950 px-3 py-1.5 rounded-lg flex items-center gap-1 font-bold">
               <Plus className="w-3 h-3" /> Nuevo Evento
             </button>
           </div>
         </div>
         {events.length === 0 ? (
           <div className="p-12 text-center flex flex-col items-center justify-center">
-            <div className="w-14 h-14 rounded-2xl bg-zinc-800 border border-zinc-700 flex items-center justify-center text-zinc-500 mb-4">
+            <div className="w-14 h-14 rounded-2xl bg-[#1E293B] border border-slate-700 flex items-center justify-center text-zinc-500 mb-4">
               <CalendarDays className="w-7 h-7" />
             </div>
             <h3 className="font-bold text-white mb-1">Aún no hay eventos programados</h3>
             <p className="text-sm text-zinc-500 mb-6">Crea tu primer evento para comenzar a registrar asistencia con QR.</p>
-            <button onClick={openEventModal} className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-sm flex items-center gap-2 transition">
+            <button onClick={openEventModal} className="px-4 py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold text-sm flex items-center gap-2 transition">
               <Plus className="w-4 h-4" /> Nuevo Evento
             </button>
           </div>
         ) : (
-          <div className="divide-y divide-zinc-800">
+          <div className="divide-y divide-slate-800">
             {programs.map((program) => {
               const isOpen = !!expandedPrograms[program.title];
               return (
                 <div key={program.title}>
-                  <div className="flex flex-wrap items-center gap-3 p-4 hover:bg-zinc-800/40 transition-colors">
+                  <div className="flex flex-wrap items-center gap-3 p-4 hover:bg-slate-800/40 transition-colors">
                     <button
                       onClick={() => toggleProgram(program.title)}
                       className="flex items-center gap-3 flex-1 min-w-[200px] text-left"
@@ -751,9 +751,9 @@ function DashboardPage() {
                       aria-label={`${isOpen ? 'Colapsar' : 'Expandir'} programa ${program.title}`}
                     >
                       <ChevronDown
-                        className={`w-4 h-4 shrink-0 text-zinc-500 transition-transform duration-200 ${isOpen ? 'rotate-180 text-emerald-400' : ''}`}
+                        className={`w-4 h-4 shrink-0 text-zinc-500 transition-transform duration-200 ${isOpen ? 'rotate-180 text-yellow-500' : ''}`}
                       />
-                      <span className={`font-medium transition-colors ${isOpen ? 'text-emerald-400' : 'text-white'}`}>{program.title}</span>
+                      <span className={`font-medium transition-colors ${isOpen ? 'text-yellow-500' : 'text-white'}`}>{program.title}</span>
                       <span className="bg-zinc-800 text-zinc-300 text-xs px-2.5 py-0.5 rounded-full shrink-0">
                         {program.sessions.length} {program.sessions.length === 1 ? 'clase' : 'clases'}
                       </span>
@@ -813,14 +813,14 @@ function DashboardPage() {
           onClick={closeEventModal}
         >
           <div
-            className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl shadow-black/50"
+            className="bg-[#141C2B] border border-slate-700/60 rounded-2xl w-full max-w-md max-h-[90vh] overflow-y-auto shadow-2xl shadow-black/50"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700/60">
               <h2 className="text-lg font-bold text-white">{editingEventId ? 'Editar Evento' : 'Nuevo Evento'}</h2>
               <button
                 onClick={closeEventModal}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-slate-800 transition"
                 aria-label="Cerrar"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -837,7 +837,7 @@ function DashboardPage() {
                   value={eventForm.title}
                   onChange={(e) => setEventForm((f) => ({ ...f, title: e.target.value }))}
                   placeholder="Ej: Clase de Escuela Sabática"
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/40 transition"
+                  className="w-full bg-[#0B0F17] border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/20 transition"
                   required
                 />
               </div>
@@ -848,14 +848,14 @@ function DashboardPage() {
                   type="date"
                   value={eventForm.event_date}
                   onChange={(e) => setEventForm((f) => ({ ...f, event_date: e.target.value }))}
-                  className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/40 transition [color-scheme:dark]"
+                  className="w-full bg-[#0B0F17] border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/20 transition [color-scheme:dark]"
                   required
                 />
               </div>
 
               {!editingEventId && (
                 <>
-                  <div className="flex items-center justify-between bg-zinc-950/60 border border-zinc-800 rounded-xl px-4 py-3">
+                  <div className="flex items-center justify-between bg-[#0B0F17] border border-slate-700/60 rounded-xl px-4 py-3">
                     <div>
                       <p className="text-sm font-semibold text-white">¿Es un evento recurrente?</p>
                       <p className="text-xs text-zinc-500 mt-0.5">Se repetirá automáticamente hasta la fecha límite.</p>
@@ -866,7 +866,7 @@ function DashboardPage() {
                       aria-checked={eventForm.is_recurring}
                       onClick={() => setEventForm((f) => ({ ...f, is_recurring: !f.is_recurring }))}
                       className={`relative shrink-0 w-11 h-6 rounded-full transition ${
-                        eventForm.is_recurring ? 'bg-emerald-500' : 'bg-zinc-700'
+                        eventForm.is_recurring ? 'bg-yellow-500' : 'bg-slate-700'
                       }`}
                     >
                       <span
@@ -889,8 +889,8 @@ function DashboardPage() {
                               onClick={() => setEventForm((f) => ({ ...f, frequency: freq }))}
                               className={`px-3 py-2 rounded-lg text-xs font-bold transition border ${
                                 eventForm.frequency === freq
-                                  ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                                  : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-zinc-200 hover:border-zinc-700'
+                                  ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30'
+                                  : 'bg-[#0B0F17] text-zinc-400 border-slate-700 hover:text-zinc-200 hover:border-slate-600'
                               }`}
                             >
                               {freq === 'semanal' ? 'Semanal (7 días)' : 'Cada 14 días'}
@@ -905,7 +905,7 @@ function DashboardPage() {
                           min={minEndDate}
                           value={eventForm.end_date}
                           onChange={(e) => setEventForm((f) => ({ ...f, end_date: e.target.value }))}
-                          className="w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/40 transition [color-scheme:dark]"
+                          className="w-full bg-[#0B0F17] border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-zinc-100 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/20 transition [color-scheme:dark]"
                           required
                         />
                         {eventForm.end_date && eventForm.end_date <= eventForm.event_date && (
@@ -923,22 +923,22 @@ function DashboardPage() {
                 </div>
               )}
 
-              <div className="flex items-center justify-end gap-3 pt-2 border-t border-zinc-800">
+              <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-700/60">
                 <button
                   type="button"
                   onClick={closeEventModal}
-                  className="px-4 py-2.5 rounded-xl text-sm font-bold text-zinc-300 hover:text-white hover:bg-zinc-800 transition"
+                  className="px-4 py-2.5 rounded-xl text-sm font-bold text-zinc-300 hover:text-white hover:bg-slate-800 transition"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={savingEvent}
-                  className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 disabled:cursor-not-allowed text-zinc-950 font-bold text-sm transition shadow-lg shadow-emerald-500/20 flex items-center gap-2"
+                  className="px-5 py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 disabled:opacity-60 disabled:cursor-not-allowed text-slate-950 font-bold text-sm transition shadow-lg shadow-yellow-500/20 flex items-center gap-2"
                 >
                   {savingEvent ? (
                     <>
-                      <span className="w-4 h-4 border-2 border-zinc-950/40 border-t-zinc-950 rounded-full animate-spin" />
+                      <span className="w-4 h-4 border-2 border-slate-950/40 border-t-slate-950 rounded-full animate-spin" />
                       Guardando...
                     </>
                   ) : editingEventId ? (

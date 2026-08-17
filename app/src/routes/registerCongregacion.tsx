@@ -97,14 +97,14 @@ function RegisterCongregacionPage() {
   };
 
   const inputClass =
-    'w-full bg-zinc-900/90 border border-zinc-800 text-zinc-100 rounded-xl px-4 py-3 focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all placeholder:text-zinc-600';
+    'w-full bg-[#0B0F17] border border-slate-700 text-zinc-100 rounded-xl px-4 py-3 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/20 outline-none transition-all placeholder:text-zinc-600';
 
   if (createdOrg) {
     return (
-      <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans">
+      <div className="min-h-screen bg-[#0B0F17] text-zinc-100 flex flex-col font-sans">
         <main className="flex-1 w-full max-w-md mx-auto p-4 md:p-6 space-y-6 pb-10">
           <div className="flex flex-col items-center text-center gap-3 pt-6">
-            <div className="w-16 h-16 rounded-2xl bg-emerald-500 flex items-center justify-center text-zinc-950 font-black text-2xl shadow-lg shadow-emerald-500/20">
+            <div className="w-16 h-16 rounded-2xl bg-yellow-500 flex items-center justify-center text-slate-950 font-black text-2xl shadow-lg shadow-yellow-500/20">
               {createdOrg.name.charAt(0).toUpperCase()}
             </div>
             <h1 className="text-xl font-extrabold text-white tracking-tight">¡Congregación registrada!</h1>
@@ -114,7 +114,7 @@ function RegisterCongregacionPage() {
             </p>
           </div>
 
-          <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6 shadow-2xl shadow-black/40">
+          <div className="bg-[#141C2B] border border-slate-700/50 rounded-2xl p-6 shadow-2xl shadow-black/40">
             <label className="block text-xs font-semibold text-zinc-400 mb-1.5">
               Enlace de auto-inscripción (único para tu iglesia)
             </label>
@@ -123,12 +123,12 @@ function RegisterCongregacionPage() {
                 readOnly
                 value={registrationLink}
                 onFocus={(e) => e.currentTarget.select()}
-                className="w-full bg-zinc-950/70 border border-zinc-800 text-zinc-300 text-xs rounded-lg px-3 py-2.5 truncate focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none"
+                className="w-full bg-[#0B0F17] border border-slate-700 text-zinc-300 text-xs rounded-lg px-3 py-2.5 truncate focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/20 outline-none"
               />
               <button
                 type="button"
                 onClick={copyLink}
-                className="shrink-0 px-3 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-xs transition active:scale-95"
+                className="shrink-0 px-3 py-2.5 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold text-xs transition active:scale-95"
               >
                 {copied ? '¡Copiado!' : 'Copiar'}
               </button>
@@ -140,14 +140,14 @@ function RegisterCongregacionPage() {
             <div className="mt-6 space-y-3">
               <Link
                 to="/asistencia"
-                className="block w-full py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-sm transition-all text-center active:scale-[0.98]"
+                className="block w-full py-3.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold text-sm transition-all text-center active:scale-[0.98]"
               >
                 Ir al Panel de Asistencia
               </Link>
               <button
                 type="button"
                 onClick={copyLink}
-                className="w-full py-3.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-sm transition-all active:scale-[0.98]"
+                className="w-full py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm transition-all active:scale-[0.98]"
               >
                 Copiar enlace para miembros
               </button>
@@ -159,10 +159,10 @@ function RegisterCongregacionPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#0B0F17] text-zinc-100 flex flex-col font-sans">
       <main className="flex-1 w-full max-w-md mx-auto p-4 md:p-6 space-y-6 pb-10">
         <div className="flex flex-col items-center text-center gap-3 pt-6">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500 flex items-center justify-center text-zinc-950 font-black text-2xl shadow-lg shadow-emerald-500/20">
+          <div className="w-16 h-16 rounded-2xl bg-yellow-500 flex items-center justify-center text-slate-950 font-black text-2xl shadow-lg shadow-yellow-500/20">
             <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6" />
             </svg>
@@ -175,7 +175,7 @@ function RegisterCongregacionPage() {
           </div>
         </div>
 
-        <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6 shadow-2xl shadow-black/40">
+        <div className="bg-[#141C2B] border border-slate-700/50 rounded-2xl p-6 shadow-2xl shadow-black/40">
           <form onSubmit={handleSubmit} className="space-y-5">
             <div>
               <label className="block text-xs font-semibold text-zinc-400 mb-1.5">
@@ -257,11 +257,11 @@ function RegisterCongregacionPage() {
             <button
               type="submit"
               disabled={submitting}
-              className="w-full px-6 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-zinc-950 font-semibold text-sm transition-all shadow-lg shadow-emerald-500/10 flex items-center justify-center gap-2"
+              className="w-full px-6 py-3.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-slate-950 font-semibold text-sm transition-all shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2"
             >
               {submitting ? (
                 <>
-                  <span className="w-4 h-4 border-2 border-zinc-950/40 border-t-zinc-950 rounded-full animate-spin" />
+                  <span className="w-4 h-4 border-2 border-slate-950/40 border-t-slate-950 rounded-full animate-spin" />
                   Registrando...
                 </>
               ) : (
@@ -273,7 +273,7 @@ function RegisterCongregacionPage() {
 
         <p className="text-center text-xs text-zinc-500">
           ¿Sos miembro y querés inscribirte con tu credencial?{' '}
-          <Link to="/registro" className="text-emerald-400 hover:text-emerald-300 font-semibold">
+          <Link to="/registro" className="text-yellow-500 hover:text-yellow-400 font-semibold">
             Auto-inscripción aquí
           </Link>
         </p>

@@ -7,10 +7,10 @@ import { PwaRegister } from '../components/PwaRegister';
 export const Route = createRootRoute({
   shellComponent: RootDocument,
   notFoundComponent: () => (
-    <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-zinc-100 p-6">
-      <h1 className="text-4xl font-black text-emerald-400 mb-2">404</h1>
+    <div className="min-h-screen bg-[#0B0F17] flex flex-col items-center justify-center text-zinc-100 p-6">
+      <h1 className="text-4xl font-black text-yellow-500 mb-2">404</h1>
       <p className="text-zinc-400 mb-6">Página no encontrada en AsistApp.</p>
-      <Link className="px-4 py-2 bg-emerald-500 text-zinc-950 font-bold rounded-xl text-sm" to="/dashboard">
+      <Link className="px-4 py-2 bg-yellow-500 text-slate-950 font-bold rounded-xl text-sm" to="/dashboard">
         Volver al Dashboard
       </Link>
     </div>
@@ -26,11 +26,11 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
         />
         <link rel="manifest" href="/manifest.json" />
-        <meta name="theme-color" content="#09090b" />
+        <meta name="theme-color" content="#0b0f17" />
         <link rel="apple-touch-icon" href="/pwa-192x192.png" />
         <HeadContent />
       </head>
-      <body className="min-h-screen bg-zinc-950 text-zinc-100 font-sans antialiased flex flex-col w-full max-w-full overflow-x-hidden box-border">
+      <body className="min-h-screen bg-[#0B0F17] text-zinc-100 font-sans antialiased flex flex-col w-full max-w-full overflow-x-hidden box-border">
         {children}
         <PwaRegister />
         <Scripts />

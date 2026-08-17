@@ -218,19 +218,19 @@ function RegistroPage() {
   };
 
   const inputClass =
-    'w-full bg-zinc-900/90 border border-zinc-800 text-zinc-100 rounded-xl px-4 py-3 text-base focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all placeholder:text-zinc-600';
+    'w-full bg-[#0B0F17] border border-slate-700 text-zinc-100 rounded-xl px-4 py-3 text-base focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/20 outline-none transition-all placeholder:text-zinc-600';
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-zinc-100">
-        <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mb-4" />
+      <div className="min-h-screen bg-[#0B0F17] flex flex-col items-center justify-center text-zinc-100">
+        <div className="w-10 h-10 border-4 border-yellow-500/20 border-t-yellow-500 rounded-full animate-spin mb-4" />
         <p className="text-sm text-zinc-400 font-medium">Cargando...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#0B0F17] text-zinc-100 flex flex-col font-sans">
       <main className="flex-1 w-full max-w-md mx-auto px-4 sm:px-6 space-y-6 pb-10">
         {/* CABECERA DE IGLESIA */}
         <div className="flex flex-col items-center text-center gap-3 pt-6">
@@ -252,7 +252,7 @@ function RegistroPage() {
         </div>
 
         {/* FORMULARIO */}
-        <div className="bg-zinc-900/60 border border-zinc-800 rounded-2xl p-6 shadow-2xl shadow-black/40">
+        <div className="bg-[#141C2B] border border-slate-700/50 rounded-2xl p-6 shadow-2xl shadow-black/40">
           {success ? (
             <div className="flex flex-col items-center text-center gap-4 py-4">
               <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400">
@@ -273,7 +273,7 @@ function RegistroPage() {
 
               <button
                 onClick={goToPortal}
-                className="w-full px-6 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-sm transition shadow-lg shadow-emerald-500/20"
+                className="w-full px-6 py-3 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold text-sm transition shadow-lg shadow-yellow-500/20"
               >
                 Guardar / Descargar QR
               </button>
@@ -287,12 +287,12 @@ function RegistroPage() {
 
               {/* SELECTOR DE IGLESIA */}
               {lockedOrg ? (
-                <div className="bg-zinc-950/60 border border-emerald-500/30 rounded-xl px-4 py-3 flex items-center gap-3">
-                  <div className="w-9 h-9 rounded-lg bg-emerald-500 flex items-center justify-center text-zinc-950 font-black text-sm shrink-0">
+                <div className="bg-[#0B0F17] border border-yellow-500/30 rounded-xl px-4 py-3 flex items-center gap-3">
+                  <div className="w-9 h-9 rounded-lg bg-yellow-500 flex items-center justify-center text-slate-950 font-black text-sm shrink-0">
                     {lockedOrg.name.charAt(0).toUpperCase()}
                   </div>
                   <div className="min-w-0">
-                    <p className="text-xs text-emerald-400 font-mono uppercase tracking-wider mb-0.5">
+                    <p className="text-xs text-yellow-500 font-mono uppercase tracking-wider mb-0.5">
                       Iglesia confirmada
                     </p>
                     <p className="text-sm font-semibold text-white truncate">{lockedOrg.name}</p>
@@ -336,7 +336,7 @@ function RegistroPage() {
                   )}
 
                   {churchOpen && (
-                    <div className="absolute z-20 mt-2 w-full bg-zinc-900 border border-zinc-700 rounded-xl shadow-2xl shadow-black/50 max-h-64 overflow-y-auto">
+                    <div className="absolute z-20 mt-2 w-full bg-[#141C2B] border border-slate-700 rounded-xl shadow-2xl shadow-black/50 max-h-64 overflow-y-auto">
                       {filteredChurches.length === 0 ? (
                         <p className="px-4 py-3 text-xs text-zinc-500">
                           Sin resultados para "{churchQuery}".
@@ -348,7 +348,7 @@ function RegistroPage() {
                             type="button"
                             onMouseDown={(e) => e.preventDefault()}
                             onClick={() => selectChurch(c)}
-                            className="w-full text-left px-4 py-3 hover:bg-zinc-800 transition border-b border-zinc-800/60 last:border-0"
+                            className="w-full text-left px-4 py-3 hover:bg-slate-800 transition border-b border-slate-800 last:border-0"
                           >
                             <p className="text-sm font-semibold text-white">{c.name}</p>
                             {c.address && <p className="text-[11px] text-zinc-500 mt-0.5">{c.address}</p>}
@@ -399,7 +399,7 @@ function RegistroPage() {
                 </p>
               </div>
 
-              <div className="flex items-center justify-between bg-zinc-950/60 border border-zinc-800 rounded-xl px-4 py-3">
+              <div className="flex items-center justify-between bg-[#0B0F17] border border-slate-700/60 rounded-xl px-4 py-3">
                 <div>
                   <p className="text-sm font-semibold text-white">¿Te inscribís a un curso formativo?</p>
                   <p className="text-xs text-zinc-500 mt-0.5">Ej: Escuela de Vida, clases bíblicas o discipulado.</p>
@@ -410,7 +410,7 @@ function RegistroPage() {
                   aria-checked={form.is_student}
                   onClick={() => setField('is_student', !form.is_student)}
                   className={`relative shrink-0 w-11 h-6 rounded-full transition ${
-                    form.is_student ? 'bg-emerald-500' : 'bg-zinc-700'
+                    form.is_student ? 'bg-yellow-500' : 'bg-slate-700'
                   }`}
                 >
                   <span
@@ -432,8 +432,8 @@ function RegistroPage() {
                         onClick={() => setField('student_stage', stage)}
                         className={`px-3 py-2.5 rounded-xl text-xs font-bold capitalize transition border ${
                           form.student_stage === stage
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                            : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-zinc-200 hover:border-zinc-700'
+                            ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30'
+                            : 'bg-[#0B0F17] text-zinc-400 border-slate-700 hover:text-zinc-200 hover:border-zinc-600'
                         }`}
                       >
                         {stage}
@@ -444,7 +444,7 @@ function RegistroPage() {
               )}
 
               {needsGuardian && (
-                <div className="space-y-4 border-t border-zinc-800 pt-4">
+                <div className="space-y-4 border-t border-slate-700/60 pt-4">
                   <div>
                     <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Nombre del Tutor / Responsable *</label>
                     <input
@@ -477,11 +477,11 @@ function RegistroPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full px-6 py-3.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-zinc-950 font-semibold text-sm transition-all shadow-lg shadow-emerald-500/10 flex items-center justify-center gap-2"
+                className="w-full px-6 py-3.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-slate-950 font-semibold text-sm transition-all shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2"
               >
                 {submitting ? (
                   <>
-                    <span className="w-4 h-4 border-2 border-zinc-950/40 border-t-zinc-950 rounded-full animate-spin" />
+                    <span className="w-4 h-4 border-2 border-slate-950/40 border-t-slate-950 rounded-full animate-spin" />
                     Inscribiendo...
                   </>
                 ) : (
@@ -497,7 +497,7 @@ function RegistroPage() {
             ¿Sos pastor o líder y querés registrar tu iglesia?{' '}
             <Link
               to="/registerCongregacion"
-              className="text-emerald-400 hover:text-emerald-300 font-semibold"
+              className="text-yellow-500 hover:text-yellow-400 font-semibold"
             >
               Crear congregación aquí
             </Link>

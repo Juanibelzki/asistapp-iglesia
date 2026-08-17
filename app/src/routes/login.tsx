@@ -116,13 +116,13 @@ function Login() {
   }
 
   const inputClass =
-    'w-full px-4 py-3 rounded-xl bg-zinc-950 border border-zinc-800 text-white text-base focus:outline-none focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 transition-all placeholder:text-zinc-600'
+    'w-full px-4 py-3 rounded-xl bg-[#0B0F17] border border-slate-700 text-white text-base focus:outline-none focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/20 transition-all placeholder:text-zinc-600'
 
   return (
-    <div className="min-h-screen bg-zinc-950 flex items-center justify-center px-4 sm:px-6">
+    <div className="min-h-screen bg-[#0B0F17] flex items-center justify-center px-4 sm:px-6">
       <form
         onSubmit={login}
-        className="bg-zinc-900 border border-zinc-800 p-6 sm:p-8 rounded-3xl w-full max-w-md shadow-2xl shadow-black/40"
+        className="bg-[#141C2B] border border-slate-700/50 p-6 sm:p-8 rounded-3xl w-full max-w-md shadow-2xl shadow-black/40"
       >
         <div className="flex flex-col items-center text-center mb-6">
           <AppLogo className="h-20 w-auto mx-auto mb-6 object-contain" />
@@ -162,11 +162,11 @@ function Login() {
         <button
           type="submit"
           disabled={submitting}
-          className="w-full bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold py-3 rounded-xl transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-emerald-500/10"
+          className="w-full bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold py-3 rounded-xl transition-all active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2 shadow-lg shadow-yellow-500/20"
         >
           {submitting ? (
             <>
-              <span className="w-4 h-4 border-2 border-zinc-950/40 border-t-zinc-950 rounded-full animate-spin" />
+              <span className="w-4 h-4 border-2 border-slate-950/40 border-t-slate-950 rounded-full animate-spin" />
               Ingresando...
             </>
           ) : (
@@ -177,13 +177,13 @@ function Login() {
         <div className="mt-6 space-y-3 text-sm text-zinc-400 text-center">
           <p>
             ¿Sos miembro de la congregación?{' '}
-            <Link to="/portal" className="text-emerald-400 hover:text-emerald-300 font-semibold">
+            <Link to="/portal" className="text-yellow-500 hover:text-yellow-400 font-semibold">
               Acceder a mi Credencial QR →
             </Link>
           </p>
           <p>
             ¿Tu iglesia no está registrada?{' '}
-            <Link to="/registerCongregacion" className="text-emerald-400 hover:text-emerald-300 font-semibold">
+            <Link to="/registerCongregacion" className="text-yellow-500 hover:text-yellow-400 font-semibold">
               Crear Congregación →
             </Link>
           </p>

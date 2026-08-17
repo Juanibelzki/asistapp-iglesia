@@ -20,8 +20,8 @@ interface OrgRow {
 }
 
 const PLAN_OPTIONS = [
-  { value: 'Semilla', price: 0, badge: 'bg-zinc-500/10 text-zinc-400 border-zinc-500/30' },
-  { value: 'Comunidad', price: 24, badge: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30' },
+  { value: 'Semilla', price: 0, badge: 'bg-slate-500/10 text-slate-300 border-slate-500/30' },
+  { value: 'Comunidad', price: 24, badge: 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30' },
   { value: 'Pro', price: 49, badge: 'bg-amber-500/10 text-amber-400 border-amber-500/30' },
 ];
 
@@ -69,7 +69,7 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
   };
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-6">
+    <div className="min-h-screen bg-[#0B0F17] text-zinc-100 flex flex-col items-center justify-center p-6">
       <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-indigo-500 flex items-center justify-center text-zinc-950 font-black text-xl shadow-lg shadow-emerald-500/20 mb-6">
         CC
       </div>
@@ -84,13 +84,13 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
           onChange={(e) => setPin(e.target.value.replace(/\D/g, '').slice(0, PIN_LENGTH))}
           placeholder={'•'.repeat(PIN_LENGTH)}
           autoFocus
-          className="w-full bg-zinc-900/90 border border-zinc-800 text-zinc-100 rounded-xl px-4 py-4 text-center text-2xl tracking-[0.6em] font-mono focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all placeholder:text-zinc-700"
+          className="w-full bg-[#141C2B] border border-slate-700 text-zinc-100 rounded-xl px-4 py-4 text-center text-2xl tracking-[0.6em] font-mono focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/20 outline-none transition-all placeholder:text-zinc-700"
         />
         {error && <p className="text-xs text-red-400 text-center">{error}</p>}
         <button
           type="submit"
           disabled={pin.length < PIN_LENGTH}
-          className="w-full py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed text-zinc-950 font-bold text-sm transition-all shadow-lg shadow-emerald-500/10"
+          className="w-full py-3 rounded-xl bg-yellow-500 hover:bg-yellow-600 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-bold text-sm transition-all shadow-lg shadow-yellow-500/20"
         >
           Desbloquear
         </button>
@@ -200,11 +200,11 @@ function CeoPage() {
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans">
-      <header className="sticky top-0 z-40 backdrop-blur-md bg-zinc-950/80 border-b border-zinc-800/80 px-6 py-4">
+    <div className="min-h-screen bg-[#0B0F17] text-zinc-100 font-sans">
+      <header className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F17]/80 border-b border-slate-800/80 px-6 py-4">
         <div className="max-w-7xl mx-auto flex flex-wrap items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
-            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-emerald-400 to-indigo-500 flex items-center justify-center text-zinc-950 font-black text-sm shrink-0">
+            <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-yellow-400 to-amber-600 flex items-center justify-center text-slate-950 font-black text-sm shrink-0">
               CC
             </div>
             <div className="min-w-0">
@@ -216,7 +216,7 @@ function CeoPage() {
           </div>
           <button
             onClick={logout}
-            className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors px-3 py-1.5 rounded-lg hover:bg-zinc-900/60"
+            className="text-sm text-zinc-400 hover:text-zinc-200 transition-colors px-3 py-1.5 rounded-lg hover:bg-[#141C2B]"
           >
             Cerrar sesión de CEO
           </button>
@@ -232,19 +232,19 @@ function CeoPage() {
 
         {/* KPIs GLOBALES */}
         <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-4 gap-4">
-          <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl">
+          <div className="border border-slate-700/60 bg-[#141C2B]/40 p-5 rounded-2xl">
             <p className="text-zinc-400 text-xs uppercase">Iglesias registradas</p>
             <p className="text-3xl font-bold tracking-tight text-white mt-2">{loading ? '…' : stats.churches}</p>
           </div>
-          <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl">
+          <div className="border border-slate-700/60 bg-[#141C2B]/40 p-5 rounded-2xl">
             <p className="text-zinc-400 text-xs uppercase">Miembros acumulados</p>
             <p className="text-3xl font-bold tracking-tight text-white mt-2">{loading ? '…' : stats.members}</p>
           </div>
-          <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl">
+          <div className="border border-slate-700/60 bg-[#141C2B]/40 p-5 rounded-2xl">
             <p className="text-zinc-400 text-xs uppercase">Asistencias escaneadas</p>
             <p className="text-3xl font-bold tracking-tight text-white mt-2">{loading ? '…' : stats.attendance}</p>
           </div>
-          <div className="border border-zinc-800/80 bg-zinc-900/40 p-5 rounded-2xl">
+          <div className="border border-slate-700/60 bg-[#141C2B]/40 p-5 rounded-2xl">
             <p className="text-zinc-400 text-xs uppercase">MRR Estimado</p>
             <p className="text-3xl font-bold tracking-tight text-white mt-2">
               {loading ? '…' : `$${stats.mrr} USD`}
@@ -262,15 +262,15 @@ function CeoPage() {
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Buscar por nombre o dirección..."
-              className="w-full sm:w-80 bg-zinc-900/90 border border-zinc-800 text-zinc-100 rounded-xl px-4 py-2.5 text-sm focus:border-emerald-500 focus:ring-1 focus:ring-emerald-500 outline-none transition-all placeholder:text-zinc-600"
+              className="w-full sm:w-80 bg-[#141C2B] border border-slate-700 text-zinc-100 rounded-xl px-4 py-2.5 text-sm focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/20 outline-none transition-all placeholder:text-zinc-600"
             />
           </div>
 
-          <div className="border border-zinc-800/80 bg-zinc-900/40 rounded-2xl overflow-hidden">
+          <div className="border border-slate-700/60 bg-[#141C2B]/40 rounded-2xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-sm">
                 <thead>
-                  <tr className="text-left text-xs uppercase tracking-wider text-zinc-500 border-b border-zinc-800/80">
+                  <tr className="text-left text-xs uppercase tracking-wider text-zinc-500 border-b border-slate-800">
                     <th className="px-4 py-3 font-semibold">Iglesia</th>
                     <th className="px-4 py-3 font-semibold">Contacto</th>
                     <th className="px-4 py-3 font-semibold">Registro</th>
@@ -298,7 +298,7 @@ function CeoPage() {
                       return (
                         <tr
                           key={org.id}
-                          className="border-b border-zinc-800/60 last:border-0 hover:bg-zinc-900/60 transition"
+                          className="border-b border-slate-800 last:border-0 hover:bg-slate-800/40 transition"
                         >
                           <td className="px-4 py-3">
                             <p className="font-semibold text-white">{org.name}</p>
@@ -311,7 +311,7 @@ function CeoPage() {
                                 href={wa}
                                 target="_blank"
                                 rel="noreferrer"
-                                className="text-xs text-emerald-400 hover:text-emerald-300 font-semibold"
+                                className="text-xs text-yellow-500 hover:text-yellow-400 font-semibold"
                               >
                                 Abrir WhatsApp
                               </a>
@@ -319,7 +319,7 @@ function CeoPage() {
                           </td>
                           <td className="px-4 py-3 text-zinc-400 text-xs">{formatDate(org.created_at)}</td>
                           <td className="px-4 py-3">
-                            <span className="inline-flex items-center gap-1.5 bg-zinc-800/60 text-zinc-300 px-2.5 py-1 rounded-full text-xs font-semibold">
+                            <span className="inline-flex items-center gap-1.5 bg-slate-800/60 text-zinc-300 px-2.5 py-1 rounded-full text-xs font-semibold">
                               {memberCounts[org.id] ?? 0} activos
                             </span>
                           </td>
@@ -333,7 +333,7 @@ function CeoPage() {
                               <select
                                 value={org.plan || 'Semilla'}
                                 onChange={(e) => changePlan(org.id, e.target.value)}
-                                className="bg-zinc-900 border border-zinc-800 text-zinc-300 text-xs rounded-lg px-2 py-1.5 outline-none focus:border-emerald-500"
+                                className="bg-[#141C2B] border border-slate-700 text-zinc-300 text-xs rounded-lg px-2 py-1.5 outline-none focus:border-yellow-500"
                               >
                                 {PLAN_OPTIONS.map((p) => (
                                   <option key={p.value} value={p.value}>
@@ -346,7 +346,7 @@ function CeoPage() {
                           <td className="px-4 py-3">
                             <button
                               onClick={() => copyRegLink(org.id)}
-                              className="px-3 py-1.5 rounded-lg bg-zinc-800 hover:bg-zinc-700 text-zinc-200 text-xs font-semibold transition active:scale-95"
+                              className="px-3 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-zinc-200 text-xs font-semibold transition active:scale-95"
                             >
                               Copiar enlace
                             </button>

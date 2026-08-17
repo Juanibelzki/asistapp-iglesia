@@ -27,12 +27,12 @@ export const Route = createFileRoute('/')({
 function LogoMark() {
   return (
     <div className="flex items-center gap-2.5">
-      <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 flex items-center justify-center overflow-hidden shadow-lg shadow-emerald-500/10 shrink-0 p-1">
-        <AppLogo className="w-full h-full object-contain" />
-      </div>
-      <span className="text-lg font-extrabold tracking-tight text-white">
-        Asist<span className="text-emerald-400">App</span>
-      </span>
+<div className="w-10 h-10 rounded-xl bg-[#141C2B] border border-slate-700 flex items-center justify-center overflow-hidden shadow-lg shadow-yellow-500/10 shrink-0 p-1">
+            <AppLogo className="w-full h-full object-contain" />
+          </div>
+          <span className="text-lg font-bold text-white">
+            Asist<span className="text-yellow-500">App</span>
+          </span>
     </div>
   )
 }
@@ -75,11 +75,11 @@ function ScannerMockup() {
         <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">
           Scanner QR
         </span>
-        <span className="px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold font-mono">
+        <span className="px-2.5 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 text-[11px] font-bold font-mono">
           99.8% más rápido
         </span>
       </div>
-      <div className="relative mx-auto w-44 h-44 bg-zinc-950 rounded-xl border border-white/10 overflow-hidden flex items-center justify-center">
+      <div className="relative mx-auto w-44 h-44 bg-[#0B0F17] rounded-xl border border-slate-700/60 overflow-hidden flex items-center justify-center">
         <FakeQr className="w-28 h-28" />
         <div className="absolute left-3 right-3 h-0.5 rounded-full bg-emerald-400/90 shadow-[0_0_12px_rgba(52,211,153,0.8)] animate-scanline" />
         <div className="absolute top-2 left-2 w-6 h-6 border-t-2 border-l-2 border-emerald-400/70 rounded-tl-lg" />
@@ -97,8 +97,8 @@ function ScannerMockup() {
 
 function MemberMockup() {
   return (
-    <div className="bg-zinc-900/90 border border-white/10 rounded-2xl p-6 backdrop-blur-xl shadow-2xl shadow-black/40 relative overflow-hidden">
-      <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full bg-emerald-500/10 blur-2xl pointer-events-none" />
+    <div className="bg-[#141C2B] border border-[#1E293B] rounded-2xl p-6 backdrop-blur-xl shadow-2xl shadow-black/40 relative overflow-hidden">
+      <div className="absolute -top-16 -right-16 w-40 h-40 rounded-full bg-yellow-500/10 blur-2xl pointer-events-none" />
       <div className="flex items-center justify-between gap-3 mb-5">
         <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">
           Credencial de Miembro
@@ -108,7 +108,7 @@ function MemberMockup() {
         </span>
       </div>
       <div className="flex items-center gap-4">
-        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-emerald-400 to-indigo-500 flex items-center justify-center text-zinc-950 font-black text-xl shrink-0 shadow-lg shadow-emerald-500/20">
+        <div className="w-14 h-14 rounded-full bg-gradient-to-br from-yellow-400 to-amber-600 flex items-center justify-center text-slate-950 font-black text-xl shrink-0 shadow-lg shadow-yellow-500/20">
           L
         </div>
         <div className="min-w-0">
@@ -117,11 +117,11 @@ function MemberMockup() {
           <p className="text-xs text-zinc-500 mt-0.5">Ministerio de Jóvenes</p>
         </div>
       </div>
-      <div className="mt-5 flex items-center justify-between gap-3 bg-zinc-950/60 border border-white/10 rounded-xl px-4 py-3">
+      <div className="mt-5 flex items-center justify-between gap-3 bg-[#0B0F17]/70 border border-slate-700 rounded-xl px-4 py-3">
         <span className="flex items-center gap-2 text-xs text-zinc-400">
-          <Users className="w-4 h-4 text-emerald-400" /> Grupo Familiar
+          <Users className="w-4 h-4 text-slate-400" /> Grupo Familiar
         </span>
-        <span className="font-mono text-lg font-bold tracking-widest text-emerald-400">
+        <span className="font-mono text-lg font-bold tracking-widest text-slate-300">
           Martínez
         </span>
       </div>
@@ -134,26 +134,26 @@ function MemberMockup() {
 
 function OfflineMockup() {
   return (
-    <div className="bg-zinc-900/90 border border-white/10 rounded-2xl p-6 backdrop-blur-xl shadow-2xl shadow-black/40">
+    <div className="bg-[#141C2B] border border-[#1E293B] rounded-2xl p-6 backdrop-blur-xl shadow-2xl shadow-black/40">
       <div className="flex items-center justify-between gap-3">
         <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">
           Modo Offline
         </span>
-        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold font-mono">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" /> Activo
+        <span className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 text-[11px] font-bold font-mono">
+          <span className="w-1.5 h-1.5 rounded-full bg-yellow-400 animate-pulse" /> Activo
         </span>
       </div>
 
-      <div className="mt-5 bg-zinc-950/60 border border-white/10 rounded-xl p-4">
+      <div className="mt-5 bg-[#0B0F17] border border-slate-700/60 rounded-xl p-4">
         <div className="flex items-center gap-3">
-          <div className="w-9 h-9 rounded-lg bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center text-emerald-400 shrink-0">
+          <div className="w-9 h-9 rounded-lg bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center text-yellow-500 shrink-0">
             <WifiOff className="w-4 h-4" />
           </div>
           <div className="min-w-0">
             <p className="text-sm font-semibold text-white">Offline Cache Activo</p>
             <p className="text-xs text-zinc-400">24 registros en cola</p>
           </div>
-          <RefreshCw className="w-4 h-4 text-emerald-400 animate-spin ml-auto shrink-0" />
+          <RefreshCw className="w-4 h-4 text-slate-400 animate-spin ml-auto shrink-0" />
         </div>
       </div>
 
@@ -162,8 +162,8 @@ function OfflineMockup() {
           <span>Sincronizando</span>
           <span>24 / 24</span>
         </div>
-        <div className="h-1.5 rounded-full bg-zinc-950/80 border border-white/10 overflow-hidden">
-          <div className="h-full w-full bg-gradient-to-r from-emerald-400 to-indigo-500 rounded-full" />
+        <div className="h-1.5 rounded-full bg-[#0B0F17] border border-slate-700/60 overflow-hidden">
+          <div className="h-full w-full bg-gradient-to-r from-yellow-400 to-amber-600 rounded-full" />
         </div>
         <p className="mt-3 text-xs text-zinc-400 flex items-center gap-1.5">
           <CircleCheck className="w-3.5 h-3.5 text-emerald-400" />
@@ -178,19 +178,19 @@ const CHART_BARS = [42, 68, 55, 82, 60, 92, 74]
 
 function DashboardMockup() {
   return (
-    <div className="bg-zinc-900/90 border border-white/10 rounded-2xl p-6 backdrop-blur-xl shadow-2xl shadow-black/40">
+    <div className="bg-[#141C2B] border border-[#1E293B] rounded-2xl p-6 backdrop-blur-xl shadow-2xl shadow-black/40">
       <div className="flex items-center justify-between gap-3">
         <span className="text-xs font-mono text-zinc-400 uppercase tracking-widest">
           Asistencia por servicio
         </span>
-        <Activity className="w-4 h-4 text-indigo-400" />
+        <Activity className="w-4 h-4 text-yellow-500" />
       </div>
 
       <div className="mt-5 flex items-end gap-2 h-24">
         {CHART_BARS.map((h, i) => (
           <div
             key={i}
-            className="flex-1 rounded-t-md bg-gradient-to-t from-emerald-500/70 to-indigo-500/70 hover:from-emerald-400 hover:to-indigo-400 transition-colors"
+            className="flex-1 rounded-t-md bg-gradient-to-t from-yellow-500/70 to-amber-600/70 hover:from-yellow-400 hover:to-amber-500 transition-colors"
             style={{ height: `${h}%` }}
           />
         ))}
@@ -203,7 +203,7 @@ function DashboardMockup() {
         </p>
       </div>
       <p className="mt-3 text-xs text-zinc-400 flex items-center gap-1.5">
-        <BarChart3 className="w-3.5 h-3.5 text-emerald-400" />
+        <BarChart3 className="w-3.5 h-3.5 text-yellow-500" />
         Reporte exportable en un clic
       </p>
     </div>
@@ -226,7 +226,7 @@ function ShowcaseBlock({ index, tag, icon: Icon, title, what, why, mockup }: Sho
   const isEven = index % 2 === 0
   const text = (
     <div className="space-y-6">
-      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
+      <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 text-xs font-mono">
         <Icon className="w-3.5 h-3.5" /> {tag}
       </div>
       <h3 className="text-2xl md:text-3xl font-bold text-white tracking-tight leading-tight">
@@ -291,9 +291,9 @@ function PhoneDemo() {
   return (
     <div className="relative mx-auto w-[300px] sm:w-[320px]">
       {/* Glow detrás del teléfono */}
-      <div className="absolute -inset-10 bg-gradient-to-br from-emerald-500/20 to-indigo-500/20 blur-3xl rounded-full pointer-events-none" />
+      <div className="absolute -inset-10 bg-gradient-to-br from-yellow-500/20 to-slate-500/20 blur-3xl rounded-full pointer-events-none" />
 
-      <div className="relative animate-float rounded-[40px] border border-white/15 bg-zinc-900/90 p-3 shadow-2xl shadow-black/60 backdrop-blur-xl">
+      <div className="relative animate-float rounded-[40px] border border-white/15 bg-[#141C2B] p-3 shadow-2xl shadow-black/60 backdrop-blur-xl">
         {/* Dynamic Island */}
         <div className="flex items-center justify-center pb-3">
           <div className="w-28 h-6 rounded-full bg-black/90 border border-white/10 flex items-center justify-end pr-5">
@@ -302,7 +302,7 @@ function PhoneDemo() {
         </div>
 
         {/* Pantalla */}
-        <div className="rounded-[28px] overflow-hidden bg-zinc-950 border border-white/5 aspect-[9/19] relative">
+        <div className="rounded-[28px] overflow-hidden bg-[#0B0F17] border border-white/5 aspect-[9/19] relative">
           <AnimatePresence mode="wait">
             {state === 'scan' && (
               <motion.div
@@ -367,14 +367,14 @@ function PhoneDemo() {
                 transition={{ duration: 0.3 }}
                 className="absolute inset-0 flex flex-col items-center justify-center p-6"
               >
-                <div className="w-10 h-10 rounded-xl bg-indigo-500/10 border border-indigo-500/30 flex items-center justify-center text-indigo-400 mb-4">
+                <div className="w-10 h-10 rounded-xl bg-yellow-500/10 border border-yellow-500/30 flex items-center justify-center text-yellow-500 mb-4">
                   <BarChart3 className="w-5 h-5" />
                 </div>
                 <p className="text-[10px] font-mono uppercase tracking-widest text-zinc-500">
                   Asistencia hoy
                 </p>
                 <p className="mt-1 text-2xl font-bold text-white">142 presentes</p>
-                <span className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 text-[11px] font-bold font-mono">
+                <span className="mt-2 inline-flex items-center gap-1 px-2 py-0.5 rounded-full bg-yellow-500/10 border border-yellow-500/30 text-yellow-500 text-[11px] font-bold font-mono">
                   +1
                 </span>
               </motion.div>
@@ -389,7 +389,7 @@ function PhoneDemo() {
 function LandingPage() {
   const [billing, setBilling] = useState<'monthly' | 'annual'>('monthly')
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 font-sans selection:bg-emerald-500 selection:text-zinc-950 pb-16 overflow-x-hidden">
+    <div className="min-h-screen bg-[#0B0F17] text-zinc-100 font-sans selection:bg-yellow-500 selection:text-slate-950 pb-16 overflow-x-hidden">
       {/* 0. NAVBAR */}
       <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-black/40 border-b border-white/10">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
@@ -399,7 +399,7 @@ function LandingPage() {
           <div className="flex items-center gap-4">
             <Link
               to="/login"
-              className="px-5 py-2 rounded-full text-sm font-medium text-zinc-200 bg-zinc-900/80 hover:text-white hover:bg-zinc-800/90 border border-white/10 hover:border-emerald-500/40 shadow-sm hover:shadow-emerald-500/10 transition-all duration-200 backdrop-blur-md"
+              className="px-5 py-2 rounded-full text-sm font-medium text-zinc-200 bg-slate-800/60 hover:text-white hover:bg-slate-800 border border-slate-600/40 hover:border-yellow-500/40 shadow-sm hover:shadow-yellow-500/10 transition-all duration-200 backdrop-blur-md"
             >
               Ingresar
             </Link>
@@ -411,16 +411,16 @@ function LandingPage() {
       <section className="relative max-w-6xl mx-auto px-6 pt-24 md:pt-28 pb-24">
         {/* Aurora Glow */}
         <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-          <div className="absolute -top-44 left-[6%] w-[620px] h-[620px] rounded-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-emerald-900/20 via-slate-900/10 to-transparent blur-3xl" />
-          <div className="absolute -top-24 right-[2%] w-[560px] h-[560px] rounded-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-indigo-900/20 via-slate-900/10 to-transparent blur-3xl" />
+          <div className="absolute -top-44 left-[6%] w-[620px] h-[620px] rounded-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-yellow-500/10 via-slate-900/10 to-transparent blur-3xl" />
+          <div className="absolute -top-24 right-[2%] w-[560px] h-[560px] rounded-full bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-slate-500/10 via-slate-900/10 to-transparent blur-3xl" />
         </div>
 
         <div className="relative grid grid-cols-1 lg:grid-cols-2 gap-16 lg:gap-12 items-center">
           {/* Columna texto */}
           <div className="text-center lg:text-left space-y-8">
             <Reveal variant="up">
-              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 text-xs font-mono">
-                <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <div className="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-yellow-500/10 border border-yellow-500/20 text-yellow-500 text-xs font-mono">
+                <span className="w-2 h-2 rounded-full bg-yellow-400 animate-pulse" />
                 Plataforma de Gestión y Asistencia Eclesial
               </div>
             </Reveal>
@@ -443,14 +443,14 @@ function LandingPage() {
               <div className="flex flex-col sm:flex-row items-center justify-center lg:justify-start gap-4">
                 <Link
                   to="/registerCongregacion"
-                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-emerald-400 text-zinc-950 font-mono font-bold text-xs uppercase tracking-widest hover:bg-emerald-300 transition-all duration-200 active:scale-95 shadow-lg shadow-emerald-500/25 flex items-center justify-center gap-2"
+                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-yellow-500 text-slate-950 font-mono font-bold text-xs uppercase tracking-widest hover:bg-yellow-600 transition-all duration-200 active:scale-95 shadow-lg shadow-yellow-500/25 flex items-center justify-center gap-2"
                 >
                   Registrar mi Iglesia
                   <ArrowRight className="w-4 h-4" />
                 </Link>
                 <Link
                   to="/portal"
-                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-zinc-900/60 border border-white/10 text-zinc-300 font-mono font-bold text-xs uppercase tracking-widest hover:bg-zinc-800 hover:text-white hover:border-white/20 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 backdrop-blur-md"
+                  className="w-full sm:w-auto px-8 py-4 rounded-full bg-slate-800/60 border border-slate-600/40 text-slate-200 font-mono font-bold text-xs uppercase tracking-widest hover:bg-slate-800 hover:text-white hover:border-white/20 transition-all duration-200 active:scale-95 flex items-center justify-center gap-2 backdrop-blur-md"
                 >
                   <BadgeCheck className="w-4 h-4" />
                   Soy Miembro (Mi Credencial)
@@ -530,7 +530,7 @@ function LandingPage() {
       {/* 3. PRECIOS */}
       <section className="max-w-6xl mx-auto px-6 py-12 text-center">
         <Reveal variant="up">
-          <p className="font-mono text-xs text-emerald-400 uppercase tracking-[0.3em] mb-3">
+          <p className="font-mono text-xs text-yellow-500 uppercase tracking-[0.3em] mb-3">
             Planes simples
           </p>
           <h2 className="text-3xl sm:text-4xl font-extrabold tracking-tight text-white mb-3">
@@ -542,12 +542,12 @@ function LandingPage() {
           </p>
 
           {/* Toggle mensual / anual */}
-          <div className="inline-flex items-center gap-3 bg-zinc-900/80 border border-zinc-800 rounded-full px-3 py-1.5 mb-12">
+          <div className="inline-flex items-center gap-3 bg-[#141C2B] border border-slate-700 rounded-full px-3 py-1.5 mb-12">
             <button
               onClick={() => setBilling('monthly')}
               className={`px-4 py-1.5 rounded-full font-mono text-xs font-bold transition-all duration-200 ${
                 billing === 'monthly'
-                  ? 'bg-emerald-400 text-zinc-950'
+                  ? 'bg-yellow-500 text-slate-950'
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
@@ -557,7 +557,7 @@ function LandingPage() {
               onClick={() => setBilling('annual')}
               className={`px-4 py-1.5 rounded-full font-mono text-xs font-bold transition-all duration-200 ${
                 billing === 'annual'
-                  ? 'bg-emerald-400 text-zinc-950'
+                  ? 'bg-yellow-500 text-slate-950'
                   : 'text-zinc-400 hover:text-white'
               }`}
             >
@@ -567,7 +567,7 @@ function LandingPage() {
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6 items-stretch">
             {/* Plan Semilla */}
-            <div className="flex flex-col bg-zinc-900/60 border border-zinc-800 rounded-3xl p-8 backdrop-blur-xl text-left">
+            <div className="flex flex-col bg-[#141C2B] border border-[#1E293B] rounded-3xl p-8 backdrop-blur-xl text-left">
               <h3 className="text-lg font-bold text-white mb-1">Semilla</h3>
               <p className="text-xs text-zinc-400 mb-2 font-mono">Hasta 40 miembros</p>
               <p className="text-xs text-zinc-400 mb-6">
@@ -581,22 +581,22 @@ function LandingPage() {
 
               <ul className="space-y-3 text-xs text-zinc-300 mb-8 font-mono">
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-yellow-500 shrink-0" />
                   Escaneo QR en vivo
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-yellow-500 shrink-0" />
                   Credencial digital
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-yellow-500 shrink-0" />
                   1 usuario admin
                 </li>
               </ul>
 
               <Link
                 to="/registro"
-                className="mt-auto block w-full py-3 rounded-full bg-zinc-800 text-white font-mono font-bold text-xs uppercase tracking-widest hover:bg-zinc-700 transition-all duration-200 active:scale-95"
+                className="mt-auto block w-full py-3 rounded-full bg-slate-800 text-white font-mono font-bold text-xs uppercase tracking-widest hover:bg-slate-700 transition-all duration-200 active:scale-95"
               >
                 Comenzar Gratis
               </Link>
@@ -608,9 +608,9 @@ function LandingPage() {
               whileInView={{ opacity: 1, y: 0 }}
               viewport={{ once: true, margin: '-100px' }}
               transition={{ duration: 0.6, ease: 'easeOut' }}
-              className="relative flex flex-col bg-gradient-to-b from-emerald-400/15 to-zinc-900/80 border border-emerald-500/40 rounded-3xl p-8 backdrop-blur-xl shadow-2xl shadow-emerald-500/10 text-left"
+              className="relative flex flex-col bg-gradient-to-b from-yellow-500/15 to-[#141C2B]/90 border border-yellow-500/40 rounded-3xl p-8 backdrop-blur-xl shadow-2xl shadow-yellow-500/10 text-left"
             >
-              <div className="absolute top-0 right-0 px-4 py-1 bg-emerald-400 text-zinc-950 font-mono text-[10px] font-bold uppercase rounded-bl-xl">
+              <div className="absolute top-0 right-0 px-4 py-1 bg-yellow-500 text-slate-950 font-mono text-[10px] font-bold uppercase rounded-bl-xl">
                 Recomendado
               </div>
 
@@ -636,40 +636,40 @@ function LandingPage() {
                 <span className="text-sm text-zinc-400">USD / mes</span>
               </div>
               {billing === 'annual' && (
-                <p className="text-[10px] text-emerald-400 font-mono -mt-4 mb-4">
+                <p className="text-[10px] text-slate-400 font-mono -mt-4 mb-4">
                   Facturado anualmente
                 </p>
               )}
 
               <ul className="space-y-3 text-xs text-zinc-300 mb-8 font-mono">
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-yellow-500 shrink-0" />
                   Modo Offline PWA
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-yellow-500 shrink-0" />
                   Métricas de asistencia
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-yellow-500 shrink-0" />
                   Reportes exportables
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-yellow-500 shrink-0" />
                   Soporte vía WhatsApp / Email
                 </li>
               </ul>
 
               <Link
                 to="/registro"
-                className="mt-auto block w-full py-3 rounded-full bg-emerald-400 text-zinc-950 font-mono font-bold text-xs uppercase tracking-widest hover:bg-emerald-300 transition-all duration-200 active:scale-95"
+                className="mt-auto block w-full py-3 rounded-full bg-yellow-500 text-slate-950 font-mono font-bold text-xs uppercase tracking-widest hover:bg-yellow-600 transition-all duration-200 active:scale-95"
               >
                 Iniciar Prueba Gratis
               </Link>
             </motion.div>
 
             {/* Plan Iglesia Pro */}
-            <div className="flex flex-col bg-zinc-900/60 border border-zinc-800 rounded-3xl p-8 backdrop-blur-xl text-left">
+            <div className="flex flex-col bg-[#141C2B] border border-[#1E293B] rounded-3xl p-8 backdrop-blur-xl text-left">
               <h3 className="text-lg font-bold text-white mb-1">Iglesia Pro</h3>
               <p className="text-xs text-zinc-400 mb-2 font-mono">Hasta 800 miembros</p>
               <p className="text-xs text-zinc-400 mb-6">
@@ -692,33 +692,33 @@ function LandingPage() {
                 <span className="text-sm text-zinc-400">USD / mes</span>
               </div>
               {billing === 'annual' && (
-                <p className="text-[10px] text-emerald-400 font-mono -mt-4 mb-4">
+                <p className="text-[10px] text-slate-400 font-mono -mt-4 mb-4">
                   Facturado anualmente
                 </p>
               )}
 
               <ul className="space-y-3 text-xs text-zinc-300 mb-8 font-mono">
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-yellow-500 shrink-0" />
                   Ministerios / áreas ilimitadas
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-yellow-500 shrink-0" />
                   Alertas de ausentismo avanzadas
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-yellow-500 shrink-0" />
                   Backup automático
                 </li>
                 <li className="flex items-center gap-2">
-                  <Check className="w-4 h-4 text-emerald-400 shrink-0" />
+                  <Check className="w-4 h-4 text-yellow-500 shrink-0" />
                   Atención prioritaria
                 </li>
               </ul>
 
               <Link
                 to="/registro"
-                className="mt-auto block w-full py-3 rounded-full bg-zinc-800 text-white font-mono font-bold text-xs uppercase tracking-widest hover:bg-zinc-700 transition-all duration-200 active:scale-95"
+                className="mt-auto block w-full py-3 rounded-full bg-slate-800 text-white font-mono font-bold text-xs uppercase tracking-widest hover:bg-slate-700 transition-all duration-200 active:scale-95"
               >
                 Elegir Plan Pro
               </Link>

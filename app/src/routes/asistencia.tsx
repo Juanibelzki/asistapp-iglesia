@@ -504,31 +504,31 @@ function AsistenciaPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-zinc-100">
-        <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mb-4" />
+      <div className="min-h-screen bg-[#0B0F17] flex flex-col items-center justify-center text-zinc-100">
+        <div className="w-10 h-10 border-4 border-yellow-500/20 border-t-yellow-500 rounded-full animate-spin mb-4" />
         <p className="text-sm text-zinc-400 font-medium">Cargando toma de asistencia...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#0B0F17] text-zinc-100 flex flex-col font-sans">
       <main className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8 space-y-6">
         {/* HEADER */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800/60 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/60 pb-6">
           <div>
             <h1 className="text-3xl font-extrabold text-white tracking-tight">Toma de Asistencia</h1>
             <p className="text-sm text-zinc-400 mt-1">Escaneá el QR de cada congregado para registrar su presencia.</p>
           </div>
           <Link
             to="/dashboard"
-            className="text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-800 px-3 py-1.5 rounded-lg transition"
+            className="text-xs text-zinc-400 hover:text-zinc-200 border border-slate-700 px-3 py-1.5 rounded-lg transition"
           >
             ← Volver al Dashboard
           </Link>
           <Link
             to="/ajustes"
-            className="text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-800 px-3 py-1.5 rounded-lg transition"
+            className="text-xs text-zinc-400 hover:text-zinc-200 border border-slate-700 px-3 py-1.5 rounded-lg transition"
           >
             Ajustes
           </Link>
@@ -568,7 +568,7 @@ function AsistenciaPage() {
         )}
 
         {/* VISOR DE CÁMARA */}
-        <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-2xl p-5 space-y-4">
+        <div className="bg-[#141C2B]/60 border border-slate-700/60 rounded-2xl p-5 space-y-4">
           <div className="flex items-center justify-between gap-3">
             <h2 className="font-bold text-white">Escáner QR</h2>
             {scannerRunning && (
@@ -581,14 +581,14 @@ function AsistenciaPage() {
 
           <div
             id={QR_READER_ID}
-            className={`w-full aspect-square max-w-sm mx-auto rounded-2xl overflow-hidden border border-zinc-800 bg-zinc-950 ${
+            className={`w-full aspect-square max-w-sm mx-auto rounded-2xl overflow-hidden border border-slate-700 bg-[#0B0F17] ${
               scannerRunning || scannerStarting ? '' : 'hidden'
             }`}
           />
 
           {!scannerRunning ? (
             <div className="flex flex-col items-center gap-3 py-6">
-              <div className="w-14 h-14 rounded-2xl bg-zinc-950 border border-zinc-800 flex items-center justify-center text-zinc-500">
+              <div className="w-14 h-14 rounded-2xl bg-[#0B0F17] border border-slate-700 flex items-center justify-center text-zinc-500">
                 <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M2.25 15.75l5.159-5.159a2.25 2.25 0 013.182 0l5.159 5.159m-1.5-1.5l1.409-1.409a2.25 2.25 0 013.182 0l2.909 2.909M3.75 21h16.5A1.5 1.5 0 0021.75 19.5V4.5A1.5 1.5 0 0020.25 3H3.75A1.5 1.5 0 002.25 4.5v15A1.5 1.5 0 003.75 21zM10.5 7.5a2.25 2.25 0 11-4.5 0 2.25 2.25 0 014.5 0z" />
                 </svg>
@@ -598,7 +598,7 @@ function AsistenciaPage() {
               </p>
               <button
                 onClick={startScanner}
-                className="w-full px-5 py-3 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 disabled:cursor-not-allowed text-zinc-950 font-bold text-sm transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
+                className="w-full px-5 py-3 rounded-xl bg-yellow-500 hover:bg-yellow-600 disabled:opacity-60 disabled:cursor-not-allowed text-slate-950 font-bold text-sm transition shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M15.75 6a3.75 3.75 0 11-7.5 0 3.75 3.75 0 017.5 0zM4.501 20.118a7.5 7.5 0 0114.998 0A17.933 17.933 0 0112 21.75c-2.676 0-5.216-.584-7.499-1.632z" />
@@ -609,7 +609,7 @@ function AsistenciaPage() {
           ) : (
             <button
               onClick={stopScanner}
-              className="w-full px-5 py-3 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-white font-bold text-sm transition flex items-center justify-center gap-2"
+              className="w-full px-5 py-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm transition flex items-center justify-center gap-2"
             >
               <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12" />

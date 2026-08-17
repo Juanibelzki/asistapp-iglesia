@@ -51,6 +51,17 @@
   --hero-a: rgba(79, 184, 178, 0.36);
   --hero-b: rgba(47, 106, 74, 0.2);
 
+  /* Gold & Silver Prestige tokens */
+  --color-canvas: #0b0f17;
+  --color-panel: #141c2b;
+  --color-panel-border: #1e293b;
+  --color-gold: #eab308;
+  --color-gold-hover: #d97706;
+  --color-silver: #94a3b8;
+  --color-silver-soft: #cbd5e1;
+  --color-border-subtle: rgba(148, 163, 184, 0.15);
+  --color-success: #10b981;
+
   --radius: 0.625rem;
   --radius-sm: 6px;
   --radius-md: 10px;
@@ -114,11 +125,11 @@
     overflow-x: hidden;
     margin: 0;
     font-family: var(--font-sans);
-    background-color: var(--bg-base);
-    background: radial-gradient(1100px 620px at -8% -10%, var(--hero-a), transparent 58%),
-                radial-gradient(1050px 620px at 112% -12%, var(--hero-b), transparent 62%),
-                radial-gradient(720px 380px at 50% 115%, rgba(79, 184, 178, 0.1), transparent 68%),
-                linear-gradient(180deg, color-mix(in oklab, var(--sand) 68%, white) 0%, var(--foam) 44%, var(--bg-base) 100%);
+    background-color: #0b0f17;
+    background: radial-gradient(1100px 620px at -8% -10%, rgba(234, 179, 8, 0.12), transparent 58%),
+                radial-gradient(1050px 620px at 112% -12%, rgba(148, 163, 184, 0.1), transparent 62%),
+                radial-gradient(720px 380px at 50% 115%, rgba(148, 163, 184, 0.08), transparent 68%),
+                linear-gradient(180deg, #0b0f17 0%, #0b0f17 100%);
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     padding-bottom: env(safe-area-inset-bottom);
@@ -207,7 +218,7 @@
 }
 
 .text-gradient {
-  background: linear-gradient(135deg, #34d399 0%, #818cf8 100%);
+  background: linear-gradient(135deg, #fde68a 0%, #eab308 60%, #d97706 100%);
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;

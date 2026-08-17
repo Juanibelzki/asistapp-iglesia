@@ -172,36 +172,36 @@ function AjustesPage() {
   };
 
   const inputClass =
-    'w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/40 transition';
+    'w-full bg-[#0B0F17] border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/20 transition';
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-zinc-100">
-        <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mb-4" />
+      <div className="min-h-screen bg-[#0B0F17] flex flex-col items-center justify-center text-zinc-100">
+        <div className="w-10 h-10 border-4 border-yellow-500/20 border-t-yellow-500 rounded-full animate-spin mb-4" />
         <p className="text-sm text-zinc-400 font-medium">Cargando configuración...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans">
+    <div className="min-h-screen bg-[#0B0F17] text-zinc-100 flex flex-col font-sans">
       <main className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8 space-y-6">
         {/* HEADER */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800/60 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/60 pb-6">
           <div>
             <h1 className="text-3xl font-extrabold text-white tracking-tight">Configuración y Branding</h1>
             <p className="text-sm text-zinc-400 mt-1">Personalizá la identidad de tu iglesia y la credencial digital.</p>
           </div>
           <div className="flex items-center gap-2">
             <Link
-              to="/configuracion/suscripcion"
-              className="text-xs font-bold text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 px-3 py-2 rounded-xl transition flex items-center gap-1.5"
+              to="/suscripcion"
+              className="text-xs font-bold text-yellow-500 bg-yellow-500/10 hover:bg-yellow-500/20 border border-yellow-500/30 px-3 py-2 rounded-xl transition flex items-center gap-1.5"
             >
               💳 Planes y Suscripción
             </Link>
             <Link
               to="/dashboard"
-              className="text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-800 px-3 py-2 rounded-xl transition"
+              className="text-xs text-zinc-400 hover:text-zinc-200 border border-slate-700 px-3 py-2 rounded-xl transition"
             >
               ← Volver al Dashboard
             </Link>
@@ -210,7 +210,7 @@ function AjustesPage() {
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">
           {/* FORMULARIO */}
-          <form onSubmit={handleSubmit} className="bg-zinc-900/50 border border-zinc-800/80 rounded-2xl p-6 space-y-5">
+          <form onSubmit={handleSubmit} className="bg-[#141C2B]/50 border border-slate-700/60 rounded-2xl p-6 space-y-5">
             <h2 className="font-bold text-white">Identidad Institucional</h2>
 
             <div>
@@ -265,9 +265,9 @@ function AjustesPage() {
                 accept=".png,.jpg,.jpeg,.svg,.webp"
                 onChange={handleLogoChange}
                 disabled={uploadingLogo}
-                className="w-full text-sm text-zinc-400 file:mr-3 file:px-3 file:py-2 file:rounded-lg file:border file:border-zinc-700 file:bg-zinc-950 file:text-zinc-200 file:text-xs file:font-bold hover:file:bg-zinc-900 transition disabled:opacity-60"
+                className="w-full text-sm text-zinc-400 file:mr-3 file:px-3 file:py-2 file:rounded-lg file:border file:border-slate-700 file:bg-[#0B0F17] file:text-zinc-200 file:text-xs file:font-bold hover:file:bg-slate-800 transition disabled:opacity-60"
               />
-              {uploadingLogo && <p className="text-[11px] text-emerald-400 mt-1.5">Subiendo logo...</p>}
+              {uploadingLogo && <p className="text-[11px] text-yellow-500 mt-1.5">Subiendo logo...</p>}
             </div>
 
             {formError && (
@@ -276,15 +276,15 @@ function AjustesPage() {
               </div>
             )}
 
-            <div className="flex items-center justify-end pt-2 border-t border-zinc-800">
+            <div className="flex items-center justify-end pt-2 border-t border-slate-700/60">
               <button
                 type="submit"
                 disabled={saving}
-                className="px-6 py-2.5 rounded-lg bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 disabled:cursor-not-allowed text-zinc-950 font-medium text-sm transition shadow-lg shadow-emerald-500/20 flex items-center gap-2"
+                className="px-6 py-2.5 rounded-lg bg-yellow-500 hover:bg-yellow-600 disabled:opacity-60 disabled:cursor-not-allowed text-slate-950 font-medium text-sm transition shadow-lg shadow-yellow-500/20 flex items-center gap-2"
               >
                 {saving ? (
                   <>
-                    <span className="w-4 h-4 border-2 border-zinc-950/40 border-t-zinc-950 rounded-full animate-spin" />
+                    <span className="w-4 h-4 border-2 border-slate-950/40 border-t-slate-950 rounded-full animate-spin" />
                     Guardando...
                   </>
                 ) : (
@@ -295,19 +295,19 @@ function AjustesPage() {
           </form>
 
           {/* VISTA PREVIA EN VIVO */}
-          <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-2xl p-6 space-y-4 lg:sticky lg:top-6">
+          <div className="bg-[#141C2B]/50 border border-slate-700/60 rounded-2xl p-6 space-y-4 lg:sticky lg:top-6">
             <h2 className="font-bold text-white">Vista Previa</h2>
 
-            <div className="bg-zinc-950/60 border border-zinc-800 rounded-2xl p-6">
+            <div className="bg-[#0B0F17] border border-slate-700/60 rounded-2xl p-6">
               <div className="flex items-center gap-4">
                 {form.logo_url ? (
                   <img
                     src={form.logo_url}
                     alt="Logo de la iglesia"
-                    className="w-14 h-14 rounded-xl object-cover border border-zinc-700 bg-zinc-900"
+                    className="w-14 h-14 rounded-xl object-cover border border-slate-700 bg-[#141C2B]"
                   />
                 ) : (
-                  <div className="w-14 h-14 rounded-xl bg-emerald-500 flex items-center justify-center text-zinc-950 font-black text-xl shadow-lg shadow-emerald-500/20">
+                  <div className="w-14 h-14 rounded-xl bg-yellow-500 flex items-center justify-center text-slate-950 font-black text-xl shadow-lg shadow-yellow-500/20">
                     {(form.name || 'A').charAt(0).toUpperCase()}
                   </div>
                 )}
@@ -316,7 +316,7 @@ function AjustesPage() {
                   <p className="text-xs text-zinc-400 truncate">{form.motto || 'Lema o visión de la iglesia'}</p>
                 </div>
               </div>
-              <div className="mt-4 border-t border-zinc-800 pt-4 space-y-1">
+              <div className="mt-4 border-t border-slate-700/60 pt-4 space-y-1">
                 {form.address && <p className="text-[11px] text-zinc-500">📍 {form.address}</p>}
                 {form.phone && <p className="text-[11px] text-zinc-500">📞 {form.phone}</p>}
               </div>

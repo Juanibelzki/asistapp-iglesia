@@ -318,30 +318,30 @@ function CongregadosPage() {
   });
 
   const inputClass =
-    'w-full bg-zinc-950 border border-zinc-800 rounded-lg px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-emerald-500/60 focus:ring-1 focus:ring-emerald-500/40 transition';
+    'w-full bg-[#0B0F17] border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/20 transition';
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-zinc-950 flex flex-col items-center justify-center text-zinc-100">
-        <div className="w-10 h-10 border-4 border-emerald-500/20 border-t-emerald-500 rounded-full animate-spin mb-4" />
+      <div className="min-h-screen bg-[#0B0F17] flex flex-col items-center justify-center text-zinc-100">
+        <div className="w-10 h-10 border-4 border-yellow-500/20 border-t-yellow-500 rounded-full animate-spin mb-4" />
         <p className="text-sm text-zinc-400 font-medium">Cargando directorio de congregados...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans selection:bg-emerald-500 selection:text-zinc-950">
+    <div className="min-h-screen bg-[#0B0F17] text-zinc-100 flex flex-col font-sans selection:bg-yellow-500 selection:text-slate-950">
 
       {/* NAVBAR */}
-      <header className="sticky top-0 z-30 border-b border-zinc-800/80 bg-zinc-950/80 backdrop-blur-md px-6 py-4">
+      <header className="sticky top-0 z-30 border-b border-slate-800/80 bg-[#0B0F17]/80 backdrop-blur-md px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-6">
             <Link className="flex items-center gap-2.5" to="/dashboard">
-              <div className="w-9 h-9 rounded-xl bg-emerald-500 flex items-center justify-center text-zinc-950 font-black text-lg shadow-lg shadow-emerald-500/20">
+              <div className="w-9 h-9 rounded-xl bg-yellow-500 flex items-center justify-center text-slate-950 font-black text-lg shadow-lg shadow-yellow-500/20">
                 A
               </div>
               <span className="text-xl font-extrabold tracking-tight text-white">
-                Asist<span className="text-emerald-400">App</span>
+                Asist<span className="text-yellow-500">App</span>
               </span>
             </Link>
 
@@ -349,7 +349,7 @@ function CongregadosPage() {
               <Link className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 transition" to="/dashboard">
                 Panel General
               </Link>
-              <span className="px-3 py-1.5 rounded-lg bg-zinc-900 text-emerald-400 border border-zinc-800">
+              <span className="px-3 py-1.5 rounded-lg bg-[#141C2B] text-yellow-500 border border-slate-700/60">
                 Congregados
               </span>
               <Link className="px-3 py-1.5 rounded-lg text-zinc-400 hover:text-zinc-200 transition" to="/materiales">
@@ -364,7 +364,7 @@ function CongregadosPage() {
             </nav>
           </div>
 
-          <Link className="text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-800 px-3 py-1.5 rounded-lg transition" to="/dashboard">
+          <Link className="text-xs text-zinc-400 hover:text-zinc-200 border border-slate-700 px-3 py-1.5 rounded-lg transition" to="/dashboard">
             ← Volver al Dashboard
           </Link>
         </div>
@@ -374,7 +374,7 @@ function CongregadosPage() {
       <main className="flex-1 max-w-7xl w-full mx-auto p-6 md:p-8 space-y-6">
 
         {/* HEADER */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800/60 pb-6">
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-800/60 pb-6">
           <div>
             <h1 className="text-3xl font-extrabold text-white tracking-tight">Directorio de Congregados</h1>
             <p className="text-sm text-zinc-400 mt-1">Gestión integral de miembros y alumnos formativos de <span className="text-zinc-200 font-semibold">{churchName}</span></p>
@@ -384,7 +384,7 @@ function CongregadosPage() {
           <button
             onClick={handleExportAttendance}
             disabled={exportingAttendance}
-            className="px-4 py-2.5 rounded-xl bg-zinc-800 hover:bg-zinc-700 text-zinc-100 font-bold text-sm transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
+            className="px-4 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-zinc-100 font-bold text-sm transition disabled:opacity-60 disabled:cursor-not-allowed flex items-center justify-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
@@ -393,7 +393,7 @@ function CongregadosPage() {
           </button>
           <button
             onClick={openModal}
-            className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-sm transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
+            className="px-4 py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold text-sm transition shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2"
           >
             <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M12 4v16m8-8H4" />
@@ -405,13 +405,13 @@ function CongregadosPage() {
 
         {/* PESTAÑA PRINCIPAL: TODOS VS ALUMNOS */}
         <div className="flex flex-col gap-4">
-          <div className="flex items-center gap-2 border-b border-zinc-800/80 pb-3">
+          <div className="flex items-center gap-2 border-b border-slate-800/80 pb-3">
             <button
               onClick={() => setMainTab('todos')}
               className={`px-4 py-2 rounded-xl text-sm font-bold transition ${
                 mainTab === 'todos'
-                  ? 'bg-zinc-800 text-white border border-zinc-700'
-                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                  ? 'bg-[#141C2B] text-white border border-slate-700'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#141C2B]/40'
               }`}
             >
               Todos los Congregados ({congregados.length})
@@ -420,8 +420,8 @@ function CongregadosPage() {
               onClick={() => setMainTab('alumnos')}
               className={`px-4 py-2 rounded-xl text-sm font-bold transition flex items-center gap-2 ${
                 mainTab === 'alumnos'
-                  ? 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/30'
-                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-zinc-900'
+                  ? 'bg-yellow-500/10 text-yellow-500 border border-yellow-500/30'
+                  : 'text-zinc-400 hover:text-zinc-200 hover:bg-[#141C2B]/40'
               }`}
             >
               <span>Alumnos Formativos</span>
@@ -433,11 +433,11 @@ function CongregadosPage() {
 
           {/* SUB-PESTAÑAS DE ALUMNOS (NIÑOS / ADOLESCENTES / ADULTOS) */}
           {mainTab === 'alumnos' && (
-            <div className="flex items-center gap-2 bg-zinc-900/60 p-1.5 rounded-xl border border-zinc-800/80 w-fit">
+            <div className="flex items-center gap-2 bg-[#141C2B]/60 p-1.5 rounded-xl border border-slate-700/60 w-fit">
               <button
                 onClick={() => setStudentStage('todos')}
                 className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
-                  studentStage === 'todos' ? 'bg-zinc-800 text-white' : 'text-zinc-400 hover:text-zinc-200'
+                  studentStage === 'todos' ? 'bg-slate-800 text-white' : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
                 Todos los Niveles
@@ -445,7 +445,7 @@ function CongregadosPage() {
               <button
                 onClick={() => setStudentStage('niño')}
                 className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
-                  studentStage === 'niño' ? 'bg-emerald-500 text-zinc-950 font-bold' : 'text-zinc-400 hover:text-zinc-200'
+                  studentStage === 'niño' ? 'bg-yellow-500 text-slate-950 font-bold' : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
                 Niños (0-11 años)
@@ -453,7 +453,7 @@ function CongregadosPage() {
               <button
                 onClick={() => setStudentStage('adolescente')}
                 className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
-                  studentStage === 'adolescente' ? 'bg-emerald-500 text-zinc-950 font-bold' : 'text-zinc-400 hover:text-zinc-200'
+                  studentStage === 'adolescente' ? 'bg-yellow-500 text-slate-950 font-bold' : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
                 Adolescentes (12-17 años)
@@ -461,7 +461,7 @@ function CongregadosPage() {
               <button
                 onClick={() => setStudentStage('adulto')}
                 className={`px-3 py-1 rounded-lg text-xs font-semibold transition ${
-                  studentStage === 'adulto' ? 'bg-emerald-500 text-zinc-950 font-bold' : 'text-zinc-400 hover:text-zinc-200'
+                  studentStage === 'adulto' ? 'bg-yellow-500 text-slate-950 font-bold' : 'text-zinc-400 hover:text-zinc-200'
                 }`}
               >
                 Adultos (18+ años)
@@ -472,8 +472,8 @@ function CongregadosPage() {
 
         {/* LISTADO / TABLA O ESTADO VACÍO */}
         {filteredList.length === 0 ? (
-          <div className="bg-zinc-900/40 border border-zinc-800/80 rounded-2xl p-12 text-center flex flex-col items-center justify-center max-w-2xl mx-auto mt-6">
-            <div className="w-14 h-14 rounded-2xl bg-zinc-900 border border-zinc-800 flex items-center justify-center text-zinc-500 mb-4">
+          <div className="bg-[#141C2B]/40 border border-slate-700/60 rounded-2xl p-12 text-center flex flex-col items-center justify-center max-w-2xl mx-auto mt-6">
+            <div className="w-14 h-14 rounded-2xl bg-[#141C2B] border border-slate-700 flex items-center justify-center text-zinc-500 mb-4">
               <svg className="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
               </svg>
@@ -488,16 +488,16 @@ function CongregadosPage() {
             </p>
             <button
               onClick={openModal}
-              className="px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-sm transition shadow-lg shadow-emerald-500/20"
+              className="px-4 py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold text-sm transition shadow-lg shadow-yellow-500/20"
             >
               + Registrar Primer Miembro
             </button>
           </div>
         ) : (
-          <div className="bg-zinc-900/50 border border-zinc-800/80 rounded-2xl overflow-hidden">
+          <div className="bg-[#141C2B]/50 border border-slate-700/60 rounded-2xl overflow-hidden">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-sm text-zinc-300">
-                <thead className="bg-zinc-900/80 text-xs uppercase tracking-wider text-zinc-400 border-b border-zinc-800">
+                <thead className="bg-[#1E293B]/80 text-xs uppercase tracking-wider text-zinc-400 border-b border-slate-800">
                   <tr>
                     <th className="py-3.5 px-6 font-semibold">Nombre Completo</th>
                     <th className="py-3.5 px-6 font-semibold">Categoría / Etapa</th>
@@ -506,19 +506,19 @@ function CongregadosPage() {
                     <th className="py-3.5 px-6 font-semibold text-right">Acciones</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-zinc-800/60 font-medium">
+                <tbody className="divide-y divide-slate-800/60 font-medium">
                   {filteredList.map((item) => (
-                    <tr key={item.id} className="hover:bg-zinc-800/30 transition">
+                    <tr key={item.id} className="hover:bg-slate-800/30 transition">
                       <td className="py-4 px-6 font-bold text-white">
                         {item.first_name} {item.last_name}
                       </td>
                       <td className="py-4 px-6">
                         {item.is_student ? (
-                          <span className="bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 px-2.5 py-1 rounded-lg text-xs font-semibold capitalize">
+                          <span className="bg-yellow-500/10 text-yellow-500 border border-yellow-500/20 px-2.5 py-1 rounded-lg text-xs font-semibold capitalize">
                             Alumno ({item.student_stage || 'General'})
                           </span>
                         ) : (
-                          <span className="bg-zinc-800 text-zinc-300 border border-zinc-700/60 px-2.5 py-1 rounded-lg text-xs font-semibold">
+                          <span className="bg-slate-800 text-zinc-300 border border-slate-700/60 px-2.5 py-1 rounded-lg text-xs font-semibold">
                             Congregado
                           </span>
                         )}
@@ -542,7 +542,7 @@ function CongregadosPage() {
                         <div className="flex items-center justify-end gap-1">
                           <button
                             onClick={() => openQrModal(item)}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 transition hover:text-emerald-400 hover:bg-emerald-500/10"
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 transition hover:text-yellow-500 hover:bg-yellow-500/10"
                             aria-label={`Ver QR de ${item.first_name} ${item.last_name}`}
                             title="Ver QR"
                           >
@@ -552,7 +552,7 @@ function CongregadosPage() {
                           </button>
                           <button
                             onClick={() => openEditModal(item)}
-                            className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 transition hover:text-emerald-400 hover:bg-emerald-500/10"
+                            className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 transition hover:text-yellow-500 hover:bg-yellow-500/10"
                             aria-label={`Editar ${item.first_name} ${item.last_name}`}
                             title="Editar"
                           >
@@ -588,16 +588,16 @@ function CongregadosPage() {
           onClick={closeModal}
         >
           <div
-            className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl shadow-black/50"
+            className="bg-[#141C2B] border border-slate-700/60 rounded-2xl w-full max-w-lg max-h-[90vh] overflow-y-auto shadow-2xl shadow-black/50"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700/60">
               <h2 className="text-lg font-bold text-white">
                 {editingId ? 'Editar Congregado' : 'Registrar Congregado'}
               </h2>
               <button
                 onClick={closeModal}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-slate-800 transition"
                 aria-label="Cerrar"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -611,7 +611,7 @@ function CongregadosPage() {
                 <div className="bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium rounded-xl p-4 flex flex-col gap-2">
                   <p className="font-bold">⚠️ Límite de miembros alcanzado ({congregados.length}/{memberLimit})</p>
                   <p className="text-zinc-400">Has alcanzado el cupo máximo de tu plan actual. Para registrar más congregados, mejora tu suscripción.</p>
-                  <Link to="/configuracion/suscripcion" className="text-emerald-400 font-bold hover:underline inline-flex items-center gap-1 mt-1">
+                  <Link to="/suscripcion" className="text-yellow-500 font-bold hover:underline inline-flex items-center gap-1 mt-1">
                     Ver planes y mejorar suscripción →
                   </Link>
                 </div>
@@ -652,7 +652,7 @@ function CongregadosPage() {
                 />
               </div>
 
-              <div className="flex items-center justify-between bg-zinc-950/60 border border-zinc-800 rounded-xl px-4 py-3">
+              <div className="flex items-center justify-between bg-[#0B0F17] border border-slate-700/60 rounded-xl px-4 py-3">
                 <div>
                   <p className="text-sm font-semibold text-white">¿Es alumno de clases bíblicas / discipulado?</p>
                   <p className="text-xs text-zinc-500 mt-0.5">Los alumnos se registran en niveles y generan su QR de asistencia.</p>
@@ -663,7 +663,7 @@ function CongregadosPage() {
                   aria-checked={form.is_student}
                   onClick={() => setField('is_student', !form.is_student)}
                   className={`relative shrink-0 w-11 h-6 rounded-full transition ${
-                    form.is_student ? 'bg-emerald-500' : 'bg-zinc-700'
+                    form.is_student ? 'bg-yellow-500' : 'bg-slate-700'
                   }`}
                 >
                   <span
@@ -685,8 +685,8 @@ function CongregadosPage() {
                         onClick={() => setField('student_stage', stage)}
                         className={`px-3 py-2 rounded-lg text-xs font-bold capitalize transition border ${
                           form.student_stage === stage
-                            ? 'bg-emerald-500/10 text-emerald-400 border-emerald-500/30'
-                            : 'bg-zinc-950 text-zinc-400 border-zinc-800 hover:text-zinc-200 hover:border-zinc-700'
+                            ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/30'
+                            : 'bg-[#0B0F17] text-zinc-400 border-slate-700 hover:text-zinc-200 hover:border-slate-600'
                         }`}
                       >
                         {stage}
@@ -702,7 +702,7 @@ function CongregadosPage() {
               )}
 
               {needsGuardian && (
-                <div className="space-y-4 border-t border-zinc-800 pt-4">
+                <div className="space-y-4 border-t border-slate-700/60 pt-4">
                   <div>
                     <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Nombre del Tutor</label>
                     <input
@@ -732,22 +732,22 @@ function CongregadosPage() {
                 </div>
               )}
 
-              <div className="flex items-center justify-end gap-3 pt-2 border-t border-zinc-800">
+              <div className="flex items-center justify-end gap-3 pt-2 border-t border-slate-700/60">
                 <button
                   type="button"
                   onClick={closeModal}
-                  className="px-4 py-2.5 rounded-xl text-sm font-bold text-zinc-300 hover:text-white hover:bg-zinc-800 transition"
+                  className="px-4 py-2.5 rounded-xl text-sm font-bold text-zinc-300 hover:text-white hover:bg-slate-800 transition"
                 >
                   Cancelar
                 </button>
                 <button
                   type="submit"
                   disabled={saving}
-                  className="px-5 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 disabled:opacity-60 disabled:cursor-not-allowed text-zinc-950 font-bold text-sm transition shadow-lg shadow-emerald-500/20 flex items-center gap-2"
+                  className="px-5 py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 disabled:opacity-60 disabled:cursor-not-allowed text-slate-950 font-bold text-sm transition shadow-lg shadow-yellow-500/20 flex items-center gap-2"
                 >
                   {saving ? (
                     <>
-                      <span className="w-4 h-4 border-2 border-zinc-950/40 border-t-zinc-950 rounded-full animate-spin" />
+                      <span className="w-4 h-4 border-2 border-slate-950/40 border-t-slate-950 rounded-full animate-spin" />
                       Guardando...
                     </>
                   ) : editingId ? (
@@ -769,14 +769,14 @@ function CongregadosPage() {
           onClick={closeQrModal}
         >
           <div
-            className="bg-zinc-900 border border-zinc-800 rounded-2xl w-full max-w-sm shadow-2xl shadow-black/50"
+            className="bg-[#141C2B] border border-slate-700/60 rounded-2xl w-full max-w-sm shadow-2xl shadow-black/50"
             onClick={(e) => e.stopPropagation()}
           >
-            <div className="flex items-center justify-between px-6 py-4 border-b border-zinc-800">
+            <div className="flex items-center justify-between px-6 py-4 border-b border-slate-700/60">
               <h2 className="text-lg font-bold text-white">QR de Asistencia</h2>
               <button
                 onClick={closeQrModal}
-                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-zinc-800 transition"
+                className="w-8 h-8 rounded-lg flex items-center justify-center text-zinc-400 hover:text-white hover:bg-slate-800 transition"
                 aria-label="Cerrar"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -797,7 +797,7 @@ function CongregadosPage() {
               </p>
               <button
                 onClick={() => downloadQr(qrMember)}
-                className="w-full px-4 py-2.5 rounded-xl bg-emerald-500 hover:bg-emerald-400 text-zinc-950 font-bold text-sm transition shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2"
+                className="w-full px-4 py-2.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold text-sm transition shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2"
               >
                 <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" />
