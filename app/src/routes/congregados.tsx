@@ -56,6 +56,7 @@ function CongregadosPage() {
   const [loading, setLoading] = useState(true);
   const [orgId, setOrgId] = useState<string | null>(null);
   const [churchName, setChurchName] = useState('Mi Congregación');
+  const [memberLimit, setMemberLimit] = useState(50);
   const [congregados, setCongregados] = useState<Congregado[]>([]);
 
   const [mainTab, setMainTab] = useState<MainTab>('todos');
@@ -104,12 +105,13 @@ function CongregadosPage() {
 
         const { data: org } = await supabase
           .from('organizations')
-          .select('name')
+          .select('name, member_limit')
           .eq('id', orgForLoad)
           .maybeSingle();
 
         if (org && isMounted) {
           setChurchName(org.name || 'Mi Congregación');
+          setMemberLimit(org.member_limit ?? 50);
         }
 
         const { data: members, error: membersError } = await supabase
@@ -240,6 +242,10 @@ function CongregadosPage() {
     e.preventDefault();
     if (!orgId) {
       setFormError('No se pudo determinar tu organización. Intenta recargar la página.');
+      return;
+    }
+    if (!editingId && congregados.length >= memberLimit) {
+      setFormError(`Has alcanzado el límite de ${memberLimit} congregados de tu plan actual. Actualiza tu suscripción en Ajustes > Planes y Suscripción.`);
       return;
     }
     if (!form.first_name.trim() || !form.last_name.trim()) {
@@ -601,6 +607,15 @@ function CongregadosPage() {
             </div>
 
             <form onSubmit={handleSubmit} className="p-6 space-y-5">
+              {!editingId && congregados.length >= memberLimit && (
+                <div className="bg-amber-500/10 border border-amber-500/30 text-amber-300 text-xs font-medium rounded-xl p-4 flex flex-col gap-2">
+                  <p className="font-bold">⚠️ Límite de miembros alcanzado ({congregados.length}/{memberLimit})</p>
+                  <p className="text-zinc-400">Has alcanzado el cupo máximo de tu plan actual. Para registrar más congregados, mejora tu suscripción.</p>
+                  <Link to="/configuracion/suscripcion" className="text-emerald-400 font-bold hover:underline inline-flex items-center gap-1 mt-1">
+                    Ver planes y mejorar suscripción →
+                  </Link>
+                </div>
+              )}
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
                   <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Nombre *</label>

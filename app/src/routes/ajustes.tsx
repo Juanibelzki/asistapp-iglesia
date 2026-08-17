@@ -192,12 +192,20 @@ function AjustesPage() {
             <h1 className="text-3xl font-extrabold text-white tracking-tight">Configuración y Branding</h1>
             <p className="text-sm text-zinc-400 mt-1">Personalizá la identidad de tu iglesia y la credencial digital.</p>
           </div>
-          <Link
-            to="/dashboard"
-            className="text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-800 px-3 py-1.5 rounded-lg transition"
-          >
-            ← Volver al Dashboard
-          </Link>
+          <div className="flex items-center gap-2">
+            <Link
+              to="/configuracion/suscripcion"
+              className="text-xs font-bold text-emerald-400 bg-emerald-500/10 hover:bg-emerald-500/20 border border-emerald-500/30 px-3 py-2 rounded-xl transition flex items-center gap-1.5"
+            >
+              💳 Planes y Suscripción
+            </Link>
+            <Link
+              to="/dashboard"
+              className="text-xs text-zinc-400 hover:text-zinc-200 border border-zinc-800 px-3 py-2 rounded-xl transition"
+            >
+              ← Volver al Dashboard
+            </Link>
+          </div>
         </div>
 
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 items-start">

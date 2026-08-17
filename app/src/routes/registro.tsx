@@ -153,6 +153,25 @@ function RegistroPage() {
     setSubmitting(true);
     setFormError('');
     try {
+      // Check quota limit
+      const { count } = await supabase
+        .from('congregados')
+        .select('*', { count: 'exact', head: true })
+        .eq('organization_id', selectedChurchId);
+
+      const { data: orgData } = await supabase
+        .from('organizations')
+        .select('member_limit')
+        .eq('id', selectedChurchId)
+        .maybeSingle();
+
+      const limit = orgData?.member_limit ?? 50;
+      if (count !== null && count >= limit) {
+        setFormError('Esta congregación ha alcanzado el límite de miembros de su plan actual. Por favor contacte al pastor o administrador.');
+        setSubmitting(false);
+        return;
+      }
+
       const generatedQr = crypto.randomUUID();
 
       const { data: insertedRows, error } = await supabase
