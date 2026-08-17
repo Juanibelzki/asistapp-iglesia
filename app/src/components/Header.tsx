@@ -1,6 +1,7 @@
 import { Link } from '@tanstack/react-router'
 import { supabase } from '../lib/supabase'
 import { useEffect, useState } from 'react'
+import { AppLogo } from './AppLogo'
 
 export default function Header() {
   const [user, setUser] = useState<any>(null)
@@ -26,9 +27,10 @@ export default function Header() {
         <h2 className="m-0 flex-shrink-0 text-base font-semibold tracking-tight">
           <Link
             to="/"
-            className="inline-flex items-center gap-2 rounded-full border border-[var(--chip-line)] bg-[var(--chip-bg)] px-3 py-1.5 text-sm text-[var(--sea-ink)] no-underline sm:px-4 sm:py-2"
+            className="inline-flex items-center gap-2 text-[var(--sea-ink)] no-underline"
           >
-            AsistApp
+            <AppLogo className="h-10 sm:h-12 w-auto object-contain" />
+            <span className="font-bold text-sm sm:text-base">Centro Cristiano Conexión-Ctes.</span>
           </Link>
         </h2>
 

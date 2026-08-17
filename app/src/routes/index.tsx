@@ -2,13 +2,13 @@ import { useEffect, useState } from 'react'
 import { createFileRoute, Link } from '@tanstack/react-router'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Reveal } from '../components/Reveal'
+import { AppLogo } from '../components/AppLogo'
 import {
   QrCode,
   WifiOff,
   BarChart3,
   ArrowRight,
   Check,
-  Church,
   BadgeCheck,
   CircleCheck,
   AlertTriangle,
@@ -26,9 +26,7 @@ export const Route = createFileRoute('/')({
 function LogoMark() {
   return (
     <div className="flex items-center gap-2.5">
-      <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-400 to-indigo-500 flex items-center justify-center shadow-lg shadow-emerald-500/20 shrink-0">
-        <Church className="w-5 h-5 text-zinc-950" />
-      </div>
+      <AppLogo className="h-10 w-auto object-contain" />
       <span className="text-lg font-extrabold tracking-tight text-white">
         Asist<span className="text-emerald-400">App</span>
       </span>

@@ -1,6 +1,7 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { AppLogo } from '../components/AppLogo';
 
 export const Route = createFileRoute('/registerstaff')({
   component: RegisterStaffPage,
@@ -232,11 +233,7 @@ function RegisterStaffPage() {
     <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col font-sans">
       <main className="flex-1 w-full max-w-md mx-auto px-4 sm:px-6 space-y-6 pb-10">
         <div className="flex flex-col items-center text-center gap-3 pt-6">
-          <div className="w-16 h-16 rounded-2xl bg-emerald-500 flex items-center justify-center text-zinc-950 font-black text-2xl shadow-lg shadow-emerald-500/20">
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-            </svg>
-          </div>
+          <AppLogo className="h-20 w-auto mx-auto object-contain" />
           <div>
             <h1 className="text-xl font-extrabold text-white tracking-tight">Sumate al equipo</h1>
             <p className="text-sm text-zinc-400 mt-1">

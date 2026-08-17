@@ -2,6 +2,7 @@ import { createFileRoute } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { QRCodeSVG } from 'qrcode.react';
+import { AppLogo } from '../components/AppLogo';
 
 export const Route = createFileRoute('/portal')({
   component: PortalPage,
@@ -216,9 +217,7 @@ function PortalPage() {
       <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-6 font-sans">
         <div className="w-full max-w-md space-y-6">
           <div className="flex items-center gap-2.5 justify-center">
-            <div className="w-10 h-10 rounded-xl bg-emerald-500 flex items-center justify-center text-zinc-950 font-black text-lg shadow-lg shadow-emerald-500/20">
-              A
-            </div>
+            <AppLogo className="h-10 w-auto object-contain" />
             <span className="text-2xl font-extrabold tracking-tight text-white">
               Asist<span className="text-emerald-400">App</span>
             </span>

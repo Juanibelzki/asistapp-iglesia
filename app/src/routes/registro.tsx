@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { QRCodeSVG } from 'qrcode.react';
+import { AppLogo } from '../components/AppLogo';
 
 export const Route = createFileRoute('/registro')({
   component: RegistroPage,
@@ -221,9 +222,7 @@ function RegistroPage() {
               className="w-16 h-16 rounded-2xl object-cover border border-zinc-700 bg-zinc-900"
             />
           ) : (
-            <div className="w-16 h-16 rounded-2xl bg-emerald-500 flex items-center justify-center text-zinc-950 font-black text-2xl shadow-lg shadow-emerald-500/20">
-              {(selectedChurch?.name || 'A').charAt(0).toUpperCase()}
-            </div>
+            <AppLogo className="h-16 sm:h-20 w-auto mx-auto object-contain" />
           )}
           <div>
             <h1 className="text-xl font-extrabold text-white tracking-tight">
