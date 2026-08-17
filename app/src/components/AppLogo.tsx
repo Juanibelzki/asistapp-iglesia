@@ -1,4 +1,4 @@
-import logoUrl from '../assets/logo.png'
+import logoUrl from '../assets/logo.jpeg'
 
 interface AppLogoProps {
   className?: string
