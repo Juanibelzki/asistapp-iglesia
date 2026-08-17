@@ -26,7 +26,9 @@ export const Route = createFileRoute('/')({
 function LogoMark() {
   return (
     <div className="flex items-center gap-2.5">
-      <AppLogo className="h-10 w-auto object-contain" />
+      <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 flex items-center justify-center overflow-hidden shadow-lg shadow-emerald-500/10 shrink-0 p-1">
+        <AppLogo className="w-full h-full object-contain" />
+      </div>
       <span className="text-lg font-extrabold tracking-tight text-white">
         Asist<span className="text-emerald-400">App</span>
       </span>

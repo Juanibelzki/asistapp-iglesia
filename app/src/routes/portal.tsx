@@ -217,7 +217,9 @@ function PortalPage() {
       <div className="min-h-screen bg-zinc-950 text-zinc-100 flex flex-col items-center justify-center p-6 font-sans">
         <div className="w-full max-w-md space-y-6">
           <div className="flex items-center gap-2.5 justify-center">
-            <AppLogo className="h-10 w-auto object-contain" />
+            <div className="w-10 h-10 rounded-xl bg-zinc-900 border border-white/10 flex items-center justify-center overflow-hidden shadow-lg shadow-emerald-500/10 shrink-0 p-1">
+              <AppLogo className="w-full h-full object-contain" />
+            </div>
             <span className="text-2xl font-extrabold tracking-tight text-white">
               Asist<span className="text-emerald-400">App</span>
             </span>
