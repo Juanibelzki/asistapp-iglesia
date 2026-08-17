@@ -3,6 +3,7 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { AnimatePresence, motion } from 'framer-motion'
 import { Reveal } from '../components/Reveal'
 import { AppLogo } from '../components/AppLogo'
+import Footer from '../components/Footer'
 import {
   QrCode,
   WifiOff,
@@ -725,6 +726,8 @@ function LandingPage() {
           </div>
         </Reveal>
       </section>
+
+      <Footer />
     </div>
   )
 }

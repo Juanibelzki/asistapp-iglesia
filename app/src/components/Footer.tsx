@@ -2,14 +2,31 @@ import { Link } from '@tanstack/react-router'
 
 export default function Footer() {
   return (
-    <footer className="mt-20 border-t border-[var(--line)] px-4 pb-14 pt-10 text-[var(--sea-ink-soft)]">
-      <div className="page-wrap flex flex-col items-center justify-between gap-4 text-center sm:flex-row sm:text-left">
-        <p className="m-0 text-sm">
-          &copy; 2026 AsistApp. Todos los derechos reservados.
-        </p>
-        <div className="flex gap-4">
-          <Link to="/privacidad" className="nav-link text-sm">Privacidad</Link>
+    <footer className="bg-slate-900/80 border-t border-white/10 text-white/70 py-6 text-center text-sm">
+      <div className="max-w-6xl mx-auto px-6 flex flex-col items-center gap-4">
+        <div className="space-y-1">
+          <p>
+            Desarrollado por <span className="font-semibold text-white">Juan Ignacio Belzki</span>
+          </p>
+          <p className="text-xs text-white/50">Desarrollo de Software & Soluciones Web</p>
+          <p>
+            <a
+              href="mailto:juanignaciobelzki20@gmail.com"
+              className="hover:text-emerald-400 underline transition-colors"
+            >
+              juanignaciobelzki20@gmail.com
+            </a>
+          </p>
         </div>
+        <div className="flex flex-wrap items-center justify-center gap-4">
+          <Link to="/terminos" className="hover:text-white transition-colors">
+            Términos y Condiciones
+          </Link>
+          <Link to="/privacidad" className="hover:text-white transition-colors">
+            Política de Privacidad
+          </Link>
+        </div>
+        <p className="text-xs text-white/40">&copy; 2026 AsistApp. Todos los derechos reservados.</p>
       </div>
     </footer>
   )

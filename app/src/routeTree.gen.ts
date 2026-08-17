@@ -26,6 +26,7 @@ import { Route as RegisterCongregacionRouteImport } from './routes/registerCongr
 import { Route as RegisterstaffRouteImport } from './routes/registerstaff'
 import { Route as RegistroRouteImport } from './routes/registro'
 import { Route as SuscripcionRouteImport } from './routes/suscripcion'
+import { Route as TerminosRouteImport } from './routes/terminos'
 import { Route as EventosEventIdAsistenciaRouteImport } from './routes/eventos.$eventId.asistencia'
 import { Route as EventosEventIdQrRouteImport } from './routes/eventos.$eventId.qr'
 
@@ -114,6 +115,11 @@ const SuscripcionRoute = SuscripcionRouteImport.update({
   path: '/suscripcion',
   getParentRoute: () => rootRouteImport,
 } as any)
+const TerminosRoute = TerminosRouteImport.update({
+  id: '/terminos',
+  path: '/terminos',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const EventosEventIdAsistenciaRoute =
   EventosEventIdAsistenciaRouteImport.update({
     id: '/$eventId/asistencia',
@@ -144,6 +150,7 @@ export interface FileRoutesByFullPath {
   '/registerstaff': typeof RegisterstaffRoute
   '/registro': typeof RegistroRoute
   '/suscripcion': typeof SuscripcionRoute
+  '/terminos': typeof TerminosRoute
   '/eventos/$eventId/asistencia': typeof EventosEventIdAsistenciaRoute
   '/eventos/$eventId/qr': typeof EventosEventIdQrRoute
 }
@@ -165,6 +172,7 @@ export interface FileRoutesByTo {
   '/registerstaff': typeof RegisterstaffRoute
   '/registro': typeof RegistroRoute
   '/suscripcion': typeof SuscripcionRoute
+  '/terminos': typeof TerminosRoute
   '/eventos/$eventId/asistencia': typeof EventosEventIdAsistenciaRoute
   '/eventos/$eventId/qr': typeof EventosEventIdQrRoute
 }
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/registerstaff': typeof RegisterstaffRoute
   '/registro': typeof RegistroRoute
   '/suscripcion': typeof SuscripcionRoute
+  '/terminos': typeof TerminosRoute
   '/eventos/$eventId/asistencia': typeof EventosEventIdAsistenciaRoute
   '/eventos/$eventId/qr': typeof EventosEventIdQrRoute
 }
@@ -210,6 +219,7 @@ export interface FileRouteTypes {
     | '/registerstaff'
     | '/registro'
     | '/suscripcion'
+    | '/terminos'
     | '/eventos/$eventId/asistencia'
     | '/eventos/$eventId/qr'
   fileRoutesByTo: FileRoutesByTo
@@ -231,6 +241,7 @@ export interface FileRouteTypes {
     | '/registerstaff'
     | '/registro'
     | '/suscripcion'
+    | '/terminos'
     | '/eventos/$eventId/asistencia'
     | '/eventos/$eventId/qr'
   id:
@@ -252,6 +263,7 @@ export interface FileRouteTypes {
     | '/registerstaff'
     | '/registro'
     | '/suscripcion'
+    | '/terminos'
     | '/eventos/$eventId/asistencia'
     | '/eventos/$eventId/qr'
   fileRoutesById: FileRoutesById
@@ -274,6 +286,7 @@ export interface RootRouteChildren {
   RegisterstaffRoute: typeof RegisterstaffRoute
   RegistroRoute: typeof RegistroRoute
   SuscripcionRoute: typeof SuscripcionRoute
+  TerminosRoute: typeof TerminosRoute
 }
 
 declare module '@tanstack/react-router' {
@@ -397,6 +410,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof SuscripcionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/terminos': {
+      id: '/terminos'
+      path: '/terminos'
+      fullPath: '/terminos'
+      preLoaderRoute: typeof TerminosRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/eventos/$eventId/asistencia': {
       id: '/eventos/$eventId/asistencia'
       path: '/$eventId/asistencia'
@@ -445,6 +465,7 @@ const rootRouteChildren: RootRouteChildren = {
   RegisterstaffRoute: RegisterstaffRoute,
   RegistroRoute: RegistroRoute,
   SuscripcionRoute: SuscripcionRoute,
+  TerminosRoute: TerminosRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
