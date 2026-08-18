@@ -25,10 +25,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           name="viewport"
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
         />
-        <link rel="icon" type="image/png" href="/favicon.png?v=2" />
-        <link rel="shortcut icon" href="/favicon.png?v=2" />
+        <link rel="icon" type="image/png" href="/favicon.png?v=3" />
+        <link rel="shortcut icon" href="/favicon.png?v=3" />
         <link rel="alternate icon" href="/favicon.ico" />
-        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=2" />
+        <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png?v=3" />
         <meta name="theme-color" content="#0b0f17" />
         <title>Ecclesiahs — Plataforma de Gestión y Asistencia Eclesial</title>
         <meta name="apple-mobile-web-app-title" content="Ecclesiahs" />
