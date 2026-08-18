@@ -26,8 +26,12 @@ function RootDocument({ children }: { children: React.ReactNode }) {
           content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
         />
         <link rel="manifest" href="/manifest.json" />
+        <link rel="icon" type="image/png" href="/favicon.png" />
+        <link rel="alternate icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="theme-color" content="#0b0f17" />
-        <link rel="apple-touch-icon" href="/pwa-192x192.png" />
+        <meta name="apple-mobile-web-app-title" content="AsistApp" />
+        <meta name="application-name" content="AsistApp" />
         <HeadContent />
       </head>
       <body className="min-h-screen bg-[#0B0F17] text-zinc-100 font-sans antialiased flex flex-col w-full max-w-full overflow-x-hidden box-border">
