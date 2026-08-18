@@ -125,7 +125,9 @@ function Login() {
         className="bg-[#141C2B] border border-slate-700/50 p-6 sm:p-8 rounded-3xl w-full max-w-md shadow-2xl shadow-black/40"
       >
         <div className="flex flex-col items-center text-center mb-6">
-          <AppLogo className="h-20 w-auto mx-auto mb-6 object-contain" />
+          <div className="mx-auto mb-6 flex h-20 w-20 items-center justify-center rounded-2xl bg-[#0B0F17]/80 border border-slate-700/60 p-2 shadow-inner">
+            <AppLogo className="h-full w-full object-contain" />
+          </div>
           <h1 className="text-2xl font-bold text-white tracking-tight">Bienvenido a Ecclesiahs</h1>
           <p className="text-sm text-zinc-400 mt-1">Accedé con tu teléfono y PIN de equipo</p>
         </div>

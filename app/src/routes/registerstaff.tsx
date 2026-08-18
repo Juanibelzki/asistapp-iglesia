@@ -233,7 +233,9 @@ function RegisterStaffPage() {
     <div className="min-h-screen bg-[#0B0F17] text-zinc-100 flex flex-col font-sans">
       <main className="flex-1 w-full max-w-md mx-auto px-4 sm:px-6 space-y-6 pb-10">
         <div className="flex flex-col items-center text-center gap-3 pt-6">
-          <AppLogo className="h-20 w-auto mx-auto object-contain" />
+          <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-2xl bg-[#0B0F17]/80 border border-slate-700/60 p-2 shadow-inner">
+            <AppLogo className="h-full w-full object-contain" />
+          </div>
           <div>
             <h1 className="text-xl font-extrabold text-white tracking-tight">Sumate al equipo</h1>
             <p className="text-sm text-zinc-400 mt-1">

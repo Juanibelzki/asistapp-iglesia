@@ -241,7 +241,9 @@ function RegistroPage() {
               className="w-16 h-16 rounded-2xl object-cover border border-zinc-700 bg-zinc-900"
             />
           ) : (
-            <AppLogo className="h-16 sm:h-20 w-auto mx-auto object-contain" />
+            <div className="mx-auto flex h-16 w-16 sm:h-20 sm:w-20 items-center justify-center rounded-2xl bg-[#0B0F17]/80 border border-slate-700/60 p-2 shadow-inner">
+              <AppLogo className="h-full w-full object-contain" />
+            </div>
           )}
           <div>
             <p className="text-[11px] text-zinc-500 font-mono uppercase tracking-widest mb-1">Bienvenido a Ecclesiahs</p>
