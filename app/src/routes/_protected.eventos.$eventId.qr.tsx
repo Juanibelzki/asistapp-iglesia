@@ -1,7 +1,8 @@
 import { createFileRoute } from '@tanstack/react-router'
 import { QRCodeSVG } from 'qrcode.react'
 
-export const Route = createFileRoute('/eventos/$eventId/qr')({
+export const Route = createFileRoute('/_protected/eventos/$eventId/qr')({
+
   component: QrPage,
 })
 

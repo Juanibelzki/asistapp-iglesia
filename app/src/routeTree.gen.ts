@@ -10,29 +10,34 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as ProtectedRouteImport } from './routes/_protected'
 import { Route as AboutRouteImport } from './routes/about'
-import { Route as AjustesRouteImport } from './routes/ajustes'
-import { Route as AsistenciaRouteImport } from './routes/asistencia'
 import { Route as CeoRouteImport } from './routes/ceo'
-import { Route as CongregadosRouteImport } from './routes/congregados'
-import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EscanearRouteImport } from './routes/escanear'
-import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as LoginRouteImport } from './routes/login'
-import { Route as MaterialesRouteImport } from './routes/materiales'
 import { Route as PortalRouteImport } from './routes/portal'
 import { Route as PrivacidadRouteImport } from './routes/privacidad'
 import { Route as RegisterCongregacionRouteImport } from './routes/registerCongregacion'
 import { Route as RegisterstaffRouteImport } from './routes/registerstaff'
 import { Route as RegistroRouteImport } from './routes/registro'
-import { Route as SuscripcionRouteImport } from './routes/suscripcion'
 import { Route as TerminosRouteImport } from './routes/terminos'
-import { Route as EventosEventIdAsistenciaRouteImport } from './routes/eventos.$eventId.asistencia'
-import { Route as EventosEventIdQrRouteImport } from './routes/eventos.$eventId.qr'
+import { Route as ProtectedAjustesRouteImport } from './routes/_protected.ajustes'
+import { Route as ProtectedAsistenciaRouteImport } from './routes/_protected.asistencia'
+import { Route as ProtectedCongregadosRouteImport } from './routes/_protected.congregados'
+import { Route as ProtectedDashboardRouteImport } from './routes/_protected.dashboard'
+import { Route as ProtectedEventosRouteImport } from './routes/_protected.eventos'
+import { Route as ProtectedMaterialesRouteImport } from './routes/_protected.materiales'
+import { Route as ProtectedSuscripcionRouteImport } from './routes/_protected.suscripcion'
+import { Route as ProtectedEventosEventIdAsistenciaRouteImport } from './routes/_protected.eventos.$eventId.asistencia'
+import { Route as ProtectedEventosEventIdQrRouteImport } from './routes/_protected.eventos.$eventId.qr'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProtectedRoute = ProtectedRouteImport.update({
+  id: '/_protected',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -40,29 +45,9 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AjustesRoute = AjustesRouteImport.update({
-  id: '/ajustes',
-  path: '/ajustes',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const AsistenciaRoute = AsistenciaRouteImport.update({
-  id: '/asistencia',
-  path: '/asistencia',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const CeoRoute = CeoRouteImport.update({
   id: '/ceo',
   path: '/ceo',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CongregadosRoute = CongregadosRouteImport.update({
-  id: '/congregados',
-  path: '/congregados',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EscanearRoute = EscanearRouteImport.update({
@@ -70,19 +55,9 @@ const EscanearRoute = EscanearRouteImport.update({
   path: '/escanear',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EventosRoute = EventosRouteImport.update({
-  id: '/eventos',
-  path: '/eventos',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const MaterialesRoute = MaterialesRouteImport.update({
-  id: '/materiales',
-  path: '/materiales',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortalRoute = PortalRouteImport.update({
@@ -110,182 +85,209 @@ const RegistroRoute = RegistroRouteImport.update({
   path: '/registro',
   getParentRoute: () => rootRouteImport,
 } as any)
-const SuscripcionRoute = SuscripcionRouteImport.update({
-  id: '/suscripcion',
-  path: '/suscripcion',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const TerminosRoute = TerminosRouteImport.update({
   id: '/terminos',
   path: '/terminos',
   getParentRoute: () => rootRouteImport,
 } as any)
-const EventosEventIdAsistenciaRoute =
-  EventosEventIdAsistenciaRouteImport.update({
+const ProtectedAjustesRoute = ProtectedAjustesRouteImport.update({
+  id: '/ajustes',
+  path: '/ajustes',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedAsistenciaRoute = ProtectedAsistenciaRouteImport.update({
+  id: '/asistencia',
+  path: '/asistencia',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedCongregadosRoute = ProtectedCongregadosRouteImport.update({
+  id: '/congregados',
+  path: '/congregados',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedDashboardRoute = ProtectedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedEventosRoute = ProtectedEventosRouteImport.update({
+  id: '/eventos',
+  path: '/eventos',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedMaterialesRoute = ProtectedMaterialesRouteImport.update({
+  id: '/materiales',
+  path: '/materiales',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedSuscripcionRoute = ProtectedSuscripcionRouteImport.update({
+  id: '/suscripcion',
+  path: '/suscripcion',
+  getParentRoute: () => ProtectedRoute,
+} as any)
+const ProtectedEventosEventIdAsistenciaRoute =
+  ProtectedEventosEventIdAsistenciaRouteImport.update({
     id: '/$eventId/asistencia',
     path: '/$eventId/asistencia',
-    getParentRoute: () => EventosRoute,
+    getParentRoute: () => ProtectedEventosRoute,
   } as any)
-const EventosEventIdQrRoute = EventosEventIdQrRouteImport.update({
-  id: '/$eventId/qr',
-  path: '/$eventId/qr',
-  getParentRoute: () => EventosRoute,
-} as any)
+const ProtectedEventosEventIdQrRoute =
+  ProtectedEventosEventIdQrRouteImport.update({
+    id: '/$eventId/qr',
+    path: '/$eventId/qr',
+    getParentRoute: () => ProtectedEventosRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/ajustes': typeof AjustesRoute
-  '/asistencia': typeof AsistenciaRoute
   '/ceo': typeof CeoRoute
-  '/congregados': typeof CongregadosRoute
-  '/dashboard': typeof DashboardRoute
   '/escanear': typeof EscanearRoute
-  '/eventos': typeof EventosRouteWithChildren
   '/login': typeof LoginRoute
-  '/materiales': typeof MaterialesRoute
   '/portal': typeof PortalRoute
   '/privacidad': typeof PrivacidadRoute
   '/registerCongregacion': typeof RegisterCongregacionRoute
   '/registerstaff': typeof RegisterstaffRoute
   '/registro': typeof RegistroRoute
-  '/suscripcion': typeof SuscripcionRoute
   '/terminos': typeof TerminosRoute
-  '/eventos/$eventId/asistencia': typeof EventosEventIdAsistenciaRoute
-  '/eventos/$eventId/qr': typeof EventosEventIdQrRoute
+  '/ajustes': typeof ProtectedAjustesRoute
+  '/asistencia': typeof ProtectedAsistenciaRoute
+  '/congregados': typeof ProtectedCongregadosRoute
+  '/dashboard': typeof ProtectedDashboardRoute
+  '/eventos': typeof ProtectedEventosRouteWithChildren
+  '/materiales': typeof ProtectedMaterialesRoute
+  '/suscripcion': typeof ProtectedSuscripcionRoute
+  '/eventos/$eventId/asistencia': typeof ProtectedEventosEventIdAsistenciaRoute
+  '/eventos/$eventId/qr': typeof ProtectedEventosEventIdQrRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/ajustes': typeof AjustesRoute
-  '/asistencia': typeof AsistenciaRoute
   '/ceo': typeof CeoRoute
-  '/congregados': typeof CongregadosRoute
-  '/dashboard': typeof DashboardRoute
   '/escanear': typeof EscanearRoute
-  '/eventos': typeof EventosRouteWithChildren
   '/login': typeof LoginRoute
-  '/materiales': typeof MaterialesRoute
   '/portal': typeof PortalRoute
   '/privacidad': typeof PrivacidadRoute
   '/registerCongregacion': typeof RegisterCongregacionRoute
   '/registerstaff': typeof RegisterstaffRoute
   '/registro': typeof RegistroRoute
-  '/suscripcion': typeof SuscripcionRoute
   '/terminos': typeof TerminosRoute
-  '/eventos/$eventId/asistencia': typeof EventosEventIdAsistenciaRoute
-  '/eventos/$eventId/qr': typeof EventosEventIdQrRoute
+  '/ajustes': typeof ProtectedAjustesRoute
+  '/asistencia': typeof ProtectedAsistenciaRoute
+  '/congregados': typeof ProtectedCongregadosRoute
+  '/dashboard': typeof ProtectedDashboardRoute
+  '/eventos': typeof ProtectedEventosRouteWithChildren
+  '/materiales': typeof ProtectedMaterialesRoute
+  '/suscripcion': typeof ProtectedSuscripcionRoute
+  '/eventos/$eventId/asistencia': typeof ProtectedEventosEventIdAsistenciaRoute
+  '/eventos/$eventId/qr': typeof ProtectedEventosEventIdQrRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_protected': typeof ProtectedRouteWithChildren
   '/about': typeof AboutRoute
-  '/ajustes': typeof AjustesRoute
-  '/asistencia': typeof AsistenciaRoute
   '/ceo': typeof CeoRoute
-  '/congregados': typeof CongregadosRoute
-  '/dashboard': typeof DashboardRoute
   '/escanear': typeof EscanearRoute
-  '/eventos': typeof EventosRouteWithChildren
   '/login': typeof LoginRoute
-  '/materiales': typeof MaterialesRoute
   '/portal': typeof PortalRoute
   '/privacidad': typeof PrivacidadRoute
   '/registerCongregacion': typeof RegisterCongregacionRoute
   '/registerstaff': typeof RegisterstaffRoute
   '/registro': typeof RegistroRoute
-  '/suscripcion': typeof SuscripcionRoute
   '/terminos': typeof TerminosRoute
-  '/eventos/$eventId/asistencia': typeof EventosEventIdAsistenciaRoute
-  '/eventos/$eventId/qr': typeof EventosEventIdQrRoute
+  '/_protected/ajustes': typeof ProtectedAjustesRoute
+  '/_protected/asistencia': typeof ProtectedAsistenciaRoute
+  '/_protected/congregados': typeof ProtectedCongregadosRoute
+  '/_protected/dashboard': typeof ProtectedDashboardRoute
+  '/_protected/eventos': typeof ProtectedEventosRouteWithChildren
+  '/_protected/materiales': typeof ProtectedMaterialesRoute
+  '/_protected/suscripcion': typeof ProtectedSuscripcionRoute
+  '/_protected/eventos/$eventId/asistencia': typeof ProtectedEventosEventIdAsistenciaRoute
+  '/_protected/eventos/$eventId/qr': typeof ProtectedEventosEventIdQrRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
-    | '/ajustes'
-    | '/asistencia'
     | '/ceo'
-    | '/congregados'
-    | '/dashboard'
     | '/escanear'
-    | '/eventos'
     | '/login'
-    | '/materiales'
     | '/portal'
     | '/privacidad'
     | '/registerCongregacion'
     | '/registerstaff'
     | '/registro'
-    | '/suscripcion'
     | '/terminos'
+    | '/ajustes'
+    | '/asistencia'
+    | '/congregados'
+    | '/dashboard'
+    | '/eventos'
+    | '/materiales'
+    | '/suscripcion'
     | '/eventos/$eventId/asistencia'
     | '/eventos/$eventId/qr'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
-    | '/ajustes'
-    | '/asistencia'
     | '/ceo'
-    | '/congregados'
-    | '/dashboard'
     | '/escanear'
-    | '/eventos'
     | '/login'
-    | '/materiales'
     | '/portal'
     | '/privacidad'
     | '/registerCongregacion'
     | '/registerstaff'
     | '/registro'
-    | '/suscripcion'
     | '/terminos'
+    | '/ajustes'
+    | '/asistencia'
+    | '/congregados'
+    | '/dashboard'
+    | '/eventos'
+    | '/materiales'
+    | '/suscripcion'
     | '/eventos/$eventId/asistencia'
     | '/eventos/$eventId/qr'
   id:
     | '__root__'
     | '/'
+    | '/_protected'
     | '/about'
-    | '/ajustes'
-    | '/asistencia'
     | '/ceo'
-    | '/congregados'
-    | '/dashboard'
     | '/escanear'
-    | '/eventos'
     | '/login'
-    | '/materiales'
     | '/portal'
     | '/privacidad'
     | '/registerCongregacion'
     | '/registerstaff'
     | '/registro'
-    | '/suscripcion'
     | '/terminos'
-    | '/eventos/$eventId/asistencia'
-    | '/eventos/$eventId/qr'
+    | '/_protected/ajustes'
+    | '/_protected/asistencia'
+    | '/_protected/congregados'
+    | '/_protected/dashboard'
+    | '/_protected/eventos'
+    | '/_protected/materiales'
+    | '/_protected/suscripcion'
+    | '/_protected/eventos/$eventId/asistencia'
+    | '/_protected/eventos/$eventId/qr'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  ProtectedRoute: typeof ProtectedRouteWithChildren
   AboutRoute: typeof AboutRoute
-  AjustesRoute: typeof AjustesRoute
-  AsistenciaRoute: typeof AsistenciaRoute
   CeoRoute: typeof CeoRoute
-  CongregadosRoute: typeof CongregadosRoute
-  DashboardRoute: typeof DashboardRoute
   EscanearRoute: typeof EscanearRoute
-  EventosRoute: typeof EventosRouteWithChildren
   LoginRoute: typeof LoginRoute
-  MaterialesRoute: typeof MaterialesRoute
   PortalRoute: typeof PortalRoute
   PrivacidadRoute: typeof PrivacidadRoute
   RegisterCongregacionRoute: typeof RegisterCongregacionRoute
   RegisterstaffRoute: typeof RegisterstaffRoute
   RegistroRoute: typeof RegistroRoute
-  SuscripcionRoute: typeof SuscripcionRoute
   TerminosRoute: typeof TerminosRoute
 }
 
@@ -298,25 +300,18 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_protected': {
+      id: '/_protected'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof ProtectedRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/about': {
       id: '/about'
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/ajustes': {
-      id: '/ajustes'
-      path: '/ajustes'
-      fullPath: '/ajustes'
-      preLoaderRoute: typeof AjustesRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/asistencia': {
-      id: '/asistencia'
-      path: '/asistencia'
-      fullPath: '/asistencia'
-      preLoaderRoute: typeof AsistenciaRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/ceo': {
@@ -326,20 +321,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof CeoRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/congregados': {
-      id: '/congregados'
-      path: '/congregados'
-      fullPath: '/congregados'
-      preLoaderRoute: typeof CongregadosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/escanear': {
       id: '/escanear'
       path: '/escanear'
@@ -347,25 +328,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof EscanearRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/eventos': {
-      id: '/eventos'
-      path: '/eventos'
-      fullPath: '/eventos'
-      preLoaderRoute: typeof EventosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/materiales': {
-      id: '/materiales'
-      path: '/materiales'
-      fullPath: '/materiales'
-      preLoaderRoute: typeof MaterialesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portal': {
@@ -403,13 +370,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegistroRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/suscripcion': {
-      id: '/suscripcion'
-      path: '/suscripcion'
-      fullPath: '/suscripcion'
-      preLoaderRoute: typeof SuscripcionRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/terminos': {
       id: '/terminos'
       path: '/terminos'
@@ -417,54 +377,122 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TerminosRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/eventos/$eventId/asistencia': {
-      id: '/eventos/$eventId/asistencia'
+    '/_protected/ajustes': {
+      id: '/_protected/ajustes'
+      path: '/ajustes'
+      fullPath: '/ajustes'
+      preLoaderRoute: typeof ProtectedAjustesRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/asistencia': {
+      id: '/_protected/asistencia'
+      path: '/asistencia'
+      fullPath: '/asistencia'
+      preLoaderRoute: typeof ProtectedAsistenciaRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/congregados': {
+      id: '/_protected/congregados'
+      path: '/congregados'
+      fullPath: '/congregados'
+      preLoaderRoute: typeof ProtectedCongregadosRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/dashboard': {
+      id: '/_protected/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof ProtectedDashboardRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/eventos': {
+      id: '/_protected/eventos'
+      path: '/eventos'
+      fullPath: '/eventos'
+      preLoaderRoute: typeof ProtectedEventosRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/materiales': {
+      id: '/_protected/materiales'
+      path: '/materiales'
+      fullPath: '/materiales'
+      preLoaderRoute: typeof ProtectedMaterialesRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/suscripcion': {
+      id: '/_protected/suscripcion'
+      path: '/suscripcion'
+      fullPath: '/suscripcion'
+      preLoaderRoute: typeof ProtectedSuscripcionRouteImport
+      parentRoute: typeof ProtectedRoute
+    }
+    '/_protected/eventos/$eventId/asistencia': {
+      id: '/_protected/eventos/$eventId/asistencia'
       path: '/$eventId/asistencia'
       fullPath: '/eventos/$eventId/asistencia'
-      preLoaderRoute: typeof EventosEventIdAsistenciaRouteImport
-      parentRoute: typeof EventosRoute
+      preLoaderRoute: typeof ProtectedEventosEventIdAsistenciaRouteImport
+      parentRoute: typeof ProtectedEventosRoute
     }
-    '/eventos/$eventId/qr': {
-      id: '/eventos/$eventId/qr'
+    '/_protected/eventos/$eventId/qr': {
+      id: '/_protected/eventos/$eventId/qr'
       path: '/$eventId/qr'
       fullPath: '/eventos/$eventId/qr'
-      preLoaderRoute: typeof EventosEventIdQrRouteImport
-      parentRoute: typeof EventosRoute
+      preLoaderRoute: typeof ProtectedEventosEventIdQrRouteImport
+      parentRoute: typeof ProtectedEventosRoute
     }
   }
 }
 
-interface EventosRouteChildren {
-  EventosEventIdAsistenciaRoute: typeof EventosEventIdAsistenciaRoute
-  EventosEventIdQrRoute: typeof EventosEventIdQrRoute
+interface ProtectedEventosRouteChildren {
+  ProtectedEventosEventIdAsistenciaRoute: typeof ProtectedEventosEventIdAsistenciaRoute
+  ProtectedEventosEventIdQrRoute: typeof ProtectedEventosEventIdQrRoute
 }
 
-const EventosRouteChildren: EventosRouteChildren = {
-  EventosEventIdAsistenciaRoute: EventosEventIdAsistenciaRoute,
-  EventosEventIdQrRoute: EventosEventIdQrRoute,
+const ProtectedEventosRouteChildren: ProtectedEventosRouteChildren = {
+  ProtectedEventosEventIdAsistenciaRoute:
+    ProtectedEventosEventIdAsistenciaRoute,
+  ProtectedEventosEventIdQrRoute: ProtectedEventosEventIdQrRoute,
 }
 
-const EventosRouteWithChildren =
-  EventosRoute._addFileChildren(EventosRouteChildren)
+const ProtectedEventosRouteWithChildren =
+  ProtectedEventosRoute._addFileChildren(ProtectedEventosRouteChildren)
+
+interface ProtectedRouteChildren {
+  ProtectedAjustesRoute: typeof ProtectedAjustesRoute
+  ProtectedAsistenciaRoute: typeof ProtectedAsistenciaRoute
+  ProtectedCongregadosRoute: typeof ProtectedCongregadosRoute
+  ProtectedDashboardRoute: typeof ProtectedDashboardRoute
+  ProtectedEventosRoute: typeof ProtectedEventosRouteWithChildren
+  ProtectedMaterialesRoute: typeof ProtectedMaterialesRoute
+  ProtectedSuscripcionRoute: typeof ProtectedSuscripcionRoute
+}
+
+const ProtectedRouteChildren: ProtectedRouteChildren = {
+  ProtectedAjustesRoute: ProtectedAjustesRoute,
+  ProtectedAsistenciaRoute: ProtectedAsistenciaRoute,
+  ProtectedCongregadosRoute: ProtectedCongregadosRoute,
+  ProtectedDashboardRoute: ProtectedDashboardRoute,
+  ProtectedEventosRoute: ProtectedEventosRouteWithChildren,
+  ProtectedMaterialesRoute: ProtectedMaterialesRoute,
+  ProtectedSuscripcionRoute: ProtectedSuscripcionRoute,
+}
+
+const ProtectedRouteWithChildren = ProtectedRoute._addFileChildren(
+  ProtectedRouteChildren,
+)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  ProtectedRoute: ProtectedRouteWithChildren,
   AboutRoute: AboutRoute,
-  AjustesRoute: AjustesRoute,
-  AsistenciaRoute: AsistenciaRoute,
   CeoRoute: CeoRoute,
-  CongregadosRoute: CongregadosRoute,
-  DashboardRoute: DashboardRoute,
   EscanearRoute: EscanearRoute,
-  EventosRoute: EventosRouteWithChildren,
   LoginRoute: LoginRoute,
-  MaterialesRoute: MaterialesRoute,
   PortalRoute: PortalRoute,
   PrivacidadRoute: PrivacidadRoute,
   RegisterCongregacionRoute: RegisterCongregacionRoute,
   RegisterstaffRoute: RegisterstaffRoute,
   RegistroRoute: RegistroRoute,
-  SuscripcionRoute: SuscripcionRoute,
   TerminosRoute: TerminosRoute,
 }
 export const routeTree = rootRouteImport

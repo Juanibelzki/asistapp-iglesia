@@ -3,7 +3,7 @@ import { supabase } from '../lib/supabase'
 import { getEvents, getProfile, deleteEvent } from '../lib/data'
 import { useEffect, useState } from 'react'
 
-export const Route = createFileRoute('/eventos')({
+export const Route = createFileRoute('/_protected/eventos')({
   component: Eventos,
   beforeLoad: async () => {
     const { data: { session } } = await supabase.auth.getSession()

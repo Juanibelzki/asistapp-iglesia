@@ -1,11 +1,12 @@
-import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
+import { createFileRoute, redirect, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { RefreshCw, CloudOff } from 'lucide-react';
 import { supabase } from '../lib/supabase';
 import { readLocalSession } from '../lib/session';
 
-export const Route = createFileRoute('/asistencia')({
+export const Route = createFileRoute('/_protected/asistencia')({
+
   component: AsistenciaPage,
 });
 
