@@ -1,10 +1,11 @@
-import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
+import { createFileRoute, redirect, useNavigate, Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { getOrganization, getProfile } from '../lib/data'
 import { readLocalSession } from '../lib/session'
 
-export const Route = createFileRoute('/suscripcion')({
+export const Route = createFileRoute('/_protected/suscripcion')({
+
   component: SuscripcionPage,
 })
 

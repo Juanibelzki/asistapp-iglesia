@@ -3,7 +3,8 @@ import { useEffect, useState, useMemo } from 'react'
 import { supabase } from '../lib/supabase'
 import { getChildren, getAttendance, upsertAttendance, deleteAttendance, getProfile } from '../lib/data'
 
-export const Route = createFileRoute('/eventos/$eventId/asistencia')({
+export const Route = createFileRoute('/_protected/eventos/$eventId/asistencia')({
+
   component: AsistenciaPage,
 })
 

@@ -1,11 +1,16 @@
-import { createRootRoute, HeadContent, Scripts, Link } from '@tanstack/react-router';
+import { createRootRoute, HeadContent, Scripts, Link, Outlet } from '@tanstack/react-router';
 // CSS principal con Tailwind v4 (@import "tailwindcss") — imprescindible para que
 // los estilos lleguen al <head> del documento renderizado en SSR.
 import '../styles.css';
 import { PwaRegister } from '../components/PwaRegister';
+import { AuthProvider } from '../context/AuthContext';
 
 export const Route = createRootRoute({
-  shellComponent: RootDocument,
+  component: () => (
+    <RootDocument>
+      <Outlet />
+    </RootDocument>
+  ),
   notFoundComponent: () => (
     <div className="min-h-screen bg-[#0B0F17] flex flex-col items-center justify-center text-zinc-100 p-6">
       <h1 className="text-4xl font-black text-yellow-500 mb-2">404</h1>
@@ -36,8 +41,10 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <HeadContent />
       </head>
       <body className="min-h-screen bg-[#0B0F17] text-zinc-100 font-sans antialiased flex flex-col w-full max-w-full overflow-x-hidden box-border">
-        {children}
-        <PwaRegister />
+        <AuthProvider>
+          {children}
+          <PwaRegister />
+        </AuthProvider>
         <Scripts />
       </body>
     </html>
