@@ -11,7 +11,7 @@ create table organizations (
   subscription_status text not null default 'trialing' check (subscription_status in ('trialing','active','past_due','canceled')),
   created_at timestamptz not null default now()
 );
--- TODO Fase 7: activar RLS por organization_id
+-- RLS activado por organization_id (Ver supabase_rls.sql)
 
 -- Tabla profiles
 create table profiles (
@@ -23,7 +23,7 @@ create table profiles (
   role text not null default 'maestro' check (role in ('admin','maestro')),
   created_at timestamptz not null default now()
 );
--- TODO Fase 7: activar RLS por organization_id
+-- RLS activado por organization_id (Ver supabase_rls.sql)
 
 -- Tabla children
 create table children (
@@ -38,7 +38,7 @@ create table children (
   notes text,
   created_at timestamptz not null default now()
 );
--- TODO Fase 7: activar RLS por organization_id
+-- RLS activado por organization_id (Ver supabase_rls.sql)
 
 -- Tabla events
 create table events (
@@ -52,7 +52,7 @@ create table events (
   created_by uuid references profiles(id),
   created_at timestamptz not null default now()
 );
--- TODO Fase 7: activar RLS por organization_id
+-- RLS activado por organization_id (Ver supabase_rls.sql)
 
 -- Tabla attendance
 create table attendance (
@@ -64,7 +64,7 @@ create table attendance (
   status text not null default 'presente' check (status in ('presente','justificado')),
   unique (event_id, child_id)
 );
--- TODO Fase 7: activar RLS por organization_id
+-- RLS activado por organization_id (Ver supabase_rls.sql)
 
 -- Mock Data Seed
 insert into organizations (id, name, city, plan, subscription_status) 
