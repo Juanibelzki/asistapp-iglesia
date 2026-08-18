@@ -211,7 +211,7 @@ function CeoPage() {
               <h1 className="text-lg font-bold text-white truncate leading-tight">
                 Master Dashboard
               </h1>
-              <p className="text-xs text-zinc-400 truncate">Super-Administrador · AsistApp</p>
+              <p className="text-xs text-zinc-400 truncate">Super-Administrador · Ecclesiahs</p>
             </div>
           </div>
           <button

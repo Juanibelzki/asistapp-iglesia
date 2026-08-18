@@ -244,6 +244,7 @@ function RegistroPage() {
             <AppLogo className="h-16 sm:h-20 w-auto mx-auto object-contain" />
           )}
           <div>
+            <p className="text-[11px] text-zinc-500 font-mono uppercase tracking-widest mb-1">Bienvenido a Ecclesiahs</p>
             <h1 className="text-xl font-extrabold text-white tracking-tight">
               {selectedChurch?.name || 'Seleccioná tu Iglesia'}
             </h1>

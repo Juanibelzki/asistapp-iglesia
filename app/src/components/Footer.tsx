@@ -26,7 +26,7 @@ export default function Footer() {
             Política de Privacidad
           </Link>
         </div>
-        <p className="text-xs text-white/40">&copy; 2026 AsistApp. Todos los derechos reservados.</p>
+        <p className="text-xs text-white/40">&copy; 2026 Ecclesiahs. Todos los derechos reservados.</p>
       </div>
     </footer>
   )

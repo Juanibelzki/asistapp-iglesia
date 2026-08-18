@@ -86,7 +86,7 @@ function RegisterCongregacionPage() {
       const msg = err instanceof Error ? err.message : 'Error al registrar la congregación.';
       if (/row-level security|violates row-level security policy/i.test(msg)) {
         setFormError(
-          'Aún no se habilitaron los permisos para registrar congregaciones. Contactá al administrador de AsistApp para activar esta función.',
+          'Aún no se habilitaron los permisos para registrar congregaciones. Contactá al administrador de Ecclesiahs para activar esta función.',
         );
       } else {
         setFormError(msg);
@@ -109,7 +109,7 @@ function RegisterCongregacionPage() {
             </div>
             <h1 className="text-xl font-extrabold text-white tracking-tight">¡Congregación registrada!</h1>
             <p className="text-sm text-zinc-400">
-              <strong className="text-white">{createdOrg.name}</strong> ya está en AsistApp. Compartí el
+              <strong className="text-white">{createdOrg.name}</strong> ya está en Ecclesiahs. Compartí el
               enlace de auto-inscripción con tus miembros para que generen su credencial con código QR.
             </p>
           </div>

@@ -9,7 +9,7 @@ export const Route = createRootRoute({
   notFoundComponent: () => (
     <div className="min-h-screen bg-[#0B0F17] flex flex-col items-center justify-center text-zinc-100 p-6">
       <h1 className="text-4xl font-black text-yellow-500 mb-2">404</h1>
-      <p className="text-zinc-400 mb-6">Página no encontrada en AsistApp.</p>
+      <p className="text-zinc-400 mb-6">Página no encontrada en Ecclesiahs.</p>
       <Link className="px-4 py-2 bg-yellow-500 text-slate-950 font-bold rounded-xl text-sm" to="/dashboard">
         Volver al Dashboard
       </Link>
@@ -29,8 +29,9 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <link rel="alternate icon" href="/favicon.ico" />
         <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
         <meta name="theme-color" content="#0b0f17" />
-        <meta name="apple-mobile-web-app-title" content="AsistApp" />
-        <meta name="application-name" content="AsistApp" />
+        <title>Ecclesiahs — Plataforma de Gestión y Asistencia Eclesial</title>
+        <meta name="apple-mobile-web-app-title" content="Ecclesiahs" />
+        <meta name="application-name" content="Ecclesiahs" />
         <HeadContent />
       </head>
       <body className="min-h-screen bg-[#0B0F17] text-zinc-100 font-sans antialiased flex flex-col w-full max-w-full overflow-x-hidden box-border">

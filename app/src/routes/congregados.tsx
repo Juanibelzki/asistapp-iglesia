@@ -341,7 +341,7 @@ function CongregadosPage() {
                 A
               </div>
               <span className="text-xl font-extrabold tracking-tight text-white">
-                Asist<span className="text-yellow-500">App</span>
+                Ecclesiahs
               </span>
             </Link>
 

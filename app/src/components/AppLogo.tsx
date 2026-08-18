@@ -5,5 +5,5 @@ interface AppLogoProps {
 }
 
 export const AppLogo = ({ className = 'h-10 w-auto' }: AppLogoProps) => {
-  return <img src={logoUrl} alt="AsistApp Logo" className={className} />
+  return <img src={logoUrl} alt="Ecclesiahs Logo" className={className} />
 }

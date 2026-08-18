@@ -126,7 +126,7 @@ function Login() {
       >
         <div className="flex flex-col items-center text-center mb-6">
           <AppLogo className="h-20 w-auto mx-auto mb-6 object-contain" />
-          <h1 className="text-2xl font-bold text-white tracking-tight">Ingresar</h1>
+          <h1 className="text-2xl font-bold text-white tracking-tight">Bienvenido a Ecclesiahs</h1>
           <p className="text-sm text-zinc-400 mt-1">Accedé con tu teléfono y PIN de equipo</p>
         </div>
 

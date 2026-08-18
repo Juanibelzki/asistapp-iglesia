@@ -8,7 +8,7 @@ function Terminos() {
   return (
     <div className="page-wrap py-8">
       <h1 className="text-3xl font-bold mb-6">Términos y Condiciones</h1>
-      <p>Al utilizar AsistApp aceptás los siguientes términos y condiciones...</p>
+      <p>Al utilizar Ecclesiahs aceptás los siguientes términos y condiciones...</p>
       {/* ... text ... */}
     </div>
   )

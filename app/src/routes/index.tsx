@@ -31,7 +31,7 @@ function LogoMark() {
             <AppLogo className="w-full h-full object-contain" />
           </div>
           <span className="text-lg font-bold text-white">
-            Asist<span className="text-yellow-500">App</span>
+            Ecclesiahs
           </span>
     </div>
   )
@@ -393,7 +393,7 @@ function LandingPage() {
       {/* 0. NAVBAR */}
       <header className="sticky top-0 z-50 w-full backdrop-blur-md bg-black/40 border-b border-white/10">
         <div className="max-w-6xl mx-auto px-6 h-16 flex items-center justify-between">
-          <Link to="/" aria-label="AsistApp">
+          <Link to="/" aria-label="Ecclesiahs">
             <LogoMark />
           </Link>
           <div className="flex items-center gap-4">

@@ -221,12 +221,12 @@ function PortalPage() {
               <AppLogo className="w-full h-full object-contain" />
             </div>
             <span className="text-2xl font-extrabold tracking-tight text-white">
-              Asist<span className="text-yellow-500">App</span>
+              Ecclesiahs
             </span>
           </div>
 
           <div className="bg-[#141C2B] border border-slate-700/50 rounded-2xl p-6 shadow-2xl shadow-black/40">
-            <h1 className="text-xl font-extrabold text-white text-center">Ingreso al Portal</h1>
+            <h1 className="text-xl font-extrabold text-white text-center">Bienvenido a Ecclesiahs</h1>
             <p className="text-xs text-zinc-400 text-center mt-1 mb-6">
               Ingresá tu número de teléfono registrado para ver tu credencial y tus próximas clases.
             </p>
