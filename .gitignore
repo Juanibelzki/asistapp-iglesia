@@ -31,3 +31,14 @@ yarn-error.log*
 *.njsproj
 *.sln
 *.sw?
+
+# macOS metadata
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+
+# Windows
+ehthumbs.db
+Thumbs.db
