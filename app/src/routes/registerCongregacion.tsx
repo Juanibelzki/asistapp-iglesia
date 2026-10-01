@@ -1,283 +1,156 @@
-import { createFileRoute, Link } from '@tanstack/react-router';
-import { useState } from 'react';
-import { supabase } from '../lib/supabase';
+import { useState } from 'react'
+import { createFileRoute, Link } from '@tanstack/react-router'
+import { Check, Copy, PartyPopper } from 'lucide-react'
+import { QRCodeSVG } from 'qrcode.react'
+import { supabase } from '../lib/supabase'
+import { useCopy } from '../lib/hooks'
+import { AuthLayout } from '../components/layout/AuthLayout'
+import { Button, LinkButton } from '../components/ui/button'
+import { Field, Input } from '../components/ui/field'
+import { Alert } from '../components/ui/feedback'
 
 export const Route = createFileRoute('/registerCongregacion')({
+  head: () => ({ meta: [{ title: 'Registrar mi iglesia · Ecclesiahs' }] }),
   component: RegisterCongregacionPage,
-});
+})
 
 interface OrgForm {
-  name: string;
-  cityProvince: string;
-  address: string;
-  pastorName: string;
-  phone: string;
+  name: string
+  cityProvince: string
+  address: string
+  pastorName: string
+  phone: string
 }
 
-const EMPTY_FORM: OrgForm = {
-  name: '',
-  cityProvince: '',
-  address: '',
-  pastorName: '',
-  phone: '',
-};
+const EMPTY_FORM: OrgForm = { name: '', cityProvince: '', address: '', pastorName: '', phone: '' }
 
 function RegisterCongregacionPage() {
-  const [submitting, setSubmitting] = useState(false);
-  const [form, setForm] = useState<OrgForm>(EMPTY_FORM);
-  const [formError, setFormError] = useState('');
-  const [createdOrg, setCreatedOrg] = useState<{ id: string; name: string } | null>(null);
-  const [copied, setCopied] = useState(false);
+  const [form, setForm] = useState<OrgForm>(EMPTY_FORM)
+  const [submitting, setSubmitting] = useState(false)
+  const [error, setError] = useState('')
+  const [created, setCreated] = useState<{ id: string; name: string } | null>(null)
+  const { copied, copy } = useCopy()
 
-  const setField = <K extends keyof OrgForm>(key: K, value: OrgForm[K]) => {
-    setForm((f) => ({ ...f, [key]: value }));
-  };
+  const set = <K extends keyof OrgForm>(k: K, v: OrgForm[K]) => setForm((f) => ({ ...f, [k]: v }))
+  const link = created && typeof window !== 'undefined' ? `${window.location.origin}/registro?org=${created.id}` : ''
 
-  const registrationLink =
-    typeof window !== 'undefined' && createdOrg
-      ? `${window.location.origin}/registro?org=${createdOrg.id}`
-      : '';
-
-  const copyLink = async () => {
-    try {
-      await navigator.clipboard.writeText(registrationLink);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-    } catch {
-      setFormError('No se pudo copiar el enlace. Copialo manualmente.');
-    }
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const submit = async (e: React.FormEvent) => {
+    e.preventDefault()
     if (!form.name.trim() || !form.cityProvince.trim() || !form.pastorName.trim() || !form.phone.trim()) {
-      setFormError('Completá los campos obligatorios para continuar.');
-      return;
+      setError('Completá los campos obligatorios para continuar.')
+      return
     }
 
-    setSubmitting(true);
-    setFormError('');
+    setSubmitting(true)
+    setError('')
     try {
-      const base = {
-        name: form.name.trim(),
-        address: form.address.trim() || null,
-        phone: form.phone.trim(),
-      };
+      const base = { name: form.name.trim(), address: form.address.trim() || null, phone: form.phone.trim() }
 
       let result = await supabase
         .from('organizations')
-        .insert({
-          ...base,
-          city: form.cityProvince.trim() || null,
-          pastor_name: form.pastorName.trim() || null,
-        })
+        .insert({ ...base, city: form.cityProvince.trim() || null, pastor_name: form.pastorName.trim() || null })
         .select('id, name')
-        .single();
+        .single()
 
+      // Columnas opcionales inexistentes en la BD real → reintentar con las básicas
       if (result.error && (result.error.code === '42703' || result.error.code === 'PGRST204')) {
-        result = await supabase.from('organizations').insert(base).select('id, name').single();
+        result = await supabase.from('organizations').insert(base).select('id, name').single()
       }
+      if (result.error) throw result.error
 
-      if (result.error) throw result.error;
-
-      setCreatedOrg(result.data as { id: string; name: string });
+      setCreated(result.data as { id: string; name: string })
     } catch (err) {
-      console.error('Error al registrar la congregación:', err);
-      const msg = err instanceof Error ? err.message : 'Error al registrar la congregación.';
-      if (/row-level security|violates row-level security policy/i.test(msg)) {
-        setFormError(
-          'Aún no se habilitaron los permisos para registrar congregaciones. Contactá al administrador de Ecclesiahs para activar esta función.',
-        );
-      } else {
-        setFormError(msg);
-      }
+      console.error('Error al registrar la congregación:', err)
+      const msg = err instanceof Error ? err.message : (err as any)?.message || 'Error al registrar la congregación.'
+      setError(
+        /row-level security/i.test(msg)
+          ? 'Aún no se habilitaron los permisos para registrar congregaciones. Contactá al administrador de Ecclesiahs para activar esta función.'
+          : msg,
+      )
     } finally {
-      setSubmitting(false);
+      setSubmitting(false)
     }
-  };
+  }
 
-  const inputClass =
-    'w-full bg-[#0B0F17] border border-slate-700 text-zinc-100 rounded-xl px-4 py-3 focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/20 outline-none transition-all placeholder:text-zinc-600';
-
-  if (createdOrg) {
+  if (created) {
     return (
-      <div className="min-h-screen bg-[#0B0F17] text-zinc-100 flex flex-col font-sans">
-        <main className="flex-1 w-full max-w-md mx-auto p-4 md:p-6 space-y-6 pb-10">
-          <div className="flex flex-col items-center text-center gap-3 pt-6">
-            <div className="w-16 h-16 rounded-2xl bg-yellow-500 flex items-center justify-center text-slate-950 font-black text-2xl shadow-lg shadow-yellow-500/20">
-              {createdOrg.name.charAt(0).toUpperCase()}
-            </div>
-            <h1 className="text-xl font-extrabold text-white tracking-tight">¡Congregación registrada!</h1>
-            <p className="text-sm text-zinc-400">
-              <strong className="text-white">{createdOrg.name}</strong> ya está en Ecclesiahs. Compartí el
-              enlace de auto-inscripción con tus miembros para que generen su credencial con código QR.
+      <AuthLayout title="¡Congregación registrada!" width="md">
+        <div className="space-y-6">
+          <div className="flex items-start gap-3 rounded-2xl bg-success-soft p-4 text-success">
+            <PartyPopper className="mt-0.5 h-5 w-5 shrink-0" aria-hidden />
+            <p className="text-sm font-medium">
+              <strong>{created.name}</strong> ya está en Ecclesiahs. Compartí el enlace de auto-inscripción con tus miembros para que
+              generen su credencial con código QR.
             </p>
           </div>
 
-          <div className="bg-[#141C2B] border border-slate-700/50 rounded-2xl p-6 shadow-2xl shadow-black/40">
-            <label className="block text-xs font-semibold text-zinc-400 mb-1.5">
-              Enlace de auto-inscripción (único para tu iglesia)
-            </label>
-            <div className="flex items-center gap-2">
-              <input
-                readOnly
-                value={registrationLink}
-                onFocus={(e) => e.currentTarget.select()}
-                className="w-full bg-[#0B0F17] border border-slate-700 text-zinc-300 text-xs rounded-lg px-3 py-2.5 truncate focus:border-yellow-500 focus:ring-1 focus:ring-yellow-500/20 outline-none"
-              />
-              <button
-                type="button"
-                onClick={copyLink}
-                className="shrink-0 px-3 py-2.5 rounded-lg bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold text-xs transition active:scale-95"
-              >
-                {copied ? '¡Copiado!' : 'Copiar'}
-              </button>
-            </div>
-            <p className="text-[11px] text-zinc-500 mt-2">
-              Enviá este enlace por WhatsApp o Email para que cada miembro complete su auto-inscripción.
-            </p>
-
-            <div className="mt-6 space-y-3">
-              <Link
-                to="/asistencia"
-                className="block w-full py-3.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold text-sm transition-all text-center active:scale-[0.98]"
-              >
-                Ir al Panel de Asistencia
-              </Link>
-              <button
-                type="button"
-                onClick={copyLink}
-                className="w-full py-3.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white font-bold text-sm transition-all active:scale-[0.98]"
-              >
-                Copiar enlace para miembros
-              </button>
+          <div className="flex justify-center">
+            <div className="rounded-2xl border border-line bg-white p-4 shadow-card">
+              <QRCodeSVG value={link} size={150} level="M" />
             </div>
           </div>
-        </main>
-      </div>
-    );
+
+          <Field label="Enlace de auto-inscripción (único para tu iglesia)" hint="Enviálo por WhatsApp o email a cada miembro.">
+            {(id) => (
+              <div className="flex gap-2">
+                <Input id={id} readOnly value={link} onFocus={(e) => e.currentTarget.select()} className="text-sm" />
+                <Button
+                  onClick={() => copy(link)}
+                  variant={copied ? 'secondary' : 'primary'}
+                  className="shrink-0"
+                  leftIcon={copied ? <Check className="h-4 w-4" /> : <Copy className="h-4 w-4" />}
+                >
+                  {copied ? 'Copiado' : 'Copiar'}
+                </Button>
+              </div>
+            )}
+          </Field>
+
+          <LinkButton to="/asistencia" size="lg" className="w-full">
+            Ir al panel de asistencia
+          </LinkButton>
+        </div>
+      </AuthLayout>
+    )
   }
 
   return (
-    <div className="min-h-screen bg-[#0B0F17] text-zinc-100 flex flex-col font-sans">
-      <main className="flex-1 w-full max-w-md mx-auto p-4 md:p-6 space-y-6 pb-10">
-        <div className="flex flex-col items-center text-center gap-3 pt-6">
-          <div className="w-16 h-16 rounded-2xl bg-yellow-500 flex items-center justify-center text-slate-950 font-black text-2xl shadow-lg shadow-yellow-500/20">
-            <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M3 21h18M5 21V7l7-4 7 4v14M9 21v-6h6v6" />
-            </svg>
-          </div>
-          <div>
-            <h1 className="text-xl font-extrabold text-white tracking-tight">Registrar mi Congregación</h1>
-            <p className="text-sm text-zinc-400 mt-1">
-              Dá de alta tu iglesia y obtené tu enlace único de auto-inscripción para miembros.
-            </p>
-          </div>
-        </div>
-
-        <div className="bg-[#141C2B] border border-slate-700/50 rounded-2xl p-6 shadow-2xl shadow-black/40">
-          <form onSubmit={handleSubmit} className="space-y-5">
-            <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1.5">
-                Nombre de la Congregación / Iglesia *
-              </label>
-              <input
-                type="text"
-                value={form.name}
-                onChange={(e) => setField('name', e.target.value)}
-                placeholder="Ej: Iglesia Vida Nueva"
-                className={inputClass}
-                autoFocus
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1.5">Ciudad y Provincia *</label>
-              <input
-                type="text"
-                value={form.cityProvince}
-                onChange={(e) => setField('cityProvince', e.target.value)}
-                placeholder="Ej: Buenos Aires, Buenos Aires"
-                className={inputClass}
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1.5">
-                Dirección de la sede principal
-              </label>
-              <input
-                type="text"
-                value={form.address}
-                onChange={(e) => setField('address', e.target.value)}
-                placeholder="Ej: Av. Rivadavia 1234"
-                className={inputClass}
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1.5">
-                Nombre del Pastor o Administrador responsable *
-              </label>
-              <input
-                type="text"
-                value={form.pastorName}
-                onChange={(e) => setField('pastorName', e.target.value)}
-                placeholder="Ej: Pastor Juan Pérez"
-                className={inputClass}
-                required
-              />
-            </div>
-
-            <div>
-              <label className="block text-xs font-semibold text-zinc-400 mb-1.5">
-                Teléfono / WhatsApp de contacto *
-              </label>
-              <input
-                type="tel"
-                value={form.phone}
-                onChange={(e) => setField('phone', e.target.value)}
-                placeholder="Ej: 611223344"
-                className={inputClass}
-                required
-              />
-              <p className="text-[11px] text-zinc-500 mt-1.5">
-                Se usará para contactarte ante dudas sobre tu cuenta.
-              </p>
-            </div>
-
-            {formError && (
-              <div className="bg-red-500/10 border border-red-500/30 text-red-400 text-xs font-medium rounded-lg px-3 py-2.5">
-                {formError}
-              </div>
-            )}
-
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full px-6 py-3.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 active:scale-[0.98] disabled:opacity-60 disabled:cursor-not-allowed text-slate-950 font-semibold text-sm transition-all shadow-lg shadow-yellow-500/20 flex items-center justify-center gap-2"
-            >
-              {submitting ? (
-                <>
-                  <span className="w-4 h-4 border-2 border-slate-950/40 border-t-slate-950 rounded-full animate-spin" />
-                  Registrando...
-                </>
-              ) : (
-                'Registrar Congregación'
-              )}
-            </button>
-          </form>
-        </div>
-
-        <p className="text-center text-xs text-zinc-500">
-          ¿Sos miembro y querés inscribirte con tu credencial?{' '}
-          <Link to="/registro" className="text-yellow-500 hover:text-yellow-400 font-semibold">
+    <AuthLayout
+      width="md"
+      title="Registrá tu congregación"
+      subtitle="Dá de alta tu iglesia y obtené tu enlace único de auto-inscripción para miembros."
+      footer={
+        <p>
+          ¿Sos miembro y querés inscribirte?{' '}
+          <Link to="/registro" className="font-semibold text-primary hover:underline">
             Auto-inscripción aquí
           </Link>
         </p>
-      </main>
-    </div>
-  );
+      }
+    >
+      <form onSubmit={submit} className="space-y-5">
+        <Field label="Nombre de la congregación / iglesia" required>
+          {(id) => <Input id={id} value={form.name} onChange={(e) => set('name', e.target.value)} placeholder="Ej: Iglesia Vida Nueva" autoFocus required />}
+        </Field>
+        <Field label="Ciudad y provincia" required>
+          {(id) => <Input id={id} value={form.cityProvince} onChange={(e) => set('cityProvince', e.target.value)} placeholder="Ej: Corrientes, Corrientes" required />}
+        </Field>
+        <Field label="Dirección de la sede principal">
+          {(id) => <Input id={id} value={form.address} onChange={(e) => set('address', e.target.value)} placeholder="Ej: Av. Costanera 1234" />}
+        </Field>
+        <Field label="Pastor o administrador responsable" required>
+          {(id) => <Input id={id} value={form.pastorName} onChange={(e) => set('pastorName', e.target.value)} placeholder="Ej: Pastor Juan Pérez" required />}
+        </Field>
+        <Field label="Teléfono / WhatsApp de contacto" required hint="Lo usaremos solo para contactarte por dudas sobre tu cuenta.">
+          {(id) => <Input id={id} type="tel" inputMode="tel" value={form.phone} onChange={(e) => set('phone', e.target.value)} placeholder="Ej: 3794 123456" required />}
+        </Field>
+
+        {error && <Alert>{error}</Alert>}
+
+        <Button type="submit" size="lg" className="w-full" loading={submitting}>
+          {submitting ? 'Registrando…' : 'Registrar congregación'}
+        </Button>
+      </form>
+    </AuthLayout>
+  )
 }

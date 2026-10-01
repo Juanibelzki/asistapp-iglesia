@@ -1,15 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { PublicPage } from '../components/layout/PublicPage'
 
 export const Route = createFileRoute('/terminos')({
+  head: () => ({ meta: [{ title: 'Términos y condiciones · Ecclesiahs' }] }),
   component: Terminos,
 })
 
 function Terminos() {
   return (
-    <div className="page-wrap py-8">
-      <h1 className="text-3xl font-bold mb-6">Términos y Condiciones</h1>
+    <PublicPage title="Términos y condiciones">
       <p>Al utilizar Ecclesiahs aceptás los siguientes términos y condiciones...</p>
-      {/* ... text ... */}
-    </div>
+      {/* TODO: completar con el texto legal definitivo */}
+    </PublicPage>
   )
 }

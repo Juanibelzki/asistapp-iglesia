@@ -10,12 +10,11 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AppRouteImport } from './routes/_app'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as AjustesRouteImport } from './routes/ajustes'
 import { Route as AsistenciaRouteImport } from './routes/asistencia'
 import { Route as CeoRouteImport } from './routes/ceo'
-import { Route as CongregadosRouteImport } from './routes/congregados'
-import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as EscanearRouteImport } from './routes/escanear'
 import { Route as EventosRouteImport } from './routes/eventos'
 import { Route as LoginRouteImport } from './routes/login'
@@ -27,12 +26,18 @@ import { Route as RegisterstaffRouteImport } from './routes/registerstaff'
 import { Route as RegistroRouteImport } from './routes/registro'
 import { Route as SuscripcionRouteImport } from './routes/suscripcion'
 import { Route as TerminosRouteImport } from './routes/terminos'
+import { Route as AppCongregadosRouteImport } from './routes/_app.congregados'
+import { Route as AppDashboardRouteImport } from './routes/_app.dashboard'
 import { Route as EventosEventIdAsistenciaRouteImport } from './routes/eventos.$eventId.asistencia'
 import { Route as EventosEventIdQrRouteImport } from './routes/eventos.$eventId.qr'
 
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AppRoute = AppRouteImport.update({
+  id: '/_app',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -53,16 +58,6 @@ const AsistenciaRoute = AsistenciaRouteImport.update({
 const CeoRoute = CeoRouteImport.update({
   id: '/ceo',
   path: '/ceo',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const CongregadosRoute = CongregadosRouteImport.update({
-  id: '/congregados',
-  path: '/congregados',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const DashboardRoute = DashboardRouteImport.update({
-  id: '/dashboard',
-  path: '/dashboard',
   getParentRoute: () => rootRouteImport,
 } as any)
 const EscanearRoute = EscanearRouteImport.update({
@@ -120,6 +115,16 @@ const TerminosRoute = TerminosRouteImport.update({
   path: '/terminos',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AppCongregadosRoute = AppCongregadosRouteImport.update({
+  id: '/congregados',
+  path: '/congregados',
+  getParentRoute: () => AppRoute,
+} as any)
+const AppDashboardRoute = AppDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AppRoute,
+} as any)
 const EventosEventIdAsistenciaRoute =
   EventosEventIdAsistenciaRouteImport.update({
     id: '/$eventId/asistencia',
@@ -138,8 +143,6 @@ export interface FileRoutesByFullPath {
   '/ajustes': typeof AjustesRoute
   '/asistencia': typeof AsistenciaRoute
   '/ceo': typeof CeoRoute
-  '/congregados': typeof CongregadosRoute
-  '/dashboard': typeof DashboardRoute
   '/escanear': typeof EscanearRoute
   '/eventos': typeof EventosRouteWithChildren
   '/login': typeof LoginRoute
@@ -151,6 +154,8 @@ export interface FileRoutesByFullPath {
   '/registro': typeof RegistroRoute
   '/suscripcion': typeof SuscripcionRoute
   '/terminos': typeof TerminosRoute
+  '/congregados': typeof AppCongregadosRoute
+  '/dashboard': typeof AppDashboardRoute
   '/eventos/$eventId/asistencia': typeof EventosEventIdAsistenciaRoute
   '/eventos/$eventId/qr': typeof EventosEventIdQrRoute
 }
@@ -160,8 +165,6 @@ export interface FileRoutesByTo {
   '/ajustes': typeof AjustesRoute
   '/asistencia': typeof AsistenciaRoute
   '/ceo': typeof CeoRoute
-  '/congregados': typeof CongregadosRoute
-  '/dashboard': typeof DashboardRoute
   '/escanear': typeof EscanearRoute
   '/eventos': typeof EventosRouteWithChildren
   '/login': typeof LoginRoute
@@ -173,18 +176,19 @@ export interface FileRoutesByTo {
   '/registro': typeof RegistroRoute
   '/suscripcion': typeof SuscripcionRoute
   '/terminos': typeof TerminosRoute
+  '/congregados': typeof AppCongregadosRoute
+  '/dashboard': typeof AppDashboardRoute
   '/eventos/$eventId/asistencia': typeof EventosEventIdAsistenciaRoute
   '/eventos/$eventId/qr': typeof EventosEventIdQrRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_app': typeof AppRouteWithChildren
   '/about': typeof AboutRoute
   '/ajustes': typeof AjustesRoute
   '/asistencia': typeof AsistenciaRoute
   '/ceo': typeof CeoRoute
-  '/congregados': typeof CongregadosRoute
-  '/dashboard': typeof DashboardRoute
   '/escanear': typeof EscanearRoute
   '/eventos': typeof EventosRouteWithChildren
   '/login': typeof LoginRoute
@@ -196,6 +200,8 @@ export interface FileRoutesById {
   '/registro': typeof RegistroRoute
   '/suscripcion': typeof SuscripcionRoute
   '/terminos': typeof TerminosRoute
+  '/_app/congregados': typeof AppCongregadosRoute
+  '/_app/dashboard': typeof AppDashboardRoute
   '/eventos/$eventId/asistencia': typeof EventosEventIdAsistenciaRoute
   '/eventos/$eventId/qr': typeof EventosEventIdQrRoute
 }
@@ -207,8 +213,6 @@ export interface FileRouteTypes {
     | '/ajustes'
     | '/asistencia'
     | '/ceo'
-    | '/congregados'
-    | '/dashboard'
     | '/escanear'
     | '/eventos'
     | '/login'
@@ -220,6 +224,8 @@ export interface FileRouteTypes {
     | '/registro'
     | '/suscripcion'
     | '/terminos'
+    | '/congregados'
+    | '/dashboard'
     | '/eventos/$eventId/asistencia'
     | '/eventos/$eventId/qr'
   fileRoutesByTo: FileRoutesByTo
@@ -229,8 +235,6 @@ export interface FileRouteTypes {
     | '/ajustes'
     | '/asistencia'
     | '/ceo'
-    | '/congregados'
-    | '/dashboard'
     | '/escanear'
     | '/eventos'
     | '/login'
@@ -242,17 +246,18 @@ export interface FileRouteTypes {
     | '/registro'
     | '/suscripcion'
     | '/terminos'
+    | '/congregados'
+    | '/dashboard'
     | '/eventos/$eventId/asistencia'
     | '/eventos/$eventId/qr'
   id:
     | '__root__'
     | '/'
+    | '/_app'
     | '/about'
     | '/ajustes'
     | '/asistencia'
     | '/ceo'
-    | '/congregados'
-    | '/dashboard'
     | '/escanear'
     | '/eventos'
     | '/login'
@@ -264,18 +269,19 @@ export interface FileRouteTypes {
     | '/registro'
     | '/suscripcion'
     | '/terminos'
+    | '/_app/congregados'
+    | '/_app/dashboard'
     | '/eventos/$eventId/asistencia'
     | '/eventos/$eventId/qr'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AppRoute: typeof AppRouteWithChildren
   AboutRoute: typeof AboutRoute
   AjustesRoute: typeof AjustesRoute
   AsistenciaRoute: typeof AsistenciaRoute
   CeoRoute: typeof CeoRoute
-  CongregadosRoute: typeof CongregadosRoute
-  DashboardRoute: typeof DashboardRoute
   EscanearRoute: typeof EscanearRoute
   EventosRoute: typeof EventosRouteWithChildren
   LoginRoute: typeof LoginRoute
@@ -296,6 +302,13 @@ declare module '@tanstack/react-router' {
       path: '/'
       fullPath: '/'
       preLoaderRoute: typeof IndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_app': {
+      id: '/_app'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AppRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -324,20 +337,6 @@ declare module '@tanstack/react-router' {
       path: '/ceo'
       fullPath: '/ceo'
       preLoaderRoute: typeof CeoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/congregados': {
-      id: '/congregados'
-      path: '/congregados'
-      fullPath: '/congregados'
-      preLoaderRoute: typeof CongregadosRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/dashboard': {
-      id: '/dashboard'
-      path: '/dashboard'
-      fullPath: '/dashboard'
-      preLoaderRoute: typeof DashboardRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/escanear': {
@@ -417,6 +416,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof TerminosRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_app/congregados': {
+      id: '/_app/congregados'
+      path: '/congregados'
+      fullPath: '/congregados'
+      preLoaderRoute: typeof AppCongregadosRouteImport
+      parentRoute: typeof AppRoute
+    }
+    '/_app/dashboard': {
+      id: '/_app/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AppDashboardRouteImport
+      parentRoute: typeof AppRoute
+    }
     '/eventos/$eventId/asistencia': {
       id: '/eventos/$eventId/asistencia'
       path: '/$eventId/asistencia'
@@ -434,6 +447,18 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AppRouteChildren {
+  AppCongregadosRoute: typeof AppCongregadosRoute
+  AppDashboardRoute: typeof AppDashboardRoute
+}
+
+const AppRouteChildren: AppRouteChildren = {
+  AppCongregadosRoute: AppCongregadosRoute,
+  AppDashboardRoute: AppDashboardRoute,
+}
+
+const AppRouteWithChildren = AppRoute._addFileChildren(AppRouteChildren)
+
 interface EventosRouteChildren {
   EventosEventIdAsistenciaRoute: typeof EventosEventIdAsistenciaRoute
   EventosEventIdQrRoute: typeof EventosEventIdQrRoute
@@ -449,12 +474,11 @@ const EventosRouteWithChildren =
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AppRoute: AppRouteWithChildren,
   AboutRoute: AboutRoute,
   AjustesRoute: AjustesRoute,
   AsistenciaRoute: AsistenciaRoute,
   CeoRoute: CeoRoute,
-  CongregadosRoute: CongregadosRoute,
-  DashboardRoute: DashboardRoute,
   EscanearRoute: EscanearRoute,
   EventosRoute: EventosRouteWithChildren,
   LoginRoute: LoginRoute,

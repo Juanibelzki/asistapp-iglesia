@@ -1,15 +1,16 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { PublicPage } from '../components/layout/PublicPage'
 
 export const Route = createFileRoute('/privacidad')({
+  head: () => ({ meta: [{ title: 'Política de privacidad · Ecclesiahs' }] }),
   component: Privacidad,
 })
 
 function Privacidad() {
   return (
-    <div className="page-wrap py-8">
-      <h1 className="text-3xl font-bold mb-6">Política de Privacidad y Protección de Menores</h1>
+    <PublicPage title="Política de privacidad y protección de menores">
       <p>En nuestra aplicación, tratamos los datos de los niños con la máxima responsabilidad y conforme al RGPD...</p>
-      {/* ... text ... */}
-    </div>
+      {/* TODO: completar con el texto legal definitivo */}
+    </PublicPage>
   )
 }
