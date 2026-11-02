@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700&family=Manrope:wght@400;500;600;700;800&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap");
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
@@ -6,6 +6,8 @@
 
 @theme inline {
   --font-sans: "Manrope", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Fraunces", ui-serif, Georgia, serif;
+  --font-chart: "JetBrains Mono", ui-monospace, SFMono-Regular, monospace;
   
   /* Palette from figma-temp */
   --color-background: #ffffff;
@@ -50,6 +52,14 @@
   --link-bg-hover: rgba(255, 255, 255, 0.9);
   --hero-a: rgba(79, 184, 178, 0.36);
   --hero-b: rgba(47, 106, 74, 0.2);
+
+  /* Nautical palette (landing): azul marino, blanco y rojo */
+  --color-marino: #0b2545;
+  --color-marino-deep: #071a33;
+  --color-marino-soft: #13315c;
+  --color-rojo: #e11d2e;
+  --color-rojo-deep: #b5121f;
+  --color-blanco-mar: #f4f7fb;
 
   /* Gold & Silver Prestige tokens */
   --color-canvas: #0b0f17;
@@ -222,6 +232,28 @@
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
+}
+
+/* Cintas en movimiento de la landing */
+@keyframes marquee {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee 38s linear infinite;
+}
+.animate-marquee-reverse {
+  animation: marquee 44s linear infinite reverse;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-marquee-reverse {
+    animation: none;
+  }
 }
 
 .no-scrollbar::-webkit-scrollbar {
