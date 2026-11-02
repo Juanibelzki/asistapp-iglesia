@@ -2,6 +2,7 @@ import { Link } from '@tanstack/react-router'
 import { supabase } from '../lib/supabase'
 import { useEffect, useState } from 'react'
 import { AppLogo } from './AppLogo'
+import { logout } from '../lib/session'
 
 export default function Header() {
   const [user, setUser] = useState<any>(null)
@@ -16,8 +17,8 @@ export default function Header() {
     return () => subscription.unsubscribe()
   }, [])
 
-  const logout = async () => {
-    await supabase.auth.signOut()
+  const handleLogout = async () => {
+    await logout()
     window.location.href = '/'
   }
 
@@ -44,7 +45,7 @@ export default function Header() {
 
         <div className="ml-auto flex items-center gap-2">
           {user ? (
-            <button onClick={logout} className="demo-button demo-button-secondary text-xs">Cerrar sesión</button>
+            <button onClick={handleLogout} className="demo-button demo-button-secondary text-xs">Cerrar sesión</button>
           ) : (
             <>
               <Link

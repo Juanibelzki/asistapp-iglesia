@@ -1,6 +1,7 @@
 import { createFileRoute, Link } from '@tanstack/react-router';
 import { useState } from 'react';
 import { supabase } from '../lib/supabase';
+import { loginWithPin } from '../lib/session';
 
 export const Route = createFileRoute('/registerCongregacion')({
   component: RegisterCongregacionPage,
@@ -12,6 +13,7 @@ interface OrgForm {
   address: string;
   pastorName: string;
   phone: string;
+  pin: string;
 }
 
 const EMPTY_FORM: OrgForm = {
@@ -20,6 +22,7 @@ const EMPTY_FORM: OrgForm = {
   address: '',
   pastorName: '',
   phone: '',
+  pin: '',
 };
 
 function RegisterCongregacionPage() {
@@ -55,39 +58,37 @@ function RegisterCongregacionPage() {
       return;
     }
 
+    if (!/^\d{4}$/.test(form.pin)) {
+      setFormError('El PIN debe tener exactamente 4 dígitos.');
+      return;
+    }
+
     setSubmitting(true);
     setFormError('');
     try {
-      const base = {
-        name: form.name.trim(),
-        address: form.address.trim() || null,
-        phone: form.phone.trim(),
-      };
+      const cleanPhone = form.phone.replace(/\D/g, '');
+      // Crea la iglesia y al pastor como administrador en una sola operación del lado
+      // de la base, con el PIN cifrado.
+      const { data, error } = await supabase.rpc('register_church', {
+        p_name: form.name.trim(),
+        p_city: form.cityProvince.trim(),
+        p_address: form.address.trim() || null,
+        p_pastor_name: form.pastorName.trim(),
+        p_phone: cleanPhone,
+        p_pin: form.pin,
+      });
+      if (error) throw error;
+      const row = Array.isArray(data) ? data[0] : data;
+      if (!row?.organization_id) throw new Error('No se pudo registrar la congregación.');
 
-      let result = await supabase
-        .from('organizations')
-        .insert({
-          ...base,
-          city: form.cityProvince.trim() || null,
-          pastor_name: form.pastorName.trim() || null,
-        })
-        .select('id, name')
-        .single();
-
-      if (result.error && (result.error.code === '42703' || result.error.code === 'PGRST204')) {
-        result = await supabase.from('organizations').insert(base).select('id, name').single();
-      }
-
-      if (result.error) throw result.error;
-
+      await loginWithPin(cleanPhone, form.pin);
+      const result = { data: { id: row.organization_id as string, name: form.name.trim() } };
       setCreatedOrg(result.data as { id: string; name: string });
     } catch (err) {
       console.error('Error al registrar la congregación:', err);
       const msg = err instanceof Error ? err.message : 'Error al registrar la congregación.';
-      if (/row-level security|violates row-level security policy/i.test(msg)) {
-        setFormError(
-          'Aún no se habilitaron los permisos para registrar congregaciones. Contactá al administrador de Ecclesiahs para activar esta función.',
-        );
+      if (/phone_taken/i.test(msg)) {
+        setFormError('Ese teléfono ya tiene una cuenta. Ingresá con tu PIN o usá otro número.');
       } else {
         setFormError(msg);
       }
@@ -139,10 +140,10 @@ function RegisterCongregacionPage() {
 
             <div className="mt-6 space-y-3">
               <Link
-                to="/asistencia"
+                to="/dashboard"
                 className="block w-full py-3.5 rounded-xl bg-yellow-500 hover:bg-yellow-600 text-slate-950 font-bold text-sm transition-all text-center active:scale-[0.98]"
               >
-                Ir al Panel de Asistencia
+                Ir a mi panel
               </Link>
               <button
                 type="button"
@@ -233,7 +234,7 @@ function RegisterCongregacionPage() {
 
             <div>
               <label className="block text-xs font-semibold text-zinc-400 mb-1.5">
-                Teléfono / WhatsApp de contacto *
+                Tu teléfono / WhatsApp (con él vas a ingresar) *
               </label>
               <input
                 type="tel"
@@ -244,8 +245,21 @@ function RegisterCongregacionPage() {
                 required
               />
               <p className="text-[11px] text-zinc-500 mt-1.5">
-                Se usará para contactarte ante dudas sobre tu cuenta.
+                Vas a quedar como administrador de la iglesia.
               </p>
+            </div>
+
+            <div>
+              <label className="block text-xs font-semibold text-zinc-400 mb-1.5">PIN de 4 dígitos para ingresar *</label>
+              <input
+                type="password"
+                inputMode="numeric"
+                value={form.pin}
+                onChange={(e) => setField('pin', e.target.value.replace(/\D/g, '').slice(0, 4))}
+                placeholder="••••"
+                className={`${inputClass} tracking-[0.5em] text-center font-mono`}
+                required
+              />
             </div>
 
             {formError && (

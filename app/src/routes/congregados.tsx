@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { readLocalSession } from '../lib/session';
+import { isStaffRole, resolveCurrentProfile } from '../lib/session';
 import { exportAttendanceReport } from '../lib/export';
 import { QRCodeSVG } from 'qrcode.react';
 
@@ -81,23 +81,15 @@ function CongregadosPage() {
 
     async function loadData() {
       try {
-        const { data: { session } } = await supabase.auth.getSession();
-        let orgForLoad: string | null = null;
-
-        if (session) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('organization_id')
-            .eq('auth_user_id', session.user.id)
-            .maybeSingle();
-          orgForLoad = profile?.organization_id ?? null;
-        } else {
-          const local = readLocalSession();
-          orgForLoad = local?.organization_id ?? null;
-        }
+        const me = await resolveCurrentProfile();
+        const orgForLoad = me?.organization_id ?? null;
 
         if (!orgForLoad) {
           if (isMounted) navigate({ to: '/login' });
+          return;
+        }
+        if (isStaffRole(me?.role)) {
+          if (isMounted) navigate({ to: '/asistencia' });
           return;
         }
 

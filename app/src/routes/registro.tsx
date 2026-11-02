@@ -62,10 +62,7 @@ function RegistroPage() {
         const params = new URLSearchParams(window.location.search);
         const orgParam = params.get('org');
 
-        const { data, error } = await supabase
-          .from('organizations')
-          .select('id, name, address, logo_url, motto')
-          .order('name', { ascending: true });
+        const { data, error } = await supabase.rpc('public_church_list');
 
         if (error) throw error;
         if (!isMounted) return;
@@ -153,43 +150,27 @@ function RegistroPage() {
     setSubmitting(true);
     setFormError('');
     try {
-      // Check quota limit
-      const { count } = await supabase
-        .from('congregados')
-        .select('*', { count: 'exact', head: true })
-        .eq('organization_id', selectedChurchId);
-
-      const { data: orgData } = await supabase
-        .from('organizations')
-        .select('member_limit')
-        .eq('id', selectedChurchId)
-        .maybeSingle();
-
-      const limit = orgData?.member_limit ?? 50;
-      if (count !== null && count >= limit) {
-        setFormError('Esta congregación ha alcanzado el límite de miembros de su plan actual. Por favor contacte al pastor o administrador.');
-        setSubmitting(false);
-        return;
+      // El alta y el control del cupo del plan se hacen del lado de la base.
+      const { data: inserted, error } = await supabase.rpc('register_member', {
+        p_org: selectedChurchId,
+        p_first_name: form.first_name.trim(),
+        p_last_name: form.last_name.trim(),
+        p_phone: form.phone.trim(),
+        p_is_student: form.is_student,
+        p_student_stage: form.is_student ? form.student_stage : null,
+        p_guardian_name: needsGuardian ? form.guardian_name.trim() || null : null,
+        p_guardian_phone: needsGuardian ? form.guardian_phone.trim() || null : null,
+      });
+      if (error) {
+        if (/member_limit/i.test(error.message)) {
+          setFormError('Esta congregación ha alcanzado el límite de miembros de su plan actual. Por favor contacte al pastor o administrador.');
+          setSubmitting(false);
+          return;
+        }
+        throw error;
       }
-
-      const generatedQr = crypto.randomUUID();
-
-      const { data: insertedRows, error } = await supabase
-        .from('congregados')
-        .insert({
-          organization_id: selectedChurchId,
-          first_name: form.first_name.trim(),
-          last_name: form.last_name.trim(),
-          phone: form.phone.trim(),
-          is_student: form.is_student,
-          student_stage: form.is_student ? form.student_stage : null,
-          guardian_name: needsGuardian ? form.guardian_name.trim() || null : null,
-          guardian_phone: needsGuardian ? form.guardian_phone.trim() || null : null,
-          qr_code: generatedQr,
-          status: 'activo',
-        })
-        .select('id, qr_code');
-      if (error) throw error;
+      const insertedRows = (Array.isArray(inserted) ? inserted : [inserted]) as { id: string; qr_code: string }[];
+      const generatedQr = insertedRows[0]?.qr_code as string;
 
       const memberId = insertedRows?.[0]?.id || generatedQr;
       const fullName = `${form.first_name.trim()} ${form.last_name.trim()}`;

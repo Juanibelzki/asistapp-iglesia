@@ -1,8 +1,8 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { getOrganization, getProfile } from '../lib/data'
-import { readLocalSession } from '../lib/session'
+import { getOrganization } from '../lib/data'
+import { resolveCurrentProfile } from '../lib/session'
 
 export const Route = createFileRoute('/suscripcion')({
   component: SuscripcionPage,
@@ -25,16 +25,8 @@ function SuscripcionPage() {
   useEffect(() => {
     async function fetchData() {
       try {
-        const { data: { session } } = await supabase.auth.getSession()
-        let orgId: string | null = null
-
-        if (session) {
-          const profile = await getProfile(session.user.id)
-          orgId = profile?.organization_id ?? null
-        } else {
-          const local = readLocalSession()
-          orgId = local?.organization_id ?? null
-        }
+        const me = await resolveCurrentProfile()
+        const orgId = me?.organization_id ?? null
 
         if (!orgId) {
           navigate({ to: '/login' })
@@ -67,40 +59,20 @@ function SuscripcionPage() {
     setTimeout(() => setToast(null), 3500)
   }
 
-  const handleUpgrade = async (planKey: string, limit: number, planName: string) => {
+  // El plan solo cambia cuando se confirma un pago del lado del servidor. Hasta que
+  // exista el cobro integrado, el pedido se envía por email para activarlo a mano.
+  const handleUpgrade = async (planKey: string, _limit: number, planName: string) => {
     if (!org) return
     setUpgrading(planKey)
-    try {
-      // Simulate gateway checkout session (Mercado Pago Subscriptions / Stripe Billing)
-      await new Promise((r) => setTimeout(r, 1200))
-
-      const { error } = await supabase
-        .from('organizations')
-        .update({
-          subscription_plan: planKey,
-          subscription_status: 'active',
-          member_limit: limit,
-          subscription_id: `sub_${gateway}_${Date.now()}`,
-          current_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
-        })
-        .eq('id', org.id)
-
-      if (error) throw error
-
-      setOrg((prev: any) => ({
-        ...prev,
-        subscription_plan: planKey,
-        subscription_status: 'active',
-        member_limit: limit,
-      }))
-
-      showToast(`¡Suscripción actualizada al ${planName} exitosamente (${gateway === 'mercadopago' ? 'Mercado Pago' : 'Stripe'})!`)
-    } catch (err) {
-      console.error('Error al actualizar plan:', err)
-      showToast(err instanceof Error ? err.message : 'No se pudo procesar la suscripción.', 'error')
-    } finally {
-      setUpgrading(null)
-    }
+    const subject = encodeURIComponent(`Activar plan ${planName} - ${org.name}`)
+    const body = encodeURIComponent(
+      `Hola, quiero activar el plan ${planName} para ${org.name} (id ${org.id}). Medio de pago preferido: ${
+        gateway === 'mercadopago' ? 'Mercado Pago' : 'Stripe'
+      }.`,
+    )
+    window.location.href = `mailto:juanignaciobelzki20@gmail.com?subject=${subject}&body=${body}`
+    showToast('Te enviamos al correo para coordinar el pago y activar el plan.', 'success')
+    setUpgrading(null)
   }
 
   if (loading) {

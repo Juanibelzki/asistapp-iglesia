@@ -2,6 +2,7 @@ import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useState } from 'react';
 import { supabase } from '../lib/supabase';
 import { AppLogo } from '../components/AppLogo';
+import { loginWithPin } from '../lib/session';
 
 export const Route = createFileRoute('/registerstaff')({
   component: RegisterStaffPage,
@@ -29,7 +30,6 @@ const EMPTY_FORM: StaffForm = {
 // elegir el rol desde el navegador permitía registrarse como administrador.
 const PUBLIC_ROLE = { value: 'staff', label: 'Ujier / Recepción (Escáner de puerta)' };
 
-const USER_SESSION_KEY = 'asistapp_user_session';
 
 function RegisterStaffPage() {
   const navigate = useNavigate();
@@ -42,7 +42,6 @@ function RegisterStaffPage() {
   const [churchQuery, setChurchQuery] = useState('');
   const [churchOpen, setChurchOpen] = useState(false);
   const [form, setForm] = useState<StaffForm>(EMPTY_FORM);
-  const selectedRole = PUBLIC_ROLE.value;
   const [formError, setFormError] = useState('');
 
   useEffect(() => {
@@ -53,10 +52,7 @@ function RegisterStaffPage() {
         const params = new URLSearchParams(window.location.search);
         const orgParam = params.get('org');
 
-        const { data, error } = await supabase
-          .from('organizations')
-          .select('id, name, address')
-          .order('name', { ascending: true });
+        const { data, error } = await supabase.rpc('public_church_list');
 
         if (error) throw error;
         if (!isMounted) return;
@@ -145,71 +141,21 @@ function RegisterStaffPage() {
     setSubmitting(true);
     setFormError('');
     try {
-      const base = {
-        organization_id: selectedChurchId,
-        full_name: form.fullName.trim(),
-        role: selectedRole,
-      };
+      const { error } = await supabase.rpc('register_staff', {
+        p_org: selectedChurchId,
+        p_full_name: form.fullName.trim(),
+        p_phone: cleanPhone,
+        p_pin: cleanPin,
+      });
+      if (error) throw error;
 
-      const attempts: Record<string, string | null>[] = [
-        { ...base, phone: cleanPhone, pin: cleanPin, auth_user_id: crypto.randomUUID() },
-        { ...base, phone: cleanPhone, pin: cleanPin },
-        { ...base, auth_user_id: crypto.randomUUID() },
-        { ...base },
-      ];
-
-      let saved = false;
-      let lastError: Error | null = null;
-
-      for (const payload of attempts) {
-        const { error } = await supabase.from('profiles').insert(payload);
-        if (!error) {
-          saved = true;
-          break;
-        }
-        lastError = error;
-        if (/row-level security/i.test(error.message)) break;
-      }
-
-      if (saved) {
-        localStorage.removeItem('asistapp_staff_cloud_pending');
-      } else {
-        console.warn('Registro en nube pendiente:', lastError?.message);
-        localStorage.setItem('asistapp_staff_cloud_pending', '1');
-      }
-
+      await loginWithPin(cleanPhone, cleanPin);
       localStorage.setItem('asistapp_welcome_msg', `¡Bienvenido al equipo de ${selectedChurch.name}!`);
-
-      const isUsher = selectedRole === 'staff' || selectedRole === 'usher' || selectedRole === 'ujier';
-      if (isUsher) {
-        localStorage.setItem(
-          'asistapp_staff_session',
-          JSON.stringify({
-            organization_id: selectedChurchId,
-            full_name: form.fullName.trim(),
-            role: selectedRole,
-            pin: cleanPin,
-            church_name: selectedChurch.name,
-          }),
-        );
-        navigate({ to: '/asistencia' });
-      } else {
-        localStorage.setItem(
-          USER_SESSION_KEY,
-          JSON.stringify({
-            organization_id: selectedChurchId,
-            role: selectedRole,
-            full_name: form.fullName.trim(),
-            phone: cleanPhone,
-            church_name: selectedChurch.name,
-          }),
-        );
-        navigate({ to: '/dashboard' });
-      }
+      navigate({ to: '/asistencia' });
     } catch (err) {
       console.error('Error al registrar staff:', err);
       const msg = err instanceof Error ? err.message : 'Error al registrarte en el equipo.';
-      setFormError(msg);
+      setFormError(/phone_taken/i.test(msg) ? 'Ese teléfono ya está registrado. Ingresá con tu PIN.' : msg);
     } finally {
       setSubmitting(false);
     }

@@ -1,20 +1,11 @@
-import { createFileRoute, redirect, useNavigate, Link } from '@tanstack/react-router'
-import { supabase } from '../lib/supabase'
-import { useState } from 'react'
+import { createFileRoute, useNavigate, Link } from '@tanstack/react-router'
+import { useEffect, useState } from 'react'
 import { AppLogo } from '../components/AppLogo'
+import { isStaffRole, LoginError, loginWithPin, resolveCurrentProfile } from '../lib/session'
 
 export const Route = createFileRoute('/login')({
   component: Login,
-  beforeLoad: async () => {
-    const { data: { session } } = await supabase.auth.getSession()
-    if (session) {
-      throw redirect({ to: '/dashboard' })
-    }
-  },
 })
-
-const USER_SESSION_KEY = 'asistapp_user_session'
-const STAFF_SESSION_KEY = 'asistapp_staff_session'
 
 function Login() {
   const [errorMsg, setErrorMsg] = useState('')
@@ -22,6 +13,13 @@ function Login() {
   const [phone, setPhone] = useState('')
   const [pin, setPin] = useState('')
   const navigate = useNavigate()
+
+  // Si el dispositivo ya tiene una sesión válida, ir directo a su pantalla.
+  useEffect(() => {
+    resolveCurrentProfile().then((me) => {
+      if (me) navigate({ to: isStaffRole(me.role) ? '/asistencia' : '/dashboard' })
+    })
+  }, [navigate])
 
   const login = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -39,77 +37,15 @@ function Login() {
 
     setSubmitting(true)
     try {
-      const cleanDigits = cleanPhone.replace(/\D/g, '')
-
-      let { data, error } = await supabase
-        .from('profiles')
-        .select('*')
-        .eq('phone', cleanDigits)
-        .eq('pin', cleanPin)
-        .limit(1)
-        .maybeSingle()
-
-      if (error) {
-        console.error('SUPABASE LOGIN ERROR:', error)
-        setErrorMsg(error.message || 'Error al conectar con la base de datos')
-        return
-      }
-
-      if (!data && cleanDigits.length >= 8) {
-        const { data: candidates, error: flexError } = await supabase
-          .from('profiles')
-          .select('*')
-          .eq('pin', cleanPin)
-          .not('phone', 'is', null)
-          .limit(20)
-
-        if (flexError) {
-          console.error('SUPABASE LOGIN ERROR:', flexError)
-          setErrorMsg(flexError.message || 'Error al conectar con la base de datos')
-          return
-        }
-
-        const normalized = (s?: string | null) => (s || '').replace(/\D/g, '')
-        const match = (candidates || []).find((c) => {
-          const stored = normalized(c.phone)
-          if (!stored) return false
-          return (
-            stored === cleanDigits ||
-            stored.endsWith(cleanDigits) ||
-            cleanDigits.endsWith(stored) ||
-            stored.slice(-8) === cleanDigits.slice(-8)
-          )
-        })
-        if (match) data = match
-      }
-
-      if (!data) {
-        console.warn(`Login sin coincidencia: phone="${cleanDigits}" pin="${cleanPin}"`)
-        setErrorMsg('Teléfono o PIN incorrectos.')
-        return
-      }
-
-      localStorage.setItem(USER_SESSION_KEY, JSON.stringify(data))
-
-      const userRole = (data.role || '').toLowerCase()
-      if (userRole === 'staff' || userRole === 'usher' || userRole === 'ujier') {
-        localStorage.setItem(
-          STAFF_SESSION_KEY,
-          JSON.stringify({
-            organization_id: data.organization_id,
-            full_name: data.full_name,
-            role: data.role || 'staff',
-            pin: cleanPin,
-            church_name: '',
-          }),
-        )
-        navigate({ to: '/asistencia' })
-      } else {
-        navigate({ to: '/dashboard' })
-      }
+      const me = await loginWithPin(cleanPhone, cleanPin)
+      navigate({ to: isStaffRole(me.role) ? '/asistencia' : '/dashboard' })
     } catch (err) {
-      console.error('Error al iniciar sesión:', err)
-      setErrorMsg('No se pudo iniciar sesión. Verificá tu conexión e intentá de nuevo.')
+      if (err instanceof LoginError && err.code !== 'network') {
+        setErrorMsg(err.message)
+      } else {
+        console.error('Error al iniciar sesión:', err)
+        setErrorMsg('No se pudo iniciar sesión. Verificá tu conexión e intentá de nuevo.')
+      }
     } finally {
       setSubmitting(false)
     }

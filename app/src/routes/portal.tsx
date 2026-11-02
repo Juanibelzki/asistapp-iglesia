@@ -17,11 +17,8 @@ interface PortalCongregado {
   organization_id: string;
   first_name: string;
   last_name: string;
-  phone?: string;
   is_student: boolean;
   student_stage?: Stage;
-  guardian_name?: string;
-  guardian_phone?: string;
   status?: string;
   qr_code?: string;
 }
@@ -30,6 +27,13 @@ interface PortalEvent {
   id: string;
   title: string;
   event_date: string;
+}
+
+interface PortalPayload {
+  member: PortalCongregado | null;
+  church_name?: string;
+  events?: PortalEvent[];
+  materials?: StudyMaterial[] | null;
 }
 
 interface StudyMaterial {
@@ -72,61 +76,33 @@ function PortalPage() {
   const [materialsError, setMaterialsError] = useState(false);
 
   const [phoneInput, setPhoneInput] = useState('');
+  const [lastNameInput, setLastNameInput] = useState('');
   const [phoneError, setPhoneError] = useState('');
   const [phoneLoading, setPhoneLoading] = useState(false);
 
-  async function loadChurchAndContent(c: PortalCongregado) {
-    try {
-      const { data: org } = await supabase
-        .from('organizations')
-        .select('name')
-        .eq('id', c.organization_id)
-        .maybeSingle();
-      if (org?.name) setChurchName(org.name);
-    } catch {
-      // silencioso: se conserva el nombre por defecto
-    }
-
-    const { data: evts } = await supabase
-      .from('events')
-      .select('*')
-      .eq('organization_id', c.organization_id)
-      .gte('event_date', localToday())
-      .order('event_date', { ascending: true });
-    if (evts) setEvents(evts as PortalEvent[]);
-
-    try {
-      const stage = c.student_stage || 'adulto';
-      const { data: mats, error } = await supabase
-        .from('study_materials')
-        .select('*')
-        .eq('organization_id', c.organization_id)
-        .or(`target_stage.eq.todos,target_stage.eq.${stage}`)
-        .order('created_at', { ascending: false });
-      if (error) {
-        setMaterialsError(true);
-        setMaterials([]);
-      } else if (mats) {
-        setMaterials(mats as StudyMaterial[]);
-      }
-    } catch {
+  // El portal pide todo a una función de la base que devuelve solo los campos que se
+  // muestran (sin teléfonos ni datos del tutor) y valida el código del miembro.
+  function applyPortal(data: PortalPayload | null) {
+    if (!data?.member) return false;
+    setCongregado(data.member);
+    if (data.church_name) setChurchName(data.church_name);
+    setEvents(data.events ?? []);
+    if (data.materials === null) {
       setMaterialsError(true);
       setMaterials([]);
+    } else {
+      setMaterialsError(false);
+      setMaterials(data.materials ?? []);
     }
+    if (data.member.qr_code) localStorage.setItem(LS_KEY, data.member.qr_code);
+    setStatus('identified');
+    return true;
   }
 
   async function identifyByCode(code: string) {
-    const { data, error } = await supabase
-      .from('congregados')
-      .select('*')
-      .eq('qr_code', code)
-      .maybeSingle();
-    if (error || !data) return false;
-    setCongregado(data as PortalCongregado);
-    localStorage.setItem(LS_KEY, code);
-    await loadChurchAndContent(data as PortalCongregado);
-    setStatus('identified');
-    return true;
+    const { data, error } = await supabase.rpc('member_portal', { p_code: code, p_today: localToday() });
+    if (error) return false;
+    return applyPortal(data as PortalPayload | null);
   }
 
   useEffect(() => {
@@ -164,29 +140,32 @@ function PortalPage() {
   const handlePhoneSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     const phone = phoneInput.trim();
-    if (!phone) return;
+    const lastName = lastNameInput.trim();
+    if (!phone || !lastName) {
+      setPhoneError('Completá tu teléfono y tu apellido.');
+      return;
+    }
     setPhoneLoading(true);
     setPhoneError('');
     try {
-      const { data, error } = await supabase
-        .from('congregados')
-        .select('*')
-        .eq('phone', phone)
-        .limit(1);
-      if (error) throw error;
-      if (!data || data.length === 0) {
-        setPhoneError('Número no encontrado. Consulta con el Staff.');
-        return;
+      const { data, error } = await supabase.rpc('member_portal_by_phone', {
+        p_phone: phone,
+        p_last_name: lastName,
+        p_today: localToday(),
+      });
+      if (error) {
+        if (/too_many_attempts/i.test(error.message)) {
+          setPhoneError('Demasiados intentos. Esperá 15 minutos y volvé a probar.');
+          return;
+        }
+        throw error;
       }
-      const found = data[0] as PortalCongregado;
-      const code = found.qr_code || found.id;
-      localStorage.setItem(LS_KEY, code);
-      setCongregado(found);
-      await loadChurchAndContent(found);
-      setStatus('identified');
+      if (!applyPortal(data as PortalPayload | null)) {
+        setPhoneError('No encontramos esos datos. Consultá con el staff.');
+      }
     } catch (err) {
       console.error('Error al buscar por teléfono:', err);
-      setPhoneError(err instanceof Error ? err.message : 'Error al buscar el número. Intenta nuevamente.');
+      setPhoneError('Error al buscar tus datos. Intentá nuevamente.');
     } finally {
       setPhoneLoading(false);
     }
@@ -228,7 +207,7 @@ function PortalPage() {
           <div className="bg-[#141C2B] border border-slate-700/50 rounded-2xl p-6 shadow-2xl shadow-black/40">
             <h1 className="text-xl font-extrabold text-white text-center">Bienvenido a Ecclesiahs</h1>
             <p className="text-xs text-zinc-400 text-center mt-1 mb-6">
-              Ingresá tu número de teléfono registrado para ver tu credencial y tus próximas clases.
+              Ingresá tu teléfono y tu apellido, tal como te inscribiste, para ver tu credencial.
             </p>
 
             <form onSubmit={handlePhoneSubmit} className="space-y-4">
@@ -239,6 +218,14 @@ function PortalPage() {
                 placeholder="Ej: 611223344"
                 className="w-full bg-[#0B0F17] border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/20 transition"
                 autoFocus
+              />
+              <input
+                type="text"
+                value={lastNameInput}
+                onChange={(e) => setLastNameInput(e.target.value)}
+                placeholder="Apellido"
+                autoComplete="family-name"
+                className="w-full bg-[#0B0F17] border border-slate-700 rounded-lg px-3 py-2.5 text-sm text-zinc-100 placeholder-zinc-500 focus:outline-none focus:border-yellow-500/60 focus:ring-1 focus:ring-yellow-500/20 transition"
               />
               <button
                 type="submit"

@@ -3,7 +3,7 @@ import { useEffect, useRef, useState } from 'react';
 import { Html5Qrcode } from 'html5-qrcode';
 import { RefreshCw, CloudOff } from 'lucide-react';
 import { supabase } from '../lib/supabase';
-import { readLocalSession } from '../lib/session';
+import { resolveCurrentProfile } from '../lib/session';
 
 export const Route = createFileRoute('/asistencia')({
   component: AsistenciaPage,
@@ -18,27 +18,7 @@ const QR_READER_ID = 'qr-reader';
 
 const OFFLINE_QUEUE_KEY = 'asistapp_offline_queue';
 const MEMBERS_CACHE_KEY = 'asistapp_members_cache';
-const STAFF_SESSION_KEY = 'asistapp_staff_session';
 const WELCOME_MSG_KEY = 'asistapp_welcome_msg';
-
-interface StaffSession {
-  organization_id: string;
-  full_name: string;
-  role: string;
-  pin: string;
-  church_name?: string;
-}
-
-const readStaffSession = (): StaffSession | null => {
-  try {
-    const raw = localStorage.getItem(STAFF_SESSION_KEY);
-    if (!raw) return null;
-    const parsed = JSON.parse(raw);
-    return parsed?.organization_id ? (parsed as StaffSession) : null;
-  } catch {
-    return null;
-  }
-};
 
 interface MemberEntry {
   id: string;
@@ -156,27 +136,13 @@ function AsistenciaPage() {
 
     async function loadData() {
       try {
-        let orgForLoad: string | null = null;
-
-        const { data: { session } } = await supabase.auth.getSession();
-
-        if (session) {
-          const { data: profile } = await supabase
-            .from('profiles')
-            .select('organization_id')
-            .eq('auth_user_id', session.user.id)
-            .maybeSingle();
-          orgForLoad = profile?.organization_id ?? null;
-        } else {
-          const staff = readStaffSession();
-          const local = readLocalSession();
-          orgForLoad = staff?.organization_id ?? local?.organization_id ?? null;
-          if (orgForLoad) {
-            const welcomeMsg = localStorage.getItem(WELCOME_MSG_KEY);
-            if (welcomeMsg) {
-              localStorage.removeItem(WELCOME_MSG_KEY);
-              if (isMounted) showToast(welcomeMsg);
-            }
+        const me = await resolveCurrentProfile();
+        const orgForLoad = me?.organization_id ?? null;
+        if (orgForLoad) {
+          const welcomeMsg = localStorage.getItem(WELCOME_MSG_KEY);
+          if (welcomeMsg) {
+            localStorage.removeItem(WELCOME_MSG_KEY);
+            if (isMounted) showToast(welcomeMsg);
           }
         }
 
@@ -256,10 +222,9 @@ function AsistenciaPage() {
     const remaining: PendingCheckIn[] = [];
 
     for (const item of queue) {
-      const { error } = await supabase.from('attendance').insert({
-        congregado_id: item.congregado_id,
-        organization_id: item.organization_id,
-        check_in_time: item.check_in_time,
+      const { error } = await supabase.rpc('record_checkin', {
+        p_congregado: item.congregado_id,
+        p_at: item.check_in_time,
       });
 
       if (error) {
@@ -426,9 +391,10 @@ function AsistenciaPage() {
             queueOffline(member);
           } else {
             try {
-              const { error: insertError } = await supabase
-                .from('attendance')
-                .insert(checkIn);
+              const { data: checkinResult, error: insertError } = await supabase.rpc('record_checkin', {
+                p_congregado: checkIn.congregado_id,
+                p_at: checkIn.check_in_time,
+              });
 
               if (insertError) {
                 const isDuplicate =
@@ -441,6 +407,8 @@ function AsistenciaPage() {
                 } else {
                   showToast(insertError.message, 'error');
                 }
+              } else if (checkinResult === 'duplicate') {
+                showToast('Ya registrado previamente', 'info');
               } else {
                 showToast(`¡Presente! ${member.first_name} ${member.last_name}`);
               }

@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from '@tanstack/react-router';
 import { useEffect, useMemo, useState } from 'react';
 import { supabase } from '../lib/supabase';
-import { readLocalSession, clearLocalSessions } from '../lib/session';
+import { isStaffRole, logout, resolveCurrentProfile } from '../lib/session';
 import { exportAttendanceReport } from '../lib/export';
 import { CalendarDays, Users, GraduationCap, Plus, CheckCircle2, Pencil, Trash2, Eraser, ChevronDown, CalendarCheck, LayoutGrid, Link2 } from 'lucide-react';
 
@@ -72,38 +72,20 @@ function DashboardPage() {
 
     async function loadData() {
       try {
-        let profileForLoad: { fullName: string; churchName: string; orgId: string } | null = null;
-        const { data: { session } } = await supabase.auth.getSession();
-        if (!session) {
-          const local = readLocalSession();
-          const localRole = (local?.role || '').toLowerCase();
-          const isDirectiveRole =
-            localRole !== 'staff' && localRole !== 'usher' && localRole !== 'ujier';
-          if (local?.organization_id && isDirectiveRole) {
-            profileForLoad = {
-              fullName: local.full_name || 'Admin',
-              churchName: local.church_name || 'Mi Iglesia',
-              orgId: local.organization_id,
-            };
-          } else {
-            navigate({ to: '/asistencia' });
-            return;
-          }
-        } else {
-          const { data: profileData } = await supabase
-            .from('profiles')
-            .select('full_name, organization_id, organizations(name)')
-            .eq('auth_user_id', session.user.id)
-            .single();
-
-          if (!profileData?.organization_id) return;
-
-          profileForLoad = {
-            fullName: profileData.full_name || 'Admin',
-            churchName: (profileData.organizations as any)?.name || 'Mi Iglesia',
-            orgId: profileData.organization_id,
-          };
+        const me = await resolveCurrentProfile();
+        if (!me?.organization_id) {
+          navigate({ to: '/login' });
+          return;
         }
+        if (isStaffRole(me.role)) {
+          navigate({ to: '/asistencia' });
+          return;
+        }
+        const profileForLoad = {
+          fullName: me.full_name || 'Admin',
+          churchName: me.church_name || 'Mi Iglesia',
+          orgId: me.organization_id,
+        };
 
         if (!profileForLoad) return;
         if (isMounted) setProfile(profileForLoad);
@@ -227,8 +209,7 @@ function DashboardPage() {
   }, [navigate]);
 
   const handleSignOut = async () => {
-    clearLocalSessions();
-    await supabase.auth.signOut();
+    await logout();
     navigate({ to: '/login' });
   };
 
