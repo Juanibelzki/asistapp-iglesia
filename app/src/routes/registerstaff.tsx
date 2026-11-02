@@ -25,11 +25,9 @@ const EMPTY_FORM: StaffForm = {
   pin: '',
 };
 
-const ROLES = [
-  { value: 'staff', label: 'Ujier / Recepción (Escáner de puerta)' },
-  { value: 'leader', label: 'Líder de Ministerio / Maestro (Dashboard y Gestión)' },
-  { value: 'admin', label: 'Pastor / Administrador General (Control Total)' },
-];
+// El alta pública solo crea ujieres. Líderes y admins los agrega un admin existente:
+// elegir el rol desde el navegador permitía registrarse como administrador.
+const PUBLIC_ROLE = { value: 'staff', label: 'Ujier / Recepción (Escáner de puerta)' };
 
 const USER_SESSION_KEY = 'asistapp_user_session';
 
@@ -44,7 +42,7 @@ function RegisterStaffPage() {
   const [churchQuery, setChurchQuery] = useState('');
   const [churchOpen, setChurchOpen] = useState(false);
   const [form, setForm] = useState<StaffForm>(EMPTY_FORM);
-  const [selectedRole, setSelectedRole] = useState('staff');
+  const selectedRole = PUBLIC_ROLE.value;
   const [formError, setFormError] = useState('');
 
   useEffect(() => {
@@ -331,22 +329,12 @@ function RegisterStaffPage() {
 
             <div>
               <label className="block text-xs font-semibold text-zinc-400 mb-2">Función / Rol en el equipo</label>
-              <div className="space-y-2">
-                {ROLES.map((r) => (
-                  <button
-                    key={r.value}
-                    type="button"
-                    onClick={() => setSelectedRole(r.value)}
-                    className={`w-full text-left px-4 py-3 rounded-xl text-sm font-medium transition border ${
-                      selectedRole === r.value
-                        ? 'bg-yellow-500/10 text-yellow-500 border-yellow-500/40'
-                        : 'bg-[#0B0F17] text-zinc-400 border-slate-700 hover:text-zinc-200 hover:border-slate-600'
-                    }`}
-                  >
-                    {r.label}
-                  </button>
-                ))}
+              <div className="w-full text-left px-4 py-3 rounded-xl text-sm font-medium border bg-yellow-500/10 text-yellow-500 border-yellow-500/40">
+                {PUBLIC_ROLE.label}
               </div>
+              <p className="mt-2 text-xs text-zinc-500">
+                Los líderes y administradores los da de alta un administrador de la iglesia.
+              </p>
             </div>
 
             <div>
