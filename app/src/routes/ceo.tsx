@@ -7,7 +7,7 @@ export const Route = createFileRoute('/ceo')({
 });
 
 const CEO_AUTH_KEY = 'asistapp_ceo_auth';
-const CEO_PIN = (import.meta.env.VITE_CEO_PIN as string | undefined) || '20446247205';
+const CEO_PIN = (import.meta.env.VITE_CEO_PIN as string | undefined) || '';
 const PIN_LENGTH = CEO_PIN.length;
 
 interface OrgRow {
@@ -59,7 +59,7 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (pin === CEO_PIN) {
+    if (CEO_PIN && pin === CEO_PIN) {
       sessionStorage.setItem(CEO_AUTH_KEY, '1');
       onUnlock();
     } else {
@@ -75,6 +75,11 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
       </div>
       <h1 className="text-lg font-bold text-white mb-1">Acceso de Super-Administrador</h1>
       <p className="text-sm text-zinc-500 mb-8">Ingresá el PIN Maestro para continuar.</p>
+      {!CEO_PIN && (
+        <p className="text-xs text-red-400 text-center mb-6 max-w-xs">
+          VITE_CEO_PIN no está configurada. Definila en app/.env para habilitar este panel.
+        </p>
+      )}
 
       <form onSubmit={handleSubmit} className="w-full max-w-xs space-y-4">
         <input
@@ -89,7 +94,7 @@ function PinGate({ onUnlock }: { onUnlock: () => void }) {
         {error && <p className="text-xs text-red-400 text-center">{error}</p>}
         <button
           type="submit"
-          disabled={pin.length < PIN_LENGTH}
+          disabled={!CEO_PIN || pin.length < PIN_LENGTH}
           className="w-full py-3 rounded-xl bg-yellow-500 hover:bg-yellow-600 active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed text-slate-950 font-bold text-sm transition-all shadow-lg shadow-yellow-500/20"
         >
           Desbloquear

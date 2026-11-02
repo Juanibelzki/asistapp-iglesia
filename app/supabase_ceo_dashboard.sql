@@ -9,5 +9,5 @@ create policy "Allow plan updates for ceo dashboard" on public.organizations
   using (true)
   with check (true);
 
--- Opcional: variable de entorno VITE_CEO_PIN en app/.env para cambiar el PIN maestro.
--- Por defecto el PIN es "2026".
+-- Obligatorio: definir VITE_CEO_PIN en app/.env con el PIN maestro.
+-- Sin esa variable el panel /ceo queda bloqueado. Nunca guardar el PIN en el código.
