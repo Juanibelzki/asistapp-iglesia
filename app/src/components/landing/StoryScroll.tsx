@@ -1,7 +1,7 @@
 import { useRef, useState } from 'react'
 import { AnimatePresence, motion, useMotionValueEvent, useScroll, useTransform } from 'framer-motion'
 import { Check, Phone, Search, UserPlus } from 'lucide-react'
-import { EASE, FakeQr, Kicker, PhoneFrame } from './primitives'
+import { EASE, FakeQr, Kicker, PhoneFrame, ScanLine } from './primitives'
 
 // Recorrido "de cero a tu primer culto": la sección queda fija mientras se
 // hace scroll y cada paso reemplaza la pantalla del teléfono con un barrido.
@@ -111,7 +111,7 @@ function ScreenScan() {
       <p className="font-chart text-[8px] uppercase tracking-[0.25em] text-white/50">Escáner · Culto general</p>
       <div className="relative mt-8 flex h-40 w-40 items-center justify-center">
         <FakeQr className="h-28 w-28" />
-        <div className="absolute inset-x-2 h-0.5 animate-scanline rounded-full bg-rojo shadow-[0_0_14px_rgba(225,29,46,0.9)]" />
+        <ScanLine className="inset-x-2" />
         {['left-0 top-0 border-l-2 border-t-2 rounded-tl-xl', 'right-0 top-0 border-r-2 border-t-2 rounded-tr-xl', 'bottom-0 left-0 border-b-2 border-l-2 rounded-bl-xl', 'bottom-0 right-0 border-b-2 border-r-2 rounded-br-xl'].map((c) => (
           <span key={c} className={`absolute h-6 w-6 border-white ${c}`} />
         ))}
@@ -178,8 +178,12 @@ export function StoryScroll() {
   const ref = useRef<HTMLElement>(null)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start start', 'end end'] })
   const [step, setStep] = useState(0)
+  const stepRef = useRef(0)
   useMotionValueEvent(scrollYProgress, 'change', (v) => {
-    setStep(Math.min(STEPS.length - 1, Math.max(0, Math.floor(v * STEPS.length))))
+    const next = Math.min(STEPS.length - 1, Math.max(0, Math.floor(v * STEPS.length)))
+    if (next === stepRef.current) return
+    stepRef.current = next
+    setStep(next)
   })
   const railHeight = useTransform(scrollYProgress, [0, 1], ['0%', '100%'])
   const phoneY = useTransform(scrollYProgress, [0, 1], [30, -30])
@@ -206,10 +210,10 @@ export function StoryScroll() {
                 <AnimatePresence mode="wait">
                   <motion.div
                     key={step}
-                    initial={{ opacity: 0, y: 30, filter: 'blur(6px)' }}
-                    animate={{ opacity: 1, y: 0, filter: 'blur(0px)' }}
-                    exit={{ opacity: 0, y: -30, filter: 'blur(6px)' }}
-                    transition={{ duration: 0.55, ease: EASE }}
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    exit={{ opacity: 0, y: -30 }}
+                    transition={{ duration: 0.45, ease: EASE }}
                   >
                     <p className="font-chart text-sm text-rojo">
                       0{step + 1} <span className="text-marino/30">/ 0{STEPS.length}</span>
@@ -252,14 +256,14 @@ export function StoryScroll() {
             </AnimatePresence>
 
             {/* El teléfono se diseña a 260px y se escala con zoom para no romper la UI interna */}
-            <motion.div style={{ y: phoneY }} className="relative w-[260px] [zoom:0.6] sm:[zoom:0.8] lg:[zoom:1]">
+            <motion.div style={{ y: phoneY }} className="relative w-[260px] will-change-transform [zoom:0.6] sm:[zoom:0.8] lg:[zoom:1]">
               <PhoneFrame>
                 <AnimatePresence initial={false}>
                   <motion.div
                     key={step}
                     className="absolute inset-0"
-                    initial={{ clipPath: 'inset(100% 0% 0% 0%)', scale: 1.06 }}
-                    animate={{ clipPath: 'inset(0% 0% 0% 0%)', scale: 1 }}
+                    initial={{ clipPath: 'inset(100% 0% 0% 0%)' }}
+                    animate={{ clipPath: 'inset(0% 0% 0% 0%)' }}
                     exit={{ opacity: 0, transition: { delay: 0.5, duration: 0.2 } }}
                     transition={{ duration: 0.7, ease: EASE }}
                   >

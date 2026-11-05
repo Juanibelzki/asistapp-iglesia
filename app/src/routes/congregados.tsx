@@ -333,7 +333,7 @@ function CongregadosPage() {
     <div className="min-h-screen bg-[#0B0F17] text-zinc-100 flex flex-col font-sans selection:bg-yellow-500 selection:text-slate-950">
 
       {/* NAVBAR */}
-      <header className="sticky top-0 z-30 border-b border-slate-800/80 bg-[#0B0F17]/80 backdrop-blur-md px-6 py-4">
+      <header className="sticky top-0 z-30 border-b border-slate-800/80 bg-[#0B0F17]/95 md:bg-[#0B0F17]/80 md:backdrop-blur-md px-6 py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between">
           <div className="flex items-center gap-6">
             <Link className="flex items-center gap-2.5" to="/dashboard">

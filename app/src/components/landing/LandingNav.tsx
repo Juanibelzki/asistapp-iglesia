@@ -13,7 +13,10 @@ const LINKS = [
 export function LandingNav() {
   const { scrollY, scrollYProgress } = useScroll()
   const [solid, setSolid] = useState(false)
-  useMotionValueEvent(scrollY, 'change', (v) => setSolid(v > 40))
+  useMotionValueEvent(scrollY, 'change', (v) => {
+    const next = v > 40
+    setSolid((prev) => (prev === next ? prev : next))
+  })
 
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-3 pt-3 sm:px-6 sm:pt-4">
@@ -23,9 +26,9 @@ export function LandingNav() {
         aria-hidden="true"
       />
       <nav
-        className={`mx-auto flex max-w-6xl items-center justify-between rounded-full border py-2 pl-3 pr-2 transition-all duration-500 ${
+        className={`mx-auto flex max-w-6xl items-center justify-between rounded-full border py-2 pl-3 pr-2 transition-[background-color,border-color,box-shadow] duration-500 ${
           solid
-            ? 'border-white/10 bg-marino-deep/80 shadow-2xl shadow-black/30 backdrop-blur-xl'
+            ? 'border-white/10 bg-marino-deep/95 shadow-2xl shadow-black/30 md:bg-marino-deep/80 md:backdrop-blur-md'
             : 'border-transparent bg-transparent'
         }`}
       >

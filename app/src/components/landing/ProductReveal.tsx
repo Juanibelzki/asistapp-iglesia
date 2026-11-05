@@ -9,7 +9,7 @@ import {
   TrendingUp,
   Users,
 } from 'lucide-react'
-import { EASE } from './primitives'
+import { EASE, useOnScreen } from './primitives'
 
 // Panel pastoral de ejemplo que "emerge" sobre el hero: arranca inclinado en
 // perspectiva y se aplana a medida que se hace scroll.
@@ -38,17 +38,17 @@ const AREA_PATH = `${LINE_PATH} L${CHART_W},${CHART_H} L0,${CHART_H} Z`
 
 function LiveCheckins() {
   const [items, setItems] = useState(() => [3, 2, 1, 0].map((id) => ({ id })))
+  const [ref, onScreen] = useOnScreen<HTMLUListElement>()
   useEffect(() => {
-    let next = 4
+    if (!onScreen) return
     const t = setInterval(() => {
-      setItems((prev) => [{ id: next }, ...prev].slice(0, 4))
-      next++
+      setItems((prev) => [{ id: prev[0].id + 1 }, ...prev].slice(0, 4))
     }, 1900)
     return () => clearInterval(t)
-  }, [])
+  }, [onScreen])
 
   return (
-    <ul className="space-y-2">
+    <ul ref={ref} className="space-y-2">
       <AnimatePresence initial={false}>
         {items.map(({ id }) => (
           <motion.li
@@ -77,10 +77,12 @@ function LiveCheckins() {
 
 function DashboardWindow() {
   const [present, setPresent] = useState(138)
+  const [ref, onScreen] = useOnScreen<HTMLDivElement>()
   useEffect(() => {
+    if (!onScreen) return
     const t = setInterval(() => setPresent((p) => (p >= 160 ? 138 : p + 1)), 1900)
     return () => clearInterval(t)
-  }, [])
+  }, [onScreen])
 
   const kpis = [
     { label: 'Congregados', value: '248', note: '12 nuevos este mes' },
@@ -90,7 +92,7 @@ function DashboardWindow() {
   ]
 
   return (
-    <div className="overflow-hidden rounded-[22px] bg-white text-marino shadow-[0_60px_120px_-30px_rgba(0,0,0,0.7)] ring-1 ring-white/20">
+    <div ref={ref} className="overflow-hidden rounded-[22px] bg-white text-marino shadow-[0_60px_120px_-30px_rgba(0,0,0,0.7)] ring-1 ring-white/20">
       {/* Barra de ventana */}
       <div className="flex items-center gap-2 bg-[#0d2240] px-4 py-3">
         <span className="h-3 w-3 rounded-full bg-rojo" />
@@ -236,7 +238,7 @@ export function ProductReveal() {
       className="relative z-10 scroll-mt-24 bg-marino-deep px-4 pb-24 sm:px-6 md:-mt-28"
       style={{ perspective: 1600 }}
     >
-      <motion.div style={{ rotateX, scale, y, transformOrigin: '50% 0%' }} className="mx-auto max-w-6xl">
+      <motion.div style={{ rotateX, scale, y, transformOrigin: '50% 0%' }} className="mx-auto max-w-6xl will-change-transform">
         <DashboardWindow />
       </motion.div>
       <p className="mx-auto mt-6 max-w-6xl text-center font-chart text-[10px] uppercase tracking-[0.3em] text-white/40">
