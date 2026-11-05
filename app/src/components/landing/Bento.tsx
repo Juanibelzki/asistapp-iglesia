@@ -1,16 +1,18 @@
 import { useEffect, useState } from 'react'
 import { AnimatePresence, motion } from 'framer-motion'
 import { BadgeCheck, CircleCheck, Download, FileSpreadsheet, RefreshCw, RotateCw, WifiOff } from 'lucide-react'
-import { EASE, FadeUp, FakeQr, Kicker, MaskLines, SpotlightCard } from './primitives'
+import { EASE, FadeUp, FakeQr, Kicker, MaskLines, ScanLine, SpotlightCard, useOnScreen } from './primitives'
 
 function LiveCounter() {
   const [count, setCount] = useState(142)
+  const [ref, onScreen] = useOnScreen<HTMLDivElement>()
   useEffect(() => {
+    if (!onScreen) return
     const t = setInterval(() => setCount((c) => (c >= 168 ? 142 : c + 1)), 2200)
     return () => clearInterval(t)
-  }, [])
+  }, [onScreen])
   return (
-    <div className="text-right">
+    <div ref={ref} className="text-right">
       <div className="relative h-[72px] overflow-hidden sm:h-[88px]">
         <AnimatePresence mode="popLayout" initial={false}>
           <motion.p
@@ -78,17 +80,19 @@ type SyncState = 'offline' | 'syncing' | 'done'
 
 function OfflineSync() {
   const [state, setState] = useState<SyncState>('offline')
+  const [ref, onScreen] = useOnScreen<HTMLDivElement>()
   useEffect(() => {
+    if (!onScreen) return
     const next: Record<SyncState, SyncState> = { offline: 'syncing', syncing: 'done', done: 'offline' }
     const t = setTimeout(() => setState(next[state]), state === 'syncing' ? 1800 : 1600)
     return () => clearTimeout(t)
-  }, [state])
+  }, [state, onScreen])
 
   const label = { offline: 'Sin señal · 24 en cola', syncing: 'Sincronizando…', done: 'Todo sincronizado' }[state]
   const Icon = state === 'offline' ? WifiOff : state === 'syncing' ? RefreshCw : CircleCheck
 
   return (
-    <div className="rounded-2xl border border-marino/10 bg-blanco-mar p-4">
+    <div ref={ref} className="rounded-2xl border border-marino/10 bg-blanco-mar p-4">
       <div className="flex items-center gap-3">
         <span
           className={`flex h-9 w-9 items-center justify-center rounded-xl transition-colors duration-500 ${
@@ -131,12 +135,14 @@ function MetricsBars() {
 
 function ExportFile() {
   const [run, setRun] = useState(0)
+  const [ref, onScreen] = useOnScreen<HTMLDivElement>()
   useEffect(() => {
+    if (!onScreen) return
     const t = setInterval(() => setRun((r) => r + 1), 3600)
     return () => clearInterval(t)
-  }, [])
+  }, [onScreen])
   return (
-    <div className="flex items-center gap-4 rounded-2xl bg-white/10 p-4 backdrop-blur">
+    <div ref={ref} className="flex items-center gap-4 rounded-2xl bg-white/10 p-4">
       <span className="flex h-12 w-10 items-center justify-center rounded-lg bg-white text-rojo">
         <FileSpreadsheet className="h-5 w-5" />
       </span>
@@ -198,7 +204,7 @@ export function Bento() {
                 <div className="mt-auto flex items-end justify-between gap-6 pt-10">
                   <div className="relative flex h-32 w-32 items-center justify-center sm:h-40 sm:w-40">
                     <FakeQr className="h-24 w-24 sm:h-28 sm:w-28" />
-                    <div className="absolute inset-x-1 h-0.5 animate-scanline rounded-full bg-rojo shadow-[0_0_14px_rgba(225,29,46,0.9)]" />
+                    <ScanLine className="inset-x-1" />
                     <span className="absolute inset-0 rounded-2xl border border-dashed border-white/25" />
                   </div>
                   <LiveCounter />

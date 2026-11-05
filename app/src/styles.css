@@ -1,4 +1,3 @@
-@import url("https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap");
 @import "tailwindcss";
 @plugin "@tailwindcss/typography";
 
@@ -201,17 +200,25 @@
   animation: float 6s ease-in-out infinite;
 }
 
+/* Se anima con transform (sin layout): el contenedor ocupa el recorrido y la
+   línea va en su borde superior; translateY(100%) la lleva al final. */
 @keyframes scanline {
   0%,
   100% {
-    top: 10%;
+    transform: translateY(0);
   }
   50% {
-    top: 86%;
+    transform: translateY(100%);
   }
 }
 .animate-scanline {
   animation: scanline 2.2s ease-in-out infinite;
+  will-change: transform;
+}
+@media (prefers-reduced-motion: reduce) {
+  .animate-scanline {
+    animation: none;
+  }
 }
 
 @keyframes floatSlow {

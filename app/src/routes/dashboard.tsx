@@ -519,7 +519,7 @@ function DashboardPage() {
 
   return (
     <div className="min-h-screen bg-[#0B0F17] text-zinc-100 w-full max-w-full overflow-x-hidden box-border flex flex-col">
-      <header className="sticky top-0 z-40 backdrop-blur-md bg-[#0B0F17]/80 border-b border-slate-800/80 px-4 py-3 sm:px-6 sm:py-4">
+      <header className="sticky top-0 z-40 bg-[#0B0F17]/95 md:bg-[#0B0F17]/80 md:backdrop-blur-md border-b border-slate-800/80 px-4 py-3 sm:px-6 sm:py-4">
         <div className="max-w-7xl mx-auto flex items-center justify-between gap-3">
           <div className="flex items-center gap-3 min-w-0">
             <div className="w-9 h-9 rounded-xl bg-yellow-500 flex items-center justify-center text-slate-950 font-black text-lg shadow-lg shadow-yellow-500/20 shrink-0">

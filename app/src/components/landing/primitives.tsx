@@ -1,7 +1,16 @@
 import { useRef, type ReactNode, type PointerEvent as ReactPointerEvent } from 'react'
-import { motion, useReducedMotion, useSpring } from 'framer-motion'
+import { motion, useInView, useReducedMotion, useSpring } from 'framer-motion'
 
 export const EASE = [0.16, 1, 0.3, 1] as const
+
+// Devuelve un ref y si ese elemento está (casi) en pantalla. Se usa para que
+// los timers de las demos animadas no sigan corriendo y re-renderizando
+// cuando la sección no se ve.
+export function useOnScreen<T extends Element>() {
+  const ref = useRef<T>(null)
+  const onScreen = useInView(ref, { margin: '120px 0px' })
+  return [ref, onScreen] as const
+}
 
 // Atrae levemente su contenido hacia el cursor (efecto magnético).
 export function Magnetic({ children, strength = 0.3 }: { children: ReactNode; strength?: number }) {
@@ -153,6 +162,16 @@ export function PhoneFrame({ children, className = '' }: { children: ReactNode; 
     >
       <div className="absolute left-1/2 top-[15px] z-30 h-[16px] w-[32%] -translate-x-1/2 rounded-full bg-black" />
       <div className="relative aspect-[9/19.5] overflow-hidden rounded-[2.05rem] bg-white">{children}</div>
+    </div>
+  )
+}
+
+// Línea de escaneo que recorre el QR. Se anima con transform (compositor) en
+// lugar de `top`, que forzaba layout en cada cuadro.
+export function ScanLine({ className = '' }: { className?: string }) {
+  return (
+    <div aria-hidden="true" className={`pointer-events-none absolute bottom-[14%] top-[10%] animate-scanline ${className}`}>
+      <div className="h-0.5 rounded-full bg-rojo shadow-[0_0_14px_rgba(225,29,46,0.9)]" />
     </div>
   )
 }

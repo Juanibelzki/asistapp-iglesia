@@ -32,6 +32,14 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <meta name="theme-color" content="#0b0f17" />
         <title>Ecclesiahs — Plataforma de Gestión y Asistencia Eclesial</title>
         <meta name="apple-mobile-web-app-title" content="Ecclesiahs" />
+        {/* Fuentes: <link> en el head (antes era @import dentro del CSS, que
+            bloqueaba el render en cadena: CSS → CSS de Google → fuentes). */}
+        <link rel="preconnect" href="https://fonts.googleapis.com" />
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
+        <link
+          rel="stylesheet"
+          href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300..700;1,9..144,300..700&family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap"
+        />
         <meta name="application-name" content="Ecclesiahs" />
         <HeadContent />
       </head>

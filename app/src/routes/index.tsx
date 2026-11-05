@@ -1,4 +1,5 @@
 import { createFileRoute } from '@tanstack/react-router'
+import { MotionConfig } from 'framer-motion'
 import { CursorFollower } from '../components/landing/CursorFollower'
 import { LandingNav } from '../components/landing/LandingNav'
 import { Hero } from '../components/landing/Hero'
@@ -17,7 +18,10 @@ export const Route = createFileRoute('/')({
 })
 
 function LandingPage() {
+  // reducedMotion="user": respeta "reducir movimiento" del sistema en todas
+  // las animaciones de framer-motion de la landing.
   return (
+    <MotionConfig reducedMotion="user">
     <div className="min-h-screen overflow-x-clip bg-marino-deep font-sans text-white selection:bg-rojo selection:text-white">
       <CursorFollower />
       <LandingNav />
@@ -34,5 +38,6 @@ function LandingPage() {
       </main>
       <LandingFooter />
     </div>
+    </MotionConfig>
   )
 }
